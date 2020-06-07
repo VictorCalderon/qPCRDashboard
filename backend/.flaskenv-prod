@@ -1,0 +1,8 @@
+FLASK_ENV=production
+FLASK_APP=corona.app:create_app
+SECRET_KEY=c944cd8ea7275e557c3c42
+
+POSTGRES_USER=coronadb
+POSTGRES_PASSWORD=coronadb
+POSTGRES_URL=db:5432
+POSTGRES_DB=coronadb
