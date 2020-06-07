@@ -1,3 +1,4 @@
 backend/flaskenv-prod
 backend/docker-compose.yml
 backend/migrations/*
+backend/postgres-data
