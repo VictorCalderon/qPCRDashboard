@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 __version__ = "0.1"
 
 setup(
-    name="corona",
+    name="qpcr-manager",
     version=__version__,
     packages=find_packages(exclude=["tests"]),
     install_requires=[
@@ -18,10 +18,14 @@ setup(
         "passlib",
         "apispec[yaml]",
         "apispec-webframeworks",
+        "pandas",
+        "psycopg2-binary",
+        "gunicorn",
+        "scikit-learn"
     ],
     entry_points={
         "console_scripts": [
-            "corona = corona.manage:cli"
+            "qpcr-manager = qpcr_manager.manage:cli"
         ]
     },
 )
