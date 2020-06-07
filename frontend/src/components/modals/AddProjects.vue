@@ -187,8 +187,8 @@ export default {
       format: "QuantStudio",
       options: [
         { value: null, text: "Choose a format" },
-        { value: "ABI7500", text: "Applied Biosystems (7500)" },
-        { value: "QuantStudio", text: "Applied Biosystems (DS2)" },
+        { value: "7500", text: "Applied Biosystems (7500)" },
+        { value: "DA2", text: "Applied Biosystems (DS2)" },
         { value: "default", text: "qPCR Dashboard" }
       ]
     };
