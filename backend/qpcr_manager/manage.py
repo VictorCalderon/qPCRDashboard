@@ -46,7 +46,7 @@ def init():
         db.create_all()
         click.echo('[INFO] Tables created...')
 
-    except ValueError:
+    except:
         raise '[ERROR] Could not add project'
 
 
