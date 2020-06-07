@@ -2,14 +2,14 @@ version: "3"
 
 services:
   web:
-    image: corona
-    container_name: covid-backend
+    image: qpcr
+    container_name: qpcr-backend
     build: .
-    command: gunicorn -b 0.0.0.0:5000 corona.wsgi:app
+    command: gunicorn -b 0.0.0.0:5000 qpcr_manager.wsgi:app
     env_file:
       - ./.flaskenv-prod
     volumes:
-      - ./corona:/code/corona
+      - ./qpcr_manager:/code/qpcr_manager
       - ./migrations:/code/migrations
 
     ports:
@@ -20,17 +20,17 @@ services:
   db:
     image: postgres
     restart: always
-    container_name: covid-database
+    container_name: qpcr-database
     environment:
-      POSTGRES_USER: coronadb
-      POSTGRES_PASSWORD: coronadb
-      POSTGRES_DB: coronadb
+      POSTGRES_USER: qpcrdash
+      POSTGRES_PASSWORD: qpcrpass 
+      POSTGRES_DB: qpcrdb
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
   adminer:
     image: adminer
-    container_name: database-manager
+    container_name: qpcrdb-manager
     restart: always
     ports:
       - 8001:8080

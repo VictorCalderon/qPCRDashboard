@@ -11,8 +11,8 @@ RUN pip install -r requirements.txt
 RUN pip install -e .
 
 # Copy directories
-COPY corona corona/
-COPY projects projects/
+COPY qpcr_manager qpcr_manager/
+COPY temp temp/
 
 # Expose port
 EXPOSE 5000

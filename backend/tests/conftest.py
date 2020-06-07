@@ -1,9 +1,9 @@
 import json
 import pytest
 
-from corona.models import User
-from corona.app import create_app
-from corona.extensions import db as _db
+from qpcr_manager.models import User
+from qpcr_manager.app import create_app
+from qpcr_manager.extensions import db as _db
 
 
 @pytest.fixture
