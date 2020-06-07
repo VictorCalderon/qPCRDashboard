@@ -1,8 +1,8 @@
-# .PHONY: init init-migration build run db-migrate test tox
+# .PHONY: init init-migration build run db-migrate
 
 init:  build run
-	docker-compose exec web corona db upgrade
-	docker-compose exec web corona init
+	docker-compose exec web qpcr-manager db upgrade
+	docker-compose exec web qpcr-manager init
 	@echo "Init done, containers running"
 
 build:
@@ -12,7 +12,7 @@ run:
 	docker-compose up -d
 
 db-migrate:
-	docker-compose exec covid-backend corona db migrate
+	docker-compose exec qpcr-backend qpcr-manager db migrate
 
 db-upgrade:
-	docker-compose exec covid-backend corona db upgrade
+	docker-compose exec qpcr-backend qpcr-manager db upgrade
