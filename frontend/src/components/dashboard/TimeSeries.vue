@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container v-if="markersExists">
     <b-row align-h="center" class="mt-5 mb-1">
       <h1 class="font-weight-light">Detected Ratio</h1>
       {{ palette }}
@@ -13,6 +13,18 @@
       <LineChart :width="1300" :height="400" :chartData="chartData" :options="chartConfig"></LineChart>
     </b-row>
   </b-container>
+  <b-container v-else>
+    <b-row align-h="center">
+      <b-card class="text-center mt-5 rounded">
+        <div
+          class="rounded py-2"
+        >You don't have any experiments. Add a new experiment and start analyzing your data.</div>
+        <b-row align-h="center" class="mt-3">
+          <b-button variant="info" v-b-modal.add-experiments-modal>Add Experiment</b-button>
+        </b-row>
+      </b-card>
+    </b-row>
+  </b-container>
 </template>
 
 <script>
@@ -24,6 +36,7 @@ export default {
   data() {
     return {
       marker: null,
+      markersExists: null,
       options: [{ value: null, text: "Choose a marker" }],
       chartData: {},
       chartConfig: {
@@ -79,7 +92,10 @@ export default {
 
     async getMarkers() {
       await axios.get("api/v1/markers").then(res => {
-         this.options = [ ...this.options, ...res.data.markers ]
+        if (res.data.markers.value) {
+          this.markersExists = true;
+          this.options = [...this.options, ...res.data.markers];
+        }
       });
     },
 
@@ -95,7 +111,7 @@ export default {
                 return p + 5;
               }),
               fill: false,
-              borderColor: '#87CEEB',
+              borderColor: "#87CEEB",
               pointHoverRadius: 20
             }
           ]
@@ -127,7 +143,7 @@ export default {
   },
 
   mounted() {
-    this.getMarkers()
+    this.getMarkers();
   },
 
   watch: {
