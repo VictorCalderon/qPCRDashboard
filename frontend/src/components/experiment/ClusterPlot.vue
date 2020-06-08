@@ -3,7 +3,7 @@
     <div class="amp-details">
       <div class="amp-details-body">
         <span class="amp-details-keys">&nbsp;Sample Clusterization:&nbsp;</span>
-        <span class="amp-details-values">&nbsp;{{ currentProject.name }}&nbsp;</span>&nbsp;
+        <span class="amp-details-values">&nbsp;{{ currentExperiment.name }}&nbsp;</span>&nbsp;
       </div>
     </div>
     <div class="chart-body">
@@ -20,22 +20,23 @@ export default {
     ScatterChart
   },
 
+  // [SUGGESTION] (Clusterplot.vue) xAxis and yAxis MUST be dynamic on mount
   data() {
     return {
       datacollection: {},
       options: {},
       currentSampleID: null,
-      xAxis: "ORF1ab",
-      yAxis: "RNase P"
+      xAxis: 'SARS-CoV-2 Gene',
+      yAxis: 'Internal Control'
     };
   },
 
   watch: {
-    currentProject() {
+    currentExperiment() {
       this.fillChart();
     },
 
-    currentProjectResults() {
+    currentExperimentResults() {
       this.fillChart();
     },
 
@@ -49,31 +50,40 @@ export default {
   },
 
   computed: {
-    currentProject() {
-      return this.$store.getters.currentProject;
+    currentExperiment() {
+      return this.$store.getters.currentExperiment;
     },
 
     currentSamples() {
       return this.$store.getters.currentSamples;
     },
 
-    currentProjectResults() {
-      return this.$store.getters.currentProjectResults;
+    currentExperimentResults() {
+      return this.$store.getters.currentExperimentResults;
     },
 
     labels() {
-      if (this.currentProjectResults) {
-        return this.currentProjectResults.samples;
+      if (this.currentExperimentResults) {
+        return this.currentExperimentResults.samples;
       } else return [];
     },
 
+    currentMarkers() {
+      if (this.currentExperimentResults) {
+        return this.currentExperimentResults.statistics.map((p) => {
+          return p.marker
+        })
+      }
+      else return []
+    },
+
     currentAxes() {
-      if (this.currentProjectResults) {
+      if (this.currentExperimentResults) {
         return [
-          ...this.currentProjectResults.data[this.xAxis].map((x, i) => {
+          ...this.currentExperimentResults.data[this.xAxis].map((x, i) => {
             return {
               x: x,
-              y: this.currentProjectResults.data[this.yAxis][i]
+              y: this.currentExperimentResults.data[this.yAxis][i]
             };
           })
         ];
@@ -125,7 +135,7 @@ export default {
           }
         },
         scales: {
-          yAxes: [
+          xAxes: [
             {
               scaleLabel: {
                 display: true,
@@ -133,7 +143,7 @@ export default {
               }
             }
           ],
-          xAxes: [
+          yAxes: [
             {
               scaleLabel: {
                 display: true,
