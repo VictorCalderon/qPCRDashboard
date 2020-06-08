@@ -45,6 +45,7 @@ class UserResource(Resource):
 
         return {"msg": "user deleted"}
 
+
 class UserList(Resource):
     """Creation and get_all
     """
@@ -172,13 +173,14 @@ class ImportExperiment(Resource):
         # Experiment name and experiment Date
         name = request.form.get('experiment_name', None)
         date = request.form.get('experiment_date', None)
+        method = request.form.get('experiment_method', None)
         fmt = request.form.get('experiment_format', None)
 
         if (name is None) or (date is None) or (file is None) or (fmt is None):
             return {'msg': 'Experiment is missing information'}, 400
 
         # Experiment instantiation
-        current_experiment = Experiment(name=name, experiment_date=date, user=current_user)
+        current_experiment = Experiment(name=name, experiment_date=date, user=current_user, method=method)
 
         try:
             if fmt == 'DA2':
@@ -303,6 +305,7 @@ class AmplificationTimeSeriesResource(Resource):
         """Query for such data
         """
         return amped_timeseries(marker_id, current_user)
+
 
 class SampleSchema(ma.SQLAlchemyAutoSchema):
 
