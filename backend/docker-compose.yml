@@ -18,18 +18,18 @@ services:
       - "db"
 
   db:
-    image: postgres
+    image: postgres:12.3
     restart: always
     container_name: qpcr-database
     environment:
       POSTGRES_USER: qpcrdash
-      POSTGRES_PASSWORD: qpcrpass 
+      POSTGRES_PASSWORD: qpcrpass
       POSTGRES_DB: qpcrdb
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
   adminer:
-    image: adminer
+    image: adminer:4.7.7
     container_name: qpcrdb-manager
     restart: always
     ports:
