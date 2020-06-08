@@ -1,6 +1,6 @@
 # .PHONY: init build run init-migration db-migrate db-upgrade
 
-init:  build run db-init db-migrate db-upgrade add-user
+init:  build run db-check db-init db-migrate db-upgrade add-user
 	@echo "Init done, containers running"
 
 build:
@@ -8,6 +8,9 @@ build:
 
 run:
 	docker-compose up -d
+
+db-check:
+	docker-compose exec web ./entrypoint.sh
 
 db-init:
 	docker-compose exec web qpcr-manager db init
