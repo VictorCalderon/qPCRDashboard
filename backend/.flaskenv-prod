@@ -2,6 +2,7 @@ FLASK_ENV=production
 FLASK_APP=corona.app:create_app
 SECRET_KEY=c809s221s7187mikasa
 
+DATABASE=postgres
 POSTGRES_USER=qpcrdash
 POSTGRES_PASSWORD=qpcrpass
 POSTGRES_URL=db:5432
