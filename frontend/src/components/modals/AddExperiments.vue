@@ -19,17 +19,49 @@
             id="fieldset-1"
             :description="invalidExperimentName"
             label="Enter your experiment's name"
-            label-for="input-1"
+            label-for="input-experimentname"
             class="text-center"
           >
             <b-form-input
-              id="input-1"
+              id="input-experimentname"
               v-model="name"
               :state="state"
               trim
               placeholder="SARS-CoV-2 Run 1"
               class="text-center"
             ></b-form-input>
+            <b-tooltip
+              target="input-experimentname"
+              triggers="hover"
+              placement="right"
+              variant="info"
+            >{{ nameDescription }}</b-tooltip>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-form-group
+            id="fieldset-1"
+            description="Brief methodology description of your experiment."
+            label="Enter your experiment's methodology"
+            label-for="input-experientmethod"
+            class="text-center"
+          >
+            <b-form-input
+              id="input-experientmethod"
+              v-model="method"
+              :state="state"
+              trim
+              placeholder="extraction-primerprobe-cycling"
+              class="text-center"
+            ></b-form-input>
+            <b-tooltip
+              target="input-experientmethod"
+              triggers="hover"
+              placement="right"
+              variant="info"
+            >{{ methodDescription }}</b-tooltip>
           </b-form-group>
         </b-col>
       </b-row>
@@ -122,6 +154,7 @@ export default {
       this.name = "";
       this.file = null;
       this.showAlert = false;
+      this.method = "";
     },
 
     async uploadExperiment() {
@@ -167,7 +200,7 @@ export default {
       } else if (this.name.length > 0) {
         return "Enter at least 5 characters";
       } else if (this.name == "") {
-        return "Please enter the experiment name";
+        return "Please enter the experiment name.";
       } else {
         return "This is how your experiment will be saved and queried.";
       }
@@ -182,6 +215,10 @@ export default {
     return {
       showAlert: false,
       name: "",
+      nameDescription:
+        "Should contain enough information to be distinguishable from other experiments",
+      methodDescription:
+        "e.g. extraction method, primers and probes used and thermocycler configuration.",
       file: null,
       date: null,
       format: "DA2",
