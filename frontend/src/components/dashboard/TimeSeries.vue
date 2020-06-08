@@ -2,6 +2,7 @@
   <b-container>
     <b-row align-h="center" class="mt-5 mb-1">
       <h1 class="font-weight-light">Detected Ratio</h1>
+      {{ palette }}
     </b-row>
     <b-row align-h="center" py-0>
       <b-col cols="3">
@@ -9,32 +10,21 @@
       </b-col>
     </b-row>
     <b-row class="m-5" align-h="center" v-if="marker">
-      <LineChart :width="1300" :height="500" :chartData="chartData" :options="chartConfig"></LineChart>
+      <LineChart :width="1300" :height="400" :chartData="chartData" :options="chartConfig"></LineChart>
     </b-row>
   </b-container>
 </template>
 
 <script>
 import LineChart from "@/components/charts/LineChart.js";
-import Axios from "axios";
+// import palette from "@/components/dashboard/colors.js";
+import axios from "axios";
 
 export default {
   data() {
     return {
       marker: null,
       options: [{ value: null, text: "Choose a marker" }],
-      palette: [
-        "#cc532f",
-        "#45b2c4",
-        "#d74164",
-        "#57a95b",
-        "#b05cc6",
-        "#999a3e",
-        "#7179cb",
-        "#cc8b43",
-        "#c46098",
-        "#b9675d"
-      ],
       chartData: {},
       chartConfig: {
         scales: {
@@ -81,15 +71,15 @@ export default {
   methods: {
     async getDashboardData() {
       if (this.marker) {
-        await Axios.get(`api/v1/dashboard/${this.marker}`).then(res => {
+        await axios.get(`api/v1/timeseries/${this.marker}`).then(res => {
           this.data = res.data;
         });
       } else this.data = null;
     },
 
     async getMarkers() {
-      await Axios.get("api/v1/markers").then(res => {
-        this.options = [...this.options, ...res.data.markers];
+      await axios.get("api/v1/markers").then(res => {
+         this.options = [ ...this.options, ...res.data.markers ]
       });
     },
 
@@ -101,23 +91,13 @@ export default {
             {
               label: "Percentage of Amplification",
               data: this.data["Amp Fraction"],
-              pointRadius: this.data["Total Projects"].map(p => {
+              pointRadius: this.data["Total Experiments"].map(p => {
                 return p + 5;
               }),
               fill: false,
-              borderColor: this.palette,
-              // pointRadius: 5,
+              borderColor: '#87CEEB',
               pointHoverRadius: 20
             }
-            // {
-            //   label: "Number of Projects",
-            //   data: this.data["Total Projects"],
-            //   pointRadius: this.data["Total Projects"],
-            //   fill: false,
-            //   borderColor: this.palette,
-            //   // pointRadius: 5,
-            //   pointHoverRadius: 8
-            // }
           ]
         };
       }
@@ -147,7 +127,7 @@ export default {
   },
 
   mounted() {
-    this.getMarkers();
+    this.getMarkers()
   },
 
   watch: {
