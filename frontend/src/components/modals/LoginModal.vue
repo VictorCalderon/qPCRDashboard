@@ -2,7 +2,7 @@
   <div class="wrapper">
     <div id="login" v-if="!signup">
       <div class="form-header" :class="[badLogin ? 'bad-login' : '']">
-        <h4 v-if="!badLogin">Corona-Board Login</h4>
+        <h4 v-if="!badLogin">qPCR Dashboard</h4>
         <h4 v-if="badLogin">Invalid Credentials</h4>
       </div>
       <form class="form-credentials" @submit.prevent="submitLogin">
