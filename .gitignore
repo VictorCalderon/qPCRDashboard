@@ -2,4 +2,5 @@ backend/flaskenv-prod
 backend/docker-compose.yml
 backend/migrations/*
 backend/postgres-data
-*env*
+data/env*
+data/demo/*
