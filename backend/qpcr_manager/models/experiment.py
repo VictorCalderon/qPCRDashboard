@@ -11,6 +11,7 @@ class Experiment(db.Model):
     name = db.Column(db.String, nullable=False)
     experiment_date = db.Column(db.Date, nullable=False)
     observations = db.Column(db.Text)
+    methodology = db.Column(db.Text)
     analyzed = db.Column(db.Boolean, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
