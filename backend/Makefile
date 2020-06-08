@@ -1,9 +1,6 @@
-# .PHONY: init init-migration build run db-migrate
+# .PHONY: init build run init-migration db-migrate db-upgrade
 
-init:  build run
-	docker-compose exec web qpcr-manager db init
-	docker-compose exec web qpcr-manager db upgrade
-	docker-compose exec web qpcr-manager init
+init:  build run db-init db-migrate db-upgrade add-user
 	@echo "Init done, containers running"
 
 build:
@@ -12,8 +9,17 @@ build:
 run:
 	docker-compose up -d
 
+db-init:
+	docker-compose exec web qpcr-manager db init
+
+db-create:
+	docker-compose exec web qpcr-manager init
+
 db-migrate:
-	docker-compose exec qpcr-backend qpcr-manager db migrate
+	docker-compose exec web qpcr-manager db migrate
 
 db-upgrade:
-	docker-compose exec qpcr-backend qpcr-manager db upgrade
+	docker-compose exec web qpcr-manager db upgrade
+
+add-user:
+	docker-compose exec web qpcr-manager add-user
