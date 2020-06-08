@@ -14,7 +14,7 @@
     </div>
     <div v-else>
       <div>
-        <h1 class="no-sample" v-if="!currentProject">Select a project</h1>
+        <h1 class="no-sample" v-if="!currentExperiment">Select an experiment</h1>
         <h1 class="no-sample" v-else>Select a sample</h1>
       </div>
     </div>
@@ -46,29 +46,29 @@ export default {
       return this.$store.getters.currentSample;
     },
 
-    currentProject() {
-      return this.$store.getters.currentProject;
+    currentExperiment() {
+      return this.$store.getters.currentExperiment;
     },
 
-    qPCRData() {
-      return this.$store.getters.currentSampleqPCRs;
+    fluorescenceData() {
+      return this.$store.getters.currentSampleFluorescences;
     },
 
-    projectqPCRs() {
-      return this.$store.getters.projectqPCRs;
+    experimentFluorescences() {
+      return this.$store.getters.experimentFluorescences;
     }
   },
   watch: {
-    qPCRData() {
-      if (Object.keys(this.qPCRData).length) {
+    fluorescenceData() {
+      if (Object.keys(this.fluorescenceData).length) {
         this.fillData();
-        this.well = this.qPCRData[0].well;
+        this.well = this.fluorescenceData[0].well;
       }
     },
-    currentProject() {
-      if (Object.keys(this.qPCRData).length) {
+    currentExperiment() {
+      if (Object.keys(this.fluorescenceData).length) {
         this.fillData();
-        this.well = this.qPCRData[0].well;
+        this.well = this.fluorescenceData[0].well;
       }
     }
   },
@@ -77,7 +77,7 @@ export default {
       this.datacollection = {
         labels: [...Array(40).keys()].map(i => i + 1),
         datasets: [
-          ...this.qPCRData.map((amp, index) => {
+          ...this.fluorescenceData.map((amp, index) => {
             return {
               label: amp.marker,
               data: amp.amp,
