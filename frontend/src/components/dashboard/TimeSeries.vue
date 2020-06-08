@@ -2,7 +2,6 @@
   <b-container v-if="markersExists">
     <b-row align-h="center" class="mt-5 mb-1">
       <h1 class="font-weight-light">Detected Ratio</h1>
-      {{ palette }}
     </b-row>
     <b-row align-h="center" py-0>
       <b-col cols="3">
@@ -92,7 +91,7 @@ export default {
 
     async getMarkers() {
       await axios.get("api/v1/markers").then(res => {
-        if (res.data.markers.value) {
+        if (res.data.markers) {
           this.markersExists = true;
           this.options = [...this.options, ...res.data.markers];
         }
