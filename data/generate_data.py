@@ -50,13 +50,15 @@ def sigmoid(height, cq):
     """Regular sigmoid func
     """
     # Set params
-    a, k, x_0, c = [np.random.normal(loc=x, scale=x/5) for x in [height,  0.43462793, cq - 3,  0.14694006]]
+    a, k, x_0, c = [np.random.normal(loc=x, scale=x/5)
+                    for x in [height,  0.43462793, cq - 3,  0.14694006]]
 
     # Calculate z
     z = np.e ** (-k * (np.arange(40) - x_0))
 
     # Return sigmoid array
     return a / (1 + z) + c
+
 
 def baseline():
     return [np.random.normal(loc=0.25, scale=0.001) for _ in range(40)]
@@ -71,11 +73,12 @@ def rn(amp):
 
         if amped[2 * i + 1]:
             rns.extend(sigmoid(2.1, results['Cq'][2 * i + 1]))
-        
+
         else:
             rns.extend(baseline())
-    
+
     return rns
+
 
 # Symetrical infected proportion config
 std = 10
@@ -96,36 +99,34 @@ for i, x in enumerate(xs):
     # Populate dataframes
     results['Well Position'] = gen_wells()
     results['Sample'] = gen_samples()
-    results['Target'] = flat([[f'Internal Control', f'SARS-CoV-2 Gene'] for n in range(1, 97)])
-    results['Amp Status'] = flat([[f'Amp', f'{random_amp(p=x/100)}'] for n in range(1, 97)])
+    results['Target'] = flat(
+        [[f'Internal Control', f'SARS-CoV-2 Gene'] for n in range(1, 97)])
+    results['Amp Status'] = flat(
+        [[f'Amp', f'{random_amp(p=x/100)}'] for n in range(1, 97)])
     results['Amp Score'] = results['Amp Status'].apply(lambda x: amp_score(x))
     results['Cq'] = results['Amp Status'].apply(lambda x: cq(x))
-    results['Cq Confidence'] = results['Amp Status'].apply(lambda x: cq_conf(x))
+    results['Cq Confidence'] = results['Amp Status'].apply(
+        lambda x: cq_conf(x))
 
     # Populate dataframess
     amp['Well Position'] = gen_wells(rep=80)
     amp['Sample'] = gen_samples(rep=80)
     amp['Cycle Number'] = flat([*range(1, 41)] * 96*2)
-    amp['Target'] = flat([[f'Internal Control'] * 40 + [f'SARS-CoV-2 Gene'] * 40 for _ in range(1, 97)])
+    amp['Target'] = flat([[f'Internal Control'] * 40 +
+                          [f'SARS-CoV-2 Gene'] * 40 for _ in range(1, 97)])
     amp['Rn'] = rn(amp)
     amp['dRn'] = [0] * len(amp)
 
-    # Make dir
-    try:
-        makedirs('demo')
-    except:
-        continue
-
     # Filenames
-    r = f'demo/Demo Run {i + 1}_Results Numbers.csv'
-    a = f'demo/Demo Run{i + 1}_Amplification Data Numbers.csv'
+    r = f'demo/Demo-Run-{i + 1}_Results Numbers.csv'
+    a = f'demo/Demo-Run-{i + 1}_Amplification Data Numbers.csv'
 
     # Save files
     results.to_csv(r, index=False)
     amp.to_csv(a, index=False)
 
     # Generate ZipFile
-    zipObj = ZipFile(f'data/Demo Run {i + 1}.zip', 'w')
+    zipObj = ZipFile(f'demo/Demo-Run-{i + 1}.zip', 'w')
     zipObj.write(r, path.basename(r))
     zipObj.write(a, path.basename(a))
 
