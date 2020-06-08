@@ -27,7 +27,7 @@ api.add_resource(ExperimentSamplesList, "/experiments/<int:experiment_id>/sample
 # Single and multiple records queries for qpcrs
 api.add_resource(SampleList, "/samples")
 api.add_resource(SampleResource, "/samples/<int:sample_id>")
-api.add_resource(SampleFluorescenceResource, "/samples/<int:sample_id>/fluorescence")
+api.add_resource(SampleFluorescenceResource, "/samples/<int:sample_id>/fluorescences")
 
 # Import/Export functionality for experiments
 api.add_resource(ImportExperiment, '/experiments/import')
