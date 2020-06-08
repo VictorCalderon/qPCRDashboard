@@ -363,15 +363,15 @@ class SampleList(Resource):
 
 
 class ExperimentSamplesList(Resource):
-    """Get all samples from a certain project
+    """Get all samples from a certain experiment
     """
 
     method_decorators = [jwt_required]
 
-    def get(self, project_id):
+    def get(self, experiment_id):
         schema = SampleSchema(many=True)
         samples = Sample.query.filter_by(
-            project_id=project_id).order_by('id')
+            experiment_id=experiment_id).order_by('id')
         return {'samples': schema.dump(samples)}
 
 
