@@ -3,10 +3,10 @@
     <modal-ChangeSettings v-if="changeSettingsModal"></modal-ChangeSettings>
     <modal-Login v-if="!accessToken"></modal-Login>
     <div v-else>
-      <modal-SearchProjects></modal-SearchProjects>
-      <modal-AddProjects></modal-AddProjects>
-      <modal-EditProject></modal-EditProject>
-      <modal-ExportProject></modal-ExportProject>
+      <modal-SearchExperiments></modal-SearchExperiments>
+      <modal-AddExperiments></modal-AddExperiments>
+      <modal-EditExperiment></modal-EditExperiment>
+      <modal-ExportExperiment></modal-ExportExperiment>
       <Menu></Menu>
       <b-row class="mx-0">
         <b-col>
@@ -21,10 +21,10 @@
 
 <script>
 import Menu from "@/components/navigation/Menu";
-import AddProject from "@/components/modals/AddProjects";
-import SearchProjects from "@/components/modals/SearchProjects";
-import EditProject from "@/components/modals/EditProject";
-import ExportProject from "@/components/modals/ExportProject";
+import AddExperiment from "@/components/modals/AddExperiments";
+import SearchExperiments from "@/components/modals/SearchExperiments";
+import EditExperiment from "@/components/modals/EditExperiment";
+import ExportExperiment from "@/components/modals/ExportExperiment";
 
 import ChangeSettings from "@/components/modals/ChangeSettings";
 import Login from "@/components/modals/LoginModal";
@@ -32,21 +32,21 @@ import Login from "@/components/modals/LoginModal";
 export default {
   components: {
     Menu,
-    "modal-AddProjects": AddProject,
-    "modal-SearchProjects": SearchProjects,
+    "modal-AddExperiments": AddExperiment,
+    "modal-SearchExperiments": SearchExperiments,
     "modal-ChangeSettings": ChangeSettings,
     "modal-Login": Login,
-    "modal-EditProject": EditProject,
-    "modal-ExportProject": ExportProject
+    "modal-EditExperiment": EditExperiment,
+    "modal-ExportExperiment": ExportExperiment
   },
 
   computed: {
-    addProjectsModal() {
-      return this.$store.getters.addProjectsModal;
+    addExperimentsModal() {
+      return this.$store.getters.addExperimentsModal;
     },
 
-    searchProjectsModal() {
-      return this.$store.getters.searchProjectsModal;
+    searchExperimentsModal() {
+      return this.$store.getters.searchExperimentsModal;
     },
 
     changeSettingsModal() {
@@ -57,14 +57,14 @@ export default {
       return this.$store.getters.accessToken;
     },
 
-    currentProject() {
-      return this.$store.getters.currentProject;
+    currentExperiment() {
+      return this.$store.getters.currentExperiment;
     }
   },
 
   methods: {
     startApp() {
-      this.$store.dispatch("loadProjects");
+      this.$store.dispatch("loadExperiments");
     }
   },
 
