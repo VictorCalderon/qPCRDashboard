@@ -1,5 +1,5 @@
 # Build stage from NodeJS Alpine
-FROM node:10.16.0-alpine as build-stage
+FROM node:14.4.0-alpine3.11 as build-stage
 
 # Set Work directory
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:1.16.1-alpine as production-stage
+FROM nginx:1.19.0-alpine as production-stage
 
 # Copy file to NGINX http folder
 COPY --from=build-stage /app/dist /usr/share/nginx/html
