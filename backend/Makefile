@@ -1,6 +1,7 @@
 # .PHONY: init init-migration build run db-migrate
 
 init:  build run
+	docker-compose exec web qpcr-manager db init
 	docker-compose exec web qpcr-manager db upgrade
 	docker-compose exec web qpcr-manager init
 	@echo "Init done, containers running"
