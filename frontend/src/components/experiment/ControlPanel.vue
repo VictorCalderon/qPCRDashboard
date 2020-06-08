@@ -1,5 +1,5 @@
 <template>
-  <div v-if="currentProject">
+  <div v-if="currentExperiment">
     <div>
       <b-row>
         <b-col>
@@ -8,7 +8,7 @@
             variant="outline-secondary"
             block
             size="sm"
-            v-b-modal.edit-projects-modal
+            v-b-modal.edit-experiments-modal
           >Edit</b-button>
         </b-col>
         <b-col>
@@ -17,7 +17,7 @@
             variant="outline-secondary"
             block
             size="sm"
-            @click="exportCurrentProject"
+            @click="exportCurrentExperiment"
           >Export</b-button>
         </b-col>
       </b-row>
@@ -30,9 +30,9 @@ import FileDownload from "js-file-download";
 
 export default {
   computed: {
-    currentProject() {
-      if (this.$store.getters.currentProject) {
-        return this.$store.getters.currentProject;
+    currentExperiment() {
+      if (this.$store.getters.currentExperiment) {
+        return this.$store.getters.currentExperiment;
       } else return null;
     }
   },
@@ -56,22 +56,22 @@ export default {
       this.primaryOptions = !this.primaryOptions;
     },
 
-    loadProjects() {
-      this.$store.dispatch("loadProjects");
+    loadExperiments() {
+      this.$store.dispatch("loadExperiments");
     },
 
-    async exportCurrentProject() {
-      await this.$store.dispatch("exportCurrentProject");
+    async exportCurrentExperiment() {
+      await this.$store.dispatch("exportCurrentExperiment");
 
       this.exportBtnLabel = "Downloading...";
 
       setTimeout(() => {
-        // Check every half a second if currentProjectFile is there
-        let file = this.$store.getters.currentProjectFile;
+        // Check every half a second if currentExperimentFile is there
+        let file = this.$store.getters.currentExperimentFile;
 
         if (file != null) {
           // Make a blob with it
-          file = new Blob([this.$store.getters.currentProjectFile], {
+          file = new Blob([this.$store.getters.currentExperimentFile], {
             type: "text/plain"
           });
 
@@ -84,8 +84,8 @@ export default {
       }, 1500);
     },
 
-    deleteCurrentProject() {
-      this.$store.dispatch("deleteProject", this.currentProject.id);
+    deleteCurrentExperiment() {
+      this.$store.dispatch("deleteExperiment", this.currentExperiment.id);
       this.deleteBtnLabel = "Deleted!";
       setTimeout(() => {
         this.toggleDelete();

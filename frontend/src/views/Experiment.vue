@@ -1,7 +1,7 @@
 <template>
-  <div class="rounded" v-if="allProjects">
-    <!-- <Projects></Projects> -->
-    <div v-if="currentProject">
+  <div class="rounded" v-if="allExperiments">
+    <!-- <Experiments></Experiments> -->
+    <div v-if="currentExperiment">
       <b-row class="m-3" align-h="center">
         <b-col cols="2" class="bg-light rounded m-1">
           <Samples></Samples>
@@ -22,9 +22,9 @@
       <b-card class="text-center mt-3 rounded">
         <div
           class="rounded py-2"
-        >You don't have any opened projects. Use the search engine or recent projects bar.</div>
+        >You don't have any opened experiments. Use the search engine or recent experiments bar.</div>
         <b-row align-h="center" class="mt-3">
-          <b-button variant="info" v-b-modal.search-projects-modal>Search Project</b-button>
+          <b-button variant="info" v-b-modal.search-experiments-modal>Search Experiment</b-button>
         </b-row>
       </b-card>
     </b-row>
@@ -34,9 +34,9 @@
       <b-card class="text-center mt-5 rounded">
         <div
           class="rounded py-2"
-        >You don't have any projects. Add a new project and start analyzing your data.</div>
+        >You don't have any experiments. Add a new experiment and start analyzing your data.</div>
         <b-row align-h="center" class="mt-3">
-          <b-button variant="info" v-b-modal.add-projects-modal>Add Project</b-button>
+          <b-button variant="info" v-b-modal.add-experiments-modal>Add Experiment</b-button>
         </b-row>
       </b-card>
     </b-row>
@@ -48,7 +48,7 @@ import ExperimentResults from "@/components/experiment/ExperimentResults";
 import Amplification from "@/components/experiment/AmplificationPlot";
 import Clustering from "@/components/experiment/ClusterPlot";
 import Samples from "@/components/experiment/Samples";
-// import Projects from "@/components/experiment/Projects";
+// import Experiments from "@/components/experiment/Experiments";
 
 export default {
   components: {
@@ -56,21 +56,21 @@ export default {
     Clustering,
     Samples,
     ExperimentResults
-    // Projects
+    // Experiments
   },
 
   methods: {
     loadExperiments() {
-      this.$store.dispatch("loadProjects");
+      this.$store.dispatch("loadExperiments");
     }
   },
 
   computed: {
-    currentProject() {
-      return this.$store.getters.currentProject;
+    currentExperiment() {
+      return this.$store.getters.currentExperiment;
     },
-    allProjects() {
-      return this.$store.getters.allProjects;
+    allExperiments() {
+      return this.$store.getters.allExperiments;
     }
   },
 

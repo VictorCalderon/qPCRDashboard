@@ -1,12 +1,11 @@
 <template>
-  <div id="project-statistics" v-if="currentProject">
+  <div id="experiment-statistics" v-if="currentExperiment">
     <h3 class="chart-title">
       <span class="details-values">Experiment:</span>&nbsp;
-      <span class="details-keys">{{ currentProject.name }}</span>&nbsp;|
+      <span class="details-keys">{{ currentExperiment.name }}</span>&nbsp;|
       <span class="details-keys">&nbsp;Status:&nbsp;</span>
-      <span class="details-values">{{ currentProject.analyzed ? 'Analyzed' : 'Pending' }}&nbsp;</span>
+      <span class="details-values">{{ currentExperiment.analyzed ? 'Analyzed' : 'Pending' }}&nbsp;</span>
     </h3>
-    <!-- <h3 class="chart-subtitle">{{ currentProject.experiment_date}}</h3> -->
     <div class="chart-body">
       <bar-chart :chart-data="datacollection" :options="options" :height="300"></bar-chart>
     </div>
@@ -21,14 +20,14 @@ export default {
     BarChart
   },
   computed: {
-    currentProject() {
-      if (this.$store.getters.currentProject) {
-        return this.$store.getters.currentProject;
+    currentExperiment() {
+      if (this.$store.getters.currentExperiment) {
+        return this.$store.getters.currentExperiment;
       } else return null;
     },
 
-    currentProjectResults() {
-      return this.$store.getters.currentProjectResults;
+    currentExperimentResults() {
+      return this.$store.getters.currentExperimentResults;
     },
 
     currentSamples() {
@@ -97,9 +96,9 @@ export default {
   },
   methods: {
     fillData() {
-      const stats = this.currentProjectResults.statistics;
+      const stats = this.currentExperimentResults.statistics;
       this.datacollection = {
-        labels: [this.currentProject.name],
+        labels: [this.currentExperiment.name],
         datasets: stats.map((result, i) => {
           return {
             label: result.marker,
@@ -115,11 +114,11 @@ export default {
       this.fillData();
     },
 
-    currentProject() {
-      if (this.currentProject) this.fillData();
+    currentExperiment() {
+      if (this.currentExperiment) this.fillData();
     },
 
-    currentProjectResults() {
+    currentExperimentResults() {
       this.fillData();
     }
   }
@@ -137,7 +136,7 @@ $GreyBackground: #e6e6e6;
 $GreyBackgroundDark: #535353;
 $Indicator: #539ee4;
 
-#project-statistics {
+#experiment-statistics {
   .chart-title {
     font-size: 1rem;
     font-weight: 400;

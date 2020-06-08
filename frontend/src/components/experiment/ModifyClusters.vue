@@ -30,9 +30,9 @@ export default {
     }
   },
   computed: {
-    currentProject() {
-      if (this.$store.getters.currentProject == null) return {};
-      return this.$store.getters.currentProject;
+    currentExperiment() {
+      if (this.$store.getters.currentExperiment == null) return {};
+      return this.$store.getters.currentExperiment;
     },
 
     customLabels() {
@@ -44,7 +44,7 @@ export default {
 
     options() {
       return [
-        ...Object.keys(this.$store.getters.currentProjectResults.data).map(
+        ...Object.keys(this.$store.getters.currentExperimentResults.data).map(
           p => {
             return {
               value: p,

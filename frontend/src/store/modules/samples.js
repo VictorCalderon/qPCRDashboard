@@ -28,8 +28,8 @@ const mutations = {
         Vue.set(state, 'currentSample', sample)
     },
 
-    'LOAD_SAMPLE_qPCRs'(state, qpcrs) {
-        Vue.set(state, 'currentSampleqPCRs', qpcrs)
+    'LOAD_SAMPLE_Fluorescences'(state, fluorescences) {
+        Vue.set(state, 'currentSampleFluorescences', fluorescences)
     },
 
     'ADD_SAMPLE_RESULT'(state, result) {
@@ -60,15 +60,15 @@ const actions = {
         const sample = state.currentSamples.find(s => s.id == sample_id);
         commit('SELECT_SAMPLE', sample);
 
-        axios.get(`api/v1/samples/${sample_id}/qpcrs`, {
+        axios.get(`api/v1/samples/${sample_id}/fluorescences`, {
         }).then(
-            res => { commit('LOAD_SAMPLE_qPCRs', res.data.qpcrs) }
+            res => { commit('LOAD_SAMPLE_Fluorescences', res.data.fluorescence_data) }
         )
     },
 
     loadCurrentSamples({ getters, commit }) {
-        if (!getters.currentProject) return void 0;
-        axios.get(`api/v1/projects/${getters.currentProject.id}/samples`, {
+        if (!getters.currentExperiment) return void 0;
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/samples`, {
         }).then(
             res => {
                 commit('LOAD_CURRENT_SAMPLES', res.data.samples)
@@ -105,8 +105,8 @@ const getters = {
         return state.currentSample;
     },
 
-    currentSampleqPCRs(state) {
-        return state.currentSampleqPCRs ? state.currentSampleqPCRs : [];
+    currentSampleFluorescences(state) {
+        return state.currentSampleFluorescences ? state.currentSampleFluorescences : [];
     },
 
     modificationSignal(state) {
