@@ -11,10 +11,10 @@
       </b-navbar-nav>
 
       <b-navbar-nav v-if="this.$route.name == 'Experiments'" class="ml-auto">
-        <b-nav-item v-b-modal.add-projects-modal class="mx-2">
+        <b-nav-item v-b-modal.add-experiments-modal class="mx-2">
           <i class="fas fa-plus"></i>&nbsp;Add
         </b-nav-item>
-        <b-nav-item v-b-modal.search-projects-modal class="mx-2">
+        <b-nav-item v-b-modal.search-experiments-modal class="mx-2">
           <i class="fas fa-search"></i>&nbsp;Search
         </b-nav-item>
         <b-nav-item-dropdown right class="mx-2">
@@ -25,18 +25,18 @@
             </span>
           </template>
           <b-dropdown-item
-            v-for="project in recentProjects"
-            :key="project.id"
-            @click="selectProject(project)"
+            v-for="experiment in recentExperiments"
+            :key="experiment.id"
+            @click="selectExperiment(experiment)"
             class="m-1"
           >
-            <span>{{project.name | shortName }}</span>
+            <span>{{experiment.name | shortName }}</span>
           </b-dropdown-item>
         </b-nav-item-dropdown>
-        <b-nav-item v-b-modal.edit-projects-modal class="mx-2">
+        <b-nav-item v-b-modal.edit-experiments-modal class="mx-2">
           <i class="far fa-edit"></i>&nbsp;Edit
         </b-nav-item>
-        <b-nav-item v-b-modal.export-projects-modal class="mx-2">
+        <b-nav-item v-b-modal.export-experiments-modal class="mx-2">
           <i class="fas fa-file-export"></i>&nbsp;Export
         </b-nav-item>
         <b-nav-item disabled class="mx-2">
@@ -79,39 +79,39 @@ export default {
     return {};
   },
   computed: {
-    allProjects() {
-      return this.$store.getters.allProjects;
+    allExperiments() {
+      return this.$store.getters.allExperiments;
     },
 
-    currentProject() {
-      if (this.$store.getters.currentProject == null) {
+    currentExperiment() {
+      if (this.$store.getters.currentExperiment == null) {
         return {};
       }
-      return this.$store.getters.currentProject;
+      return this.$store.getters.currentExperiment;
     },
 
     currentUser() {
       return this.$store.getters.currentUser;
     },
 
-    recentProjects() {
-      return this.$store.getters.recentProjects;
+    recentExperiments() {
+      return this.$store.getters.recentExperiments;
     }
   },
   methods: {
-    async selectProject(project) {
-      await this.$store.dispatch("selectProject", project);
+    async selectExperiment(experiment) {
+      await this.$store.dispatch("selectExperiment", experiment);
       await this.$store.dispatch("loadCurrentSamples");
-      await this.$store.dispatch("loadProjectqPCRs");
-      await this.$store.dispatch("loadCurrentProjectResults");
+      await this.$store.dispatch("loadExperimentqPCRs");
+      await this.$store.dispatch("loadCurrentExperimentResults");
     },
 
-    toggleAddProjects() {
-      this.$store.dispatch("toggleAddProjects");
+    toggleAddExperiments() {
+      this.$store.dispatch("toggleAddExperiments");
     },
 
-    toggleSearchProjects() {
-      this.$store.dispatch("toggleSearchProjects");
+    toggleSearchExperiments() {
+      this.$store.dispatch("toggleSearchExperiments");
     },
 
     toggleSettingsModal() {
