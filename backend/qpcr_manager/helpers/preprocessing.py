@@ -238,7 +238,7 @@ def feed_DA2(filebuffer, current_experiment, current_user):
     for sample_name in unique_samples:
 
         # Instantiate sample
-        sample = Sample(sample=sample_name, project=current_experiment)
+        sample = Sample(sample=sample_name, experiment=current_experiment)
 
         # Mask dataframe for qPCRs
         sample_qpcrs = amp[amp['Sample'] == sample_name]
@@ -265,12 +265,11 @@ def feed_DA2(filebuffer, current_experiment, current_user):
 
             # Instantiate Result
             result = Result(
-                amp_status=amp_status(result[4]), amp_score=round(result[5], 2),
-                amp_cq=round(result[6], 3), cq_confidence=round(result[7], 3),
-                marker_id=marker_id, sample=sample
+                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), 
+                cq_confidence=round(result[6], 3), marker_id=marker_id, sample=sample
             )
 
-    # Add project to DB
+    # Add experiment to DB
     db.session.add(current_experiment)
     db.session.commit()
 
@@ -297,7 +296,7 @@ def feed_7500(filebuffer, current_experiment, current_user):
     for sample_name in unique_samples:
 
         # Instantiate a sample
-        sample = Sample(sample=sample_name, project=current_experiment)
+        sample = Sample(sample=sample_name, experiment=current_experiment)
 
         # Mask dataframe for sample qPCRS
         sample_qpcrs = qs[qs['Sample Name'] == sample_name]
@@ -313,7 +312,7 @@ def feed_7500(filebuffer, current_experiment, current_user):
                 well=qpcr[1], cycle=qpcr[2],
                 rn=qpcr[5], sample=sample, marker_id=marker_id)
 
-    # Add project to DB
+    # Add experiment to DB
     db.session.add(current_experiment)
     db.session.commit()
 
@@ -361,8 +360,8 @@ def query_fluorescence(sample_id):
     return sorted(fluorescence_array, key=lambda x: x['marker'])
 
 
-def export_results(project_id, current_user):
-    """Export project
+def export_results(experiment_id, current_user):
+    """Export experiment
     """
 
     config = {
@@ -374,8 +373,8 @@ def export_results(project_id, current_user):
 
     try:
 
-        # Get samples form project
-        samples = Experiment.query.filter_by(user_id=current_user.id, id=project_id).first()
+        # Get samples form experiment
+        samples = Experiment.query.filter_by(user_id=current_user.id, id=experiment_id).first()
 
         if samples is None:
             raise ValueError
@@ -384,7 +383,7 @@ def export_results(project_id, current_user):
         results = [(s.sample, s.result) for s in samples.samples]
 
     except:
-        raise ValueError('You can only export your own projects')
+        raise ValueError('You can only export your own experiments')
 
     try:
         # Empty file
@@ -412,7 +411,7 @@ def export_results(project_id, current_user):
         return ''.join(file_string)
 
     except:
-        raise IOError('Could not export project')
+        raise IOError('Could not export experiment')
 
 
 def analyze_experiment(experiment_samples):
