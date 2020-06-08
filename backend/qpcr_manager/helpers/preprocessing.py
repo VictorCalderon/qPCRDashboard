@@ -81,7 +81,7 @@ def import_DA2(buffered_zip):
             'Well Position': str, 'Sample': str, 'Target': str,
             'Amp Status': str, 'Cq': float, 'Cq Confidence': float
         })
-    
+
     # Remove files
     rmtree(dir_uuid, ignore_errors=True)
 
@@ -144,7 +144,7 @@ def parse_7500(data_container, sep='\t'):
     try:
         samples = [record.split(sep) for record in data_container['Sample']]
         samples = pd.DataFrame.from_records(data=samples[1:], columns=samples[0])
-    
+
     except KeyError:
         raise('[Sample Setup] header was not found in file')
 
@@ -265,7 +265,7 @@ def feed_DA2(filebuffer, current_experiment, current_user):
 
             # Instantiate Result
             result = Result(
-                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), 
+                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3),
                 cq_confidence=round(result[6], 3), marker_id=marker_id, sample=sample
             )
 
@@ -505,7 +505,7 @@ def amped_timeseries(marker_id, current_user):
     """Query dashboard data (date, perc_cases, total_samples, total_experiments)
     """
 
-    # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view 
+    # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
     my_query = f"""
     SELECT experiment_date, CAST(COUNT(CASE WHEN amp_status THEN 1 END) as decimal) / COUNT(amp_status), COUNT(DISTINCT(sample)), COUNT(DISTINCT(name))
     FROM samples AS s
