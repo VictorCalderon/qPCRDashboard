@@ -180,7 +180,7 @@ class ImportExperiment(Resource):
             return {'msg': 'Experiment is missing information'}, 400
 
         # Experiment instantiation
-        current_experiment = Experiment(name=name, experiment_date=date, user=current_user, method=method)
+        current_experiment = Experiment(name=name, experiment_date=date, user=current_user, methodology=method)
 
         try:
             if fmt == 'DA2':
