@@ -6,7 +6,6 @@
         <span class="amp-details-values">&nbsp;{{ currentSample.sample }}&nbsp;</span>&nbsp;|&nbsp;
         <span class="amp-details-keys">&nbsp;Well&nbsp;:</span>
         <span class="amp-details-values">&nbsp;{{ well }}&nbsp;</span>
-        <ModifySample></ModifySample>
       </div>
     </div>
     <div class="chart-body" v-if="currentSample">
@@ -23,16 +22,16 @@
 
 <script>
 import LineChart from "@/components/charts/LineChart.js";
-import ModifySample from "@/components/experiment/ModifySample.vue";
 
 export default {
   components: {
-    LineChart,
-    ModifySample
+    LineChart
   },
+
   created() {
     this.changeSettings();
   },
+
   data() {
     return {
       colors: ["#E14544", "#535353", "#34a0e9", "#E8B53C"],
