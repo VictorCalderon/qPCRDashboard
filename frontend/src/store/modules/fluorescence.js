@@ -33,11 +33,9 @@ const actions = {
 }
 
 const getters = {
-
     experimentFluorescences(state) {
         return state.ExperimentFluorescences
     },
-
 }
 
 export default {
