@@ -64,9 +64,9 @@ class ExperimentSchema(ma.SQLAlchemyAutoSchema):
 
     id = ma.auto_field()
     name = ma.auto_field()
-    experiment_date = ma.auto_field()
+    date = ma.auto_field()
     analyzed = ma.auto_field()
-    observations = ma.auto_field()
+    methodology = ma.auto_field()
 
     class Meta:
         model = Experiment
@@ -92,9 +92,9 @@ class ExperimentResource(Resource):
         if request.json.get('name'):
             experiment.name = request.json.get('name')
 
-        # Change experiment_date
-        if request.json.get('experiment_date'):
-            experiment.experiment_date = request.json.get('experiment_date')
+        # Change date
+        if request.json.get('date'):
+            experiment.date = request.json.get('date')
 
         # Change analyzed to true
         if request.json.get('analyzed') == 'true':
@@ -105,8 +105,8 @@ class ExperimentResource(Resource):
             experiment.analyzed = False
 
         # Change observation
-        if request.json.get('observations'):
-            experiment.observations = request.json.get('observations')
+        if request.json.get('methodology'):
+            experiment.observations = request.json.get('methodology')
 
         # Add experiment to session and commit change
         db.session.add(experiment)
@@ -168,19 +168,19 @@ class ImportExperiment(Resource):
     def post(self):
 
         # Get data from post
-        file = request.files.get('experiment_file', None)
+        file = request.files.get('file', None)
 
         # Experiment name and experiment Date
-        name = request.form.get('experiment_name', None)
-        date = request.form.get('experiment_date', None)
-        method = request.form.get('experiment_method', None)
-        fmt = request.form.get('experiment_format', None)
+        name = request.form.get('name', None)
+        date = request.form.get('date', None)
+        methodology = request.form.get('methodology', None)
+        fmt = request.form.get('format', None)
 
         if (name is None) or (date is None) or (file is None) or (fmt is None):
             return {'msg': 'Experiment is missing information'}, 400
 
         # Experiment instantiation
-        current_experiment = Experiment(name=name, experiment_date=date, user=current_user, methodology=method)
+        current_experiment = Experiment(name=name, date=date, user=current_user, methodology=methodology)
 
         try:
             if fmt == 'DA2':
@@ -224,7 +224,7 @@ class ExperimentResults(Resource):
         return {'data': data, 'samples': samples, 'statistics': statistics}
 
 
-class QueryExperiments(Resource):
+class ExperimentsQuery(Resource):
     """Query experiments from database
     """
 
@@ -236,12 +236,13 @@ class QueryExperiments(Resource):
         schema = ExperimentSchema(many=True)
 
         # Parse params
-        experiment_name = request.args.get('experiment_name')
-        experiment_date = request.args.get('experiment_date')
+        name = request.args.get('name')
+        date = request.args.get('date')
         analyzed = request.args.get('analyzed')
+        methodology = request.args.get('methodology')
 
         # Query db for users experiments
-        query = Experiment.query.filter_by(user_id=current_user.id)
+        query = Experiment.query.filter_by(user_id=current_user.id).order_by(Experiment.id.desc())
 
         # Filter by date
         if analyzed:
@@ -250,16 +251,22 @@ class QueryExperiments(Resource):
             query = query.filter_by(analyzed=analyzed)
 
         # Filter by experiment name
-        if experiment_name:
+        if name:
 
             # Apply filter
-            query = query.filter(Experiment.name.like(f'%{experiment_name}%'))
+            query = query.filter(Experiment.name.like(f'%{name}%'))
 
         # Filter by date
-        if experiment_date:
+        if date:
 
             # Apply filter
-            query = query.filter_by(experiment_date=experiment_date)
+            query = query.filter_by(date=date)
+
+        # Filter by date
+        if methodology:
+
+            # Apply filter
+            query = query.filter_by(methodology=methodology)
 
         # Return query
         return paginate(query, schema)
@@ -365,6 +372,21 @@ class SampleList(Resource):
         return {"msg": "sample created", "sample": schema.dump(sample)}, 201
 
 
+class SamplesQuery(Resource):
+    """Query samples from database
+    """
+
+    method_decorators = [jwt_required]
+
+    def post(self):
+
+        # Parse params
+        sample = request.args.get('sample')
+
+        # Run query and return data
+        return query_samples(current_user, sample)
+
+
 class ExperimentSamplesList(Resource):
     """Get all samples from a certain experiment
     """
@@ -395,8 +417,8 @@ class SampleFluorescenceResource(Resource):
 __all__ = [
     'UserResource', 'UserList',
     'ExperimentResource', 'ExperimentList', 'LastExperimentResource',
-    'QueryExperiments', 'ExperimentResults', 'ExperimentSamplesList',
-    'SampleResource', 'SampleList', 'SampleFluorescenceResource',
+    'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
+    'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
     'MarkerList'
 ]
