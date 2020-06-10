@@ -1,6 +1,5 @@
 <template>
   <div class="rounded" v-if="allExperiments">
-    <!-- <Experiments></Experiments> -->
     <div v-if="currentExperiment">
       <b-row class="m-3" align-h="center">
         <b-col cols="2" class="bg-light rounded m-1">
@@ -22,7 +21,7 @@
       <b-card class="text-center mt-3 rounded">
         <div
           class="rounded py-2"
-        >You don't have any opened experiments. Use the search engine or recent experiments bar.</div>
+        >You don't seem to be working on any experiments right now. Use the engine to search for experiments.</div>
         <b-row align-h="center" class="mt-3">
           <b-button variant="info" v-b-modal.search-experiments-modal>Search Experiment</b-button>
         </b-row>
