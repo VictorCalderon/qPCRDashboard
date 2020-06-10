@@ -28,11 +28,11 @@
             <label for="edit-datepicker">Choose a date</label>
             <b-form-datepicker
               id="edit-datepicker"
-              v-model="experiment.experiment_date"
+              v-model="experiment.date"
               class="mb-2"
               locale="en"
               :date-format-options="{ year: 'numeric', month: 'short', day: '2-digit' }"
-              :placeholder="currentExperiment.experiment_date"
+              :placeholder="currentExperiment.date"
             ></b-form-datepicker>
           </div>
         </b-col>
@@ -41,13 +41,13 @@
       <b-row class="mb-2" align-h="center">
         <b-col>
           <div class="text-center">
-            <label for="edit-experimentname">Descriptions and Observations</label>
-            <b-form-textarea
-              id="edit-experimentname"
-              v-model="experiment.observations"
+            <label for="edit-experimentmethod">Methodology</label>
+            <b-form-input
+              id="edit-experimentmethod"
+              v-model="experiment.methodology"
               class="text-center"
-              :placeholder="currentExperiment.observations"
-            ></b-form-textarea>
+              :placeholder="currentExperiment.methodology"
+            ></b-form-input>
           </div>
         </b-col>
       </b-row>
@@ -127,7 +127,7 @@ export default {
         name: null,
         experiment_date: null,
         analyzed: null,
-        observation: null,
+        methodology: null,
         id: null
       },
       alert: null,
@@ -146,10 +146,12 @@ export default {
     },
 
     async modifyExperiment() {
-      await this.$store.dispatch("updateExperiment", this.experiment).then(() => {
-        this.showAlert = true;
-        this.closeEdit();
-      });
+      await this.$store
+        .dispatch("updateExperiment", this.experiment)
+        .then(() => {
+          this.showAlert = true;
+          this.closeEdit();
+        });
     },
 
     hideModal() {
@@ -158,7 +160,7 @@ export default {
         experiment_date: null,
         analyzed: null,
         id: null,
-        observations: null
+        methodology: null
       };
       this.$refs["edit-experiments-modal"].hide();
     },

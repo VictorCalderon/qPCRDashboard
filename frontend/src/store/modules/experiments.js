@@ -8,37 +8,37 @@ const state = {
     allExperiments: null,
     importMsg: null,
     recentExperiments: null,
-    queriedExperiments: null,
+    queriedExperiments: [],
     currentExperiment: null,
     currentExperimentResults: null
 }
 
 const mutations = {
-    'LOAD_ALL_PROJECTS'(state, experiments) {
+    'LOAD_ALL_EXPERIMENTS'(state, experiments) {
         Vue.set(state, 'allExperiments', experiments)
     },
 
-    'TOGGLE_ADD_PROJECTS'(state) {
+    'TOGGLE_ADD_EXPERIMENTS'(state) {
         Vue.set(state, 'addExperimentsModal', !state.addExperimentsModal)
     },
 
-    'TOGGLE_SEARCH_PROJECTS'(state) {
+    'TOGGLE_SEARCH_EXPERIMENTS'(state) {
         Vue.set(state, 'searchExperimentsModal', !state.searchExperimentsModal)
     },
 
-    'POST_PROJECT_MSG'(state, errorMsg) {
+    'POST_EXPERIMENT_MSG'(state, errorMsg) {
         Vue.set(state, 'postExperimentMsg', errorMsg)
     },
 
-    'LOAD_NEXT_PROJECTS'(state, nextUrl) {
+    'LOAD_NEXT_EXPERIMENTS'(state, nextUrl) {
         Vue.set(state, 'next', nextUrl)
     },
 
-    'LOAD_PREV_PROJECTS'(state, prevUrl) {
+    'LOAD_PREV_EXPERIMENTS'(state, prevUrl) {
         Vue.set(state, 'prev', prevUrl)
     },
 
-    'SELECT_PROJECT'(state, experiment) {
+    'SELECT_EXPERIMENT'(state, experiment) {
         Vue.set(state, 'currentExperiment', experiment)
     },
 
@@ -50,15 +50,15 @@ const mutations = {
         Vue.set(state, 'updateMsg', msg)
     },
 
-    'EXPORT_PROJECT_FILE'(state, file) {
+    'EXPORT_EXPERIMENT_FILE'(state, file) {
         Vue.set(state, 'currentExperimentFile', file)
     },
 
-    'CLEAR_PROJECTS'(state) {
+    'CLEAR_EXPERIMENTS'(state) {
         Vue.set(state, 'allExperiments', [])
     },
 
-    'LOAD_RECENT_PROJECTS'(state) {
+    'LOAD_RECENT_EXPERIMENTS'(state) {
         if (state.recentExperiments == null && state.allExperiments != null) {
             const recentExperiments = state.allExperiments.slice(0, 6);
             Vue.set(state, 'recentExperiments', recentExperiments)
@@ -67,7 +67,7 @@ const mutations = {
 
     },
 
-    'ADD_RECENT_PROJECT'(state, experiment) {
+    'ADD_RECENT_EXPERIMENT'(state, experiment) {
         // Grab current data
         let recentExperiments = state.recentExperiments
 
@@ -78,7 +78,7 @@ const mutations = {
         Vue.set(state, 'recentExperiments', recentExperiments)
     },
 
-    'REMOVE_RECENT_PROJECT'(state, experiment) {
+    'REMOVE_RECENT_EXPERIMENT'(state, experiment) {
         // Grab current data
         let recentExperiments = state.recentExperiments
 
@@ -92,15 +92,15 @@ const mutations = {
         Vue.set(state, 'recentExperiments', recentExperiments)
     },
 
-    'PROJECTS_QUERY'(state, experiments) {
+    'EXPERIMENTS_QUERY'(state, experiments) {
         Vue.set(state, 'queriedExperiments', experiments)
     },
 
-    'CLEAR_CURRENT_PROJECT'(state) {
+    'CLEAR_CURRENT_EXPERIMENT'(state) {
         Vue.set(state, 'currentExperiment', null)
     },
 
-    'SET_PROJECT_RESULTS'(state, results) {
+    'SET_EXPERIMENT_RESULTS'(state, results) {
         Vue.set(state, 'currentExperimentResults', results)
     },
 
@@ -114,12 +114,12 @@ const actions = {
         axios.get('api/v1/experiments', {
         }).then(res => {
             if (res.data.results.length > 0) {
-                commit('LOAD_ALL_PROJECTS', res.data.results);
-                commit('LOAD_NEXT_PROJECTS', res.data.next);
-                commit('LOAD_PREV_PROJECTS', res.data.prev);
+                commit('LOAD_ALL_EXPERIMENTS', res.data.results);
+                commit('LOAD_NEXT_EXPERIMENTS', res.data.next);
+                commit('LOAD_PREV_EXPERIMENTS', res.data.prev);
             }
         }).then(
-            commit('LOAD_RECENT_PROJECTS')
+            commit('LOAD_RECENT_EXPERIMENTS')
         )
     },
 
@@ -127,24 +127,24 @@ const actions = {
         await axios.get("api/v1/markers").then(res => {
             commit('AVAILABLE_MARKERS', res.data.marker);
         });
-      },
+    },
 
     loadCurrentExperimentResults({ commit, getters }) {
         axios.get(`api/v1/experiments/${getters.currentExperiment.id}/results`).then(res => {
-            commit('SET_PROJECT_RESULTS', res.data)
+            commit('SET_EXPERIMENT_RESULTS', res.data)
         })
     },
 
     toggleAddExperiments({ commit }) {
-        commit('TOGGLE_ADD_PROJECTS')
+        commit('TOGGLE_ADD_EXPERIMENTS')
     },
 
     toggleSearchExperiments({ commit }) {
-        commit('TOGGLE_SEARCH_PROJECTS')
+        commit('TOGGLE_SEARCH_EXPERIMENTS')
     },
 
     selectExperiment({ getters, commit }, experiment) {
-        commit('SELECT_PROJECT', experiment);
+        commit('SELECT_EXPERIMENT', experiment);
 
         // Check if experiment is already added
         if (getters.recentExperiments) {
@@ -153,7 +153,7 @@ const actions = {
             const search = getters.recentExperiments.filter(p => p.id == experiment.id)
 
             if (search.length == 0) {
-                commit('ADD_RECENT_PROJECT', experiment);
+                commit('ADD_RECENT_EXPERIMENT', experiment);
             }
         }
 
@@ -167,43 +167,27 @@ const actions = {
         experiments.push(experiment)
 
         // Make this the new experiment
-        commit('SET_AS_RECENT_PROJECTS', experiments)
+        commit('SET_AS_RECENT_EXPERIMENTS', experiments)
 
     },
 
     selectCurrentExperiment({ commit, getters }) {
         if (getters.currentExperiment) {
-            commit('SELECT_PROJECT', getters.currentExperiment.id)
+            commit('SELECT_EXPERIMENT', getters.currentExperiment.id)
         }
     },
 
     loadLastExperiment({ commit }) {
         axios.get('api/v1/experiments/lastexperiment', {
         }).then(res => {
-            commit('SELECT_PROJECT', res.data.experiment)
+            commit('SELECT_EXPERIMENT', res.data.experiment)
         })
-    },
-
-    uploadExperiment({ commit }, formData) {
-        axios.post('api/v1/experiments/import', formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        })
-
-            .then(res => {
-                commit('IMPORT_MSG', res.data.msg)
-            })
-
-            .catch(err => {
-                commit('IMPORT_MSG', err.data.msg)
-            })
     },
 
     exportCurrentExperiment({ commit, getters }) {
         if (getters.currentExperiment.id) {
             axios.get(`api/v1/experiments/export/${getters.currentExperiment.id}`).then(res => {
-                commit('EXPORT_PROJECT_FILE', res.data.file)
+                commit('EXPORT_EXPERIMENT_FILE', res.data.file)
             })
         }
     },
@@ -216,21 +200,21 @@ const actions = {
     },
 
     clearExperiments({ commit }) {
-        commit('CLEAR_PROJECTS')
+        commit('CLEAR_EXPERIMENTS')
     },
 
     clearCurrentExperiment({ commit }) {
-        commit('CLEAR_CURRENT_PROJECT')
+        commit('CLEAR_CURRENT_EXPERIMENT')
     },
 
     filterExperiments({ commit }, filter) {
-        commit('PROJECTS_FILTER', filter)
+        commit('EXPERIMENTS_FILTER', filter)
     },
 
     queryExperiments({ commit }, params) {
         axios.post('api/v1/experiments/query', null, { params })
             .then(res => {
-                commit('PROJECTS_QUERY', res.data.results)
+                commit('EXPERIMENTS_QUERY', res.data.results)
             })
     },
 

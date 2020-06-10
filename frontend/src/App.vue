@@ -1,9 +1,8 @@
 <template>
   <div class="wrapper">
-    <modal-ChangeSettings v-if="changeSettingsModal"></modal-ChangeSettings>
     <modal-Login v-if="!accessToken"></modal-Login>
     <div v-else>
-      <modal-SearchExperiments></modal-SearchExperiments>
+      <modal-SearchDatabase></modal-SearchDatabase>
       <modal-AddExperiments></modal-AddExperiments>
       <modal-EditExperiment></modal-EditExperiment>
       <modal-ExportExperiment></modal-ExportExperiment>
@@ -22,37 +21,23 @@
 <script>
 import Menu from "@/components/navigation/Menu";
 import AddExperiment from "@/components/modals/AddExperiments";
-import SearchExperiments from "@/components/modals/SearchExperiments";
+import SearchDatabase from "@/components/modals/SearchDatabase";
 import EditExperiment from "@/components/modals/EditExperiment";
 import ExportExperiment from "@/components/modals/ExportExperiment";
 
-import ChangeSettings from "@/components/modals/ChangeSettings";
 import Login from "@/components/modals/LoginModal";
 
 export default {
   components: {
     Menu,
     "modal-AddExperiments": AddExperiment,
-    "modal-SearchExperiments": SearchExperiments,
-    "modal-ChangeSettings": ChangeSettings,
+    "modal-SearchDatabase": SearchDatabase,
     "modal-Login": Login,
     "modal-EditExperiment": EditExperiment,
     "modal-ExportExperiment": ExportExperiment
   },
 
   computed: {
-    addExperimentsModal() {
-      return this.$store.getters.addExperimentsModal;
-    },
-
-    searchExperimentsModal() {
-      return this.$store.getters.searchExperimentsModal;
-    },
-
-    changeSettingsModal() {
-      return this.$store.getters.changeSettingsToggle;
-    },
-
     accessToken() {
       return this.$store.getters.accessToken;
     },

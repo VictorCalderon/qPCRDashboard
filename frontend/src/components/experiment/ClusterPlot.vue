@@ -26,8 +26,8 @@ export default {
       datacollection: {},
       options: {},
       currentSampleID: null,
-      xAxis: 'SARS-CoV-2 Gene',
-      yAxis: 'Internal Control'
+      xAxis: "SARS-CoV-2 Gene",
+      yAxis: "Internal Control"
     };
   },
 
@@ -70,11 +70,10 @@ export default {
 
     currentMarkers() {
       if (this.currentExperimentResults) {
-        return this.currentExperimentResults.statistics.map((p) => {
-          return p.marker
-        })
-      }
-      else return []
+        return this.currentExperimentResults.statistics.map(p => {
+          return p.marker;
+        });
+      } else return [];
     },
 
     currentAxes() {

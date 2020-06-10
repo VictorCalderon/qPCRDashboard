@@ -9,8 +9,7 @@ class Experiment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    experiment_date = db.Column(db.Date, nullable=False)
-    observations = db.Column(db.Text)
+    date = db.Column(db.Date, nullable=False)
     methodology = db.Column(db.String)
     analyzed = db.Column(db.Boolean, default=False)
 

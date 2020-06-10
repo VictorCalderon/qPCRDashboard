@@ -28,6 +28,25 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 
+def query_samples(current_user, sample):
+    """Query database for samples based on sample name
+    """
+
+    # Build query
+    query = f"""
+    SELECT experiments.id, sample, name, marker, amp_status, amp_cq FROM experiments
+    JOIN samples on samples.experiment_id = experiments.id
+    JOIN results on results.sample_id = samples.id
+    JOIN markers on results.marker_id = markers.id
+    WHERE experiments.user_id = {current_user.id} and samples.sample like '%%{sample}%%';
+    """
+
+    # Run in pandas
+    samples = pd.read_sql(query, con=db.session.bind)
+
+    return samples.to_dict(orient='records')
+
+
 def import_DA2(buffered_zip):
     """ Extract data from zipped qPCR experiment
 
@@ -364,54 +383,35 @@ def export_results(experiment_id, current_user):
     """Export experiment
     """
 
-    config = {
-        'export_delimiter': ',',
-        'retention_tag_sample': 'Control',
-        'retention_tag_result_1': 'RETENIDO',
-        'retention_tag_result_2': 'INHIBIDO',
-    }
-
     try:
+        query = f"""
+        SELECT sample, marker, amp_status, amp_cq FROM experiments
+        JOIN samples on samples.experiment_id = experiments.id
+        JOIN results on results.sample_id = samples.id
+        JOIN markers on results.marker_id = markers.id
+        WHERE experiments.user_id = {current_user.id} and experiments.id = {experiment_id};
+        """
 
-        # Get samples form experiment
-        samples = Experiment.query.filter_by(user_id=current_user.id, id=experiment_id).first()
+        # Get results
+        query = db.session.execute(query)
+        # experiment = Experiment.query.filter_by(user_id=current_user.id, id=experiment_id).first()
 
-        if samples is None:
-            raise ValueError
+        if query is None:
+            raise ValueError('This experiment could not be exported')
+
+        def bool_to_string(x): return 'Amp' if x else 'No Amp'
 
         # Get results (samples, results)
-        results = [(s.sample, s.result) for s in samples.samples]
+        results = [[q[0], q[1], bool_to_string(q[2]), str(q[3])] for q in query]
 
     except:
         raise ValueError('You can only export your own experiments')
 
-    try:
-        # Empty file
-        file_string = []
+    # Merge into a single string
+    stringed_results = [','.join(x) + '\n' for x in results]
 
-        # Iterate over results
-        for sample, result in results:
-
-            # Filter if retention_tag_result
-            if (config['retention_tag_result_1'] in result) or (config['retention_tag_result_2'] in result):
-
-                # Skip
-                continue
-
-            # Filter if retention_tag_sample
-            if (config['retention_tag_sample'] in sample):
-
-                # Skip
-                continue
-
-            # Write data
-            file_string.append(f"{sample}{config['export_delimiter']}{result}\n")
-
-        # return filepath
-        return ''.join(file_string)
-
-    except:
-        raise IOError('Could not export experiment')
+    # One big string
+    return ''.join(stringed_results)
 
 
 def analyze_experiment(experiment_samples):
@@ -466,7 +466,6 @@ def analyze_experiment(experiment_samples):
         results_df['PCA 2'] = pca.iloc[:, 1]
 
     # Data
-    # data = [{'x': s[markers[1]], 'y': s[markers[0]]} for s in results_df.to_dict('records')]
     data = results_df.to_dict('list')
 
     # # Build extended Confidene dataframe
@@ -484,7 +483,7 @@ def available_markers(current_user):
 
     query = f"""
     SELECT DISTINCT(m.id)
-    FROM samples AS s 
+    FROM samples AS s
     JOIN experiments AS p on s.experiment_id = p.id
     JOIN results AS r on r.sample_id = s.id
     JOIN markers as m on r.marker_id = m.id
@@ -495,7 +494,7 @@ def available_markers(current_user):
     markers = db.session.execute(query)
 
     # Clean markers
-    markers = [{'value': m.id, 'text': query_marker(m.id)} for m in markers]
+    markers = [[m.id, query_marker(m.id)] for m in markers]
 
     # Return marker list
     return markers
@@ -507,13 +506,13 @@ def amped_timeseries(marker_id, current_user):
 
     # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
     my_query = f"""
-    SELECT experiment_date, CAST(COUNT(CASE WHEN amp_status THEN 1 END) as decimal) / COUNT(amp_status), COUNT(DISTINCT(sample)), COUNT(DISTINCT(name))
+    SELECT date, CAST(COUNT(CASE WHEN amp_status THEN 1 END) as decimal) / COUNT(amp_status), COUNT(DISTINCT(sample)), COUNT(DISTINCT(name))
     FROM samples AS s
     JOIN experiments as p on s.experiment_id = p.id
     JOIN results as r on r.sample_id = s.id
     JOIN markers as m on r.marker_id = m.id
     WHERE m.id = {marker_id} AND p.user_id = {current_user.id}
-    GROUP BY experiment_date
+    GROUP BY date
     """
 
     # Run query

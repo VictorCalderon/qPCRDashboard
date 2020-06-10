@@ -20,7 +20,7 @@ api.add_resource(ExperimentResource, "/experiments/<int:experiment_id>")
 api.add_resource(LastExperimentResource, "/experiments/lastexperiment")
 
 # Single Experiment utilities
-api.add_resource(QueryExperiments, "/experiments/query")
+api.add_resource(ExperimentsQuery, "/experiments/query")
 api.add_resource(ExperimentResults, "/experiments/<int:experiment_id>/results")
 api.add_resource(ExperimentSamplesList, "/experiments/<int:experiment_id>/samples")
 
@@ -28,6 +28,8 @@ api.add_resource(ExperimentSamplesList, "/experiments/<int:experiment_id>/sample
 api.add_resource(SampleList, "/samples")
 api.add_resource(SampleResource, "/samples/<int:sample_id>")
 api.add_resource(SampleFluorescenceResource, "/samples/<int:sample_id>/fluorescences")
+api.add_resource(SamplesQuery, "/samples/query")
+
 
 # Import/Export functionality for experiments
 api.add_resource(ImportExperiment, '/experiments/import')

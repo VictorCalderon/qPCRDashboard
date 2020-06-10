@@ -1,5 +1,5 @@
 <template>
-  <b-container v-if="markersExists">
+  <b-container v-if="allExperiments">
     <b-row align-h="center" class="mt-5 mb-1">
       <h1 class="font-weight-light">Detected Ratio</h1>
     </b-row>
@@ -9,7 +9,13 @@
       </b-col>
     </b-row>
     <b-row class="m-5" align-h="center" v-if="marker">
-      <LineChart :width="1300" :height="400" :chartData="chartData" :options="chartConfig"></LineChart>
+      <LineChart
+        :width="1300"
+        :height="400"
+        :chartData="chartData"
+        :options="chartConfig"
+        class="bg-light px-5 pt-5 pb-4"
+      ></LineChart>
     </b-row>
   </b-container>
   <b-container v-else>
@@ -91,9 +97,17 @@ export default {
 
     async getMarkers() {
       await axios.get("api/v1/markers").then(res => {
-        if (res.data.markers) {
-          this.markersExists = true;
-          this.options = [...this.options, ...res.data.markers];
+        let markers = res.data.markers;
+        if (markers.length > 0) {
+          this.options = [
+            ...markers.map(m => {
+              return { value: m[0], text: m[1] };
+            }),
+            ...this.options
+          ];
+          this.marker = markers[1][0];
+        } else {
+          this.markers = null;
         }
       });
     },
@@ -143,6 +157,11 @@ export default {
 
   mounted() {
     this.getMarkers();
+  },
+  computed: {
+    allExperiments() {
+      return this.$store.getters.allExperiments;
+    }
   },
 
   watch: {
