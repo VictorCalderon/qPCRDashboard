@@ -3,7 +3,8 @@ import Vue from 'vue'
 
 const state = {
     sampleModifiedSignal: false,
-    currentSample: []
+    currentSample: [],
+    queriedSamples: [],
 }
 
 const mutations = {
@@ -42,7 +43,11 @@ const mutations = {
 
     'SAMPLE_MODIFIED'(state) {
         Vue.set(state, 'sampleModifiedSignal', !state.sampleModifiedSignal)
-    }
+    },
+
+    'SAMPLES_QUERY'(state, samples) {
+        Vue.set(state, 'queriedSamples', samples)
+    },
 }
 
 const actions = {
@@ -87,6 +92,14 @@ const actions = {
     filterSamples({ commit }, filter) {
         commit('SAMPLES_FILTER', filter)
     },
+
+
+    querySamples({ commit }, params) {
+        axios.post('api/v1/samples/query', null, { params })
+            .then(res => {
+                commit('SAMPLES_QUERY', res.data)
+            })
+    },
 }
 
 
@@ -117,6 +130,10 @@ const getters = {
         return state.filter
             ? state.currentSamples.filter(sample => sample.sample.includes(state.filter))
             : state.currentSamples;
+    },
+
+    queriedSamples(state) {
+        return state.queriedSamples
     }
 }
 
