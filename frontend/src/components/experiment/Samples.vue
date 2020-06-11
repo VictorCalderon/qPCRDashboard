@@ -7,13 +7,11 @@
       <b-row v-for="sample in filteredSamples" :key="sample.id" class="my-0">
         <b-col>
           <b-button
-            class="py-2 mt-1 bg-light text-dark border"
+            class="py-2 mt-1 bg-secondary text-light border"
             block
             @click="selectSample(sample.id)"
           >
             {{ sample.sample | shortName }}
-            <br />
-            <small>{{ sample.result }}</small>
           </b-button>
         </b-col>
       </b-row>
@@ -25,16 +23,14 @@
 export default {
   data() {
     return {
-      filter: null
+      filter: null,
     };
   },
 
   methods: {
-    refreshProjects() {
-      this.$store.dispatch("loadProjects");
-    },
     selectSample(id) {
-      this.$store.dispatch("selectSample", id);
+      this.$store.dispatch("selectSample", id).then(
+      );
     }
   },
 
@@ -42,12 +38,11 @@ export default {
     currentSamples() {
       return this.$store.getters.currentSamples;
     },
+
     filteredSamples() {
       return this.$store.getters.filteredSamples;
     },
-    customLabels() {
-      return this.$store.getters.customLabels;
-    },
+
     searchFilter() {
       if (this.filter == "") return null;
       else return this.filter;
@@ -61,6 +56,7 @@ export default {
       const firstSample = this.filteredSamples.slice(0, 1);
       this.selectSample(firstSample[0].id);
     },
+    
     searchFilter() {
       this.$store.dispatch("filterSamples", this.filter);
     }
