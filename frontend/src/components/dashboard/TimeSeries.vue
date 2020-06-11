@@ -153,11 +153,6 @@ export default {
             usePointStyle: false
           }
         },
-        // title: {
-        //   display: true,
-        //   text: this.marker,
-        //   fontsize: 16
-        // }
       };
     }
   },
