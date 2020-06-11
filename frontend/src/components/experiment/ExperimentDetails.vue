@@ -15,7 +15,7 @@
           <p
             class="my-0"
           >Cq -> &nbsp;&mu;: {{ basicStatistics(marker).mean }} &nbsp;&nbsp; &sigma;: {{ basicStatistics(marker).std }}</p>
-          <p class="my-0">Amp Percentage: &nbsp; {{ basicStatistics(marker).perc }}</p>
+          <p class="my-0">Amp Percentage: &nbsp; {{ basicStatistics(marker).perc }}%</p>
         </div>
       </div>
     </div>
