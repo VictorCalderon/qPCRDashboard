@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="chart-body" v-if="currentSample">
-      <h6 class="text-center"> {{ "Sample Name: " + this.currentSample.sample + " | Well: " + this.well }}</h6>
+      <h6
+        class="text-center"
+      >{{ "Sample Name: " + this.currentSample.sample + " | Well: " + this.well }}</h6>
       <line-chart :chart-data="datacollection" :options="options" :height="300"></line-chart>
     </div>
     <div v-else>
@@ -76,9 +78,8 @@ export default {
 
     currentSample() {
       this.fillData();
-      this.well = this.fluorescenceData[0].well;
       this.changeSettings();
-    },
+    }
   },
 
   methods: {
@@ -116,7 +117,7 @@ export default {
             fontSize: 12,
             usePointStyle: false
           }
-        },
+        }
         // title: {
         //   display: true,
         //   text: "Sample Name: " + this.currentSample.sample + " | Well: " + this.well,
