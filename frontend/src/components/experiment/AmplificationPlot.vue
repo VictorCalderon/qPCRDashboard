@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div class="amp-details">
+    <!-- <div class="amp-details">
       <div class="amp-details-body">
         <span class="amp-details-keys">&nbsp;Sample Name:&nbsp;</span>
         <span class="amp-details-values">&nbsp;{{ currentSample.sample }}&nbsp;</span>&nbsp;|&nbsp;
         <span class="amp-details-keys">&nbsp;Well&nbsp;:</span>
         <span class="amp-details-values">&nbsp;{{ well }}&nbsp;</span>
       </div>
-    </div>
+    </div>-->
     <div class="chart-body" v-if="currentSample">
-      <line-chart :chart-data="datacollection" :options="options" :height="300"></line-chart>
+      <line-chart :chart-data="datacollection" :options="options" :height="325"></line-chart>
     </div>
     <div v-else>
       <div>
@@ -34,7 +34,7 @@ export default {
 
   data() {
     return {
-      colors: ["#E14544", "#535353", "#34a0e9", "#E8B53C"],
+      colors: ["#F49F0A", "#00A6A6", "#BBDEF0", "F08700"],
       well: null,
       datacollection: {},
       options: {}
@@ -55,22 +55,33 @@ export default {
 
     experimentFluorescences() {
       return this.$store.getters.experimentFluorescences;
+    },
+
+    plotTitle() {
+      return (
+        "Sample Name: " + this.currentSample.sample + " | Well: " + this.well
+      );
     }
   },
+
   watch: {
     fluorescenceData() {
       if (Object.keys(this.fluorescenceData).length) {
         this.fillData();
         this.well = this.fluorescenceData[0].well;
+        this.changeSettings();
       }
     },
+
     currentExperiment() {
       if (Object.keys(this.fluorescenceData).length) {
         this.fillData();
         this.well = this.fluorescenceData[0].well;
+        this.changeSettings();
       }
     }
   },
+
   methods: {
     fillData() {
       this.datacollection = {
@@ -87,6 +98,7 @@ export default {
         ]
       };
     },
+
     changeSettings() {
       this.options = {
         scales: {
@@ -105,6 +117,11 @@ export default {
             fontSize: 12,
             usePointStyle: false
           }
+        },
+        title: {
+          display: true,
+          text: this.plotTitle,
+          fontSize: 16
         }
       };
     }
