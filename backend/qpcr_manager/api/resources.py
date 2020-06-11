@@ -104,9 +104,9 @@ class ExperimentResource(Resource):
         if request.json.get('analyzed') == 'false':
             experiment.analyzed = False
 
-        # Change observation
+        # Change methodology
         if request.json.get('methodology'):
-            experiment.observations = request.json.get('methodology')
+            experiment.methodology = request.json.get('methodology')
 
         # Add experiment to session and commit change
         db.session.add(experiment)
