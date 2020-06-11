@@ -1,7 +1,7 @@
 <template>
   <b-container v-if="allExperiments">
     <b-row align-h="center" class="mt-5 mb-1">
-      <h1 class="font-weight-light">Amplification Faction Time Series</h1>
+      <h1 class="font-weight-light">Amplification Fraction Time Series</h1>
     </b-row>
     <b-row align-h="center" py-0>
       <b-col cols="3">
@@ -121,7 +121,7 @@ export default {
               label: "Percentage of Amplification",
               data: this.data["Amp Fraction"],
               pointRadius: this.data["Total Experiments"].map(p => {
-                return p + 5;
+                return 2 * p + 5;
               }),
               fill: true,
               backgroundColor: "#D5606285",
@@ -153,11 +153,11 @@ export default {
             usePointStyle: false
           }
         },
-        title: {
-          display: true,
-          text: this.marker,
-          fontsize: 16
-        }
+        // title: {
+        //   display: true,
+        //   text: this.marker,
+        //   fontsize: 16
+        // }
       };
     }
   },
@@ -173,6 +173,12 @@ export default {
 
   watch: {
     async marker() {
+      await this.getDashboardData();
+      await this.fillData();
+      await this.fillSettings();
+    },
+
+    async allExperiments() {
       await this.getDashboardData();
       await this.fillData();
       await this.fillSettings();
