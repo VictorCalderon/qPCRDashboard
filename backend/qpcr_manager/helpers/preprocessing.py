@@ -455,14 +455,14 @@ def experiment_statistics(experiment_samples):
 
     # Build PCA pipeline
     pipe = Pipeline([('scaler', StandardScaler()),
-                        ('reducer', PCA(n_components=2))])
+                     ('reducer', PCA(n_components=2))])
 
     # Process cq matrix
     pca = pipe.fit_transform(results_df)
 
     # Add PCA components to dataframe
-    results_df['PCA 1'] = pca[:, 0]
-    results_df['PCA 2'] = pca[:, 1]
+    results_df['PCA 1'] = np.round(pca[:, 0], 4)
+    results_df['PCA 2'] = np.round(pca[:, 1], 4)
 
     # Data
     cq_raw = results_df.to_dict('list')
