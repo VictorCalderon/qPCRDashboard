@@ -1,13 +1,7 @@
 <template>
   <div id="experiment-statistics" v-if="currentExperiment">
-    <h3 class="chart-title">
-      <span class="details-values">Experiment:</span>&nbsp;
-      <span class="details-keys">{{ currentExperiment.name }}</span>&nbsp;|
-      <span class="details-keys">&nbsp;Status:&nbsp;</span>
-      <span class="details-values">{{ currentExperiment.analyzed ? 'Analyzed' : 'Pending' }}&nbsp;</span>
-    </h3>
     <div class="chart-body">
-      <bar-chart :chart-data="datacollection" :options="options" :height="300"></bar-chart>
+      <bar-chart :chart-data="datacollection" :options="options" :height="340"></bar-chart>
     </div>
   </div>
 </template>
@@ -24,6 +18,10 @@ export default {
       if (this.$store.getters.currentExperiment) {
         return this.$store.getters.currentExperiment;
       } else return null;
+    },
+
+    plotName() {
+      return this.currentExperiment.name + " Amplification Count";
     },
 
     currentExperimentResults() {
@@ -61,9 +59,27 @@ export default {
   },
   data() {
     return {
-      colors: ["#E14544", "#535353", "#003a3ac0"],
+      colors: ["#067BC2", "#84BCDA", "#ECC30B", "F37748"],
       datacollection: {},
-      options: {
+      options: {}
+    };
+  },
+  methods: {
+    fillData() {
+      const stats = this.currentExperimentResults.amp_status;
+      this.datacollection = {
+        labels: [this.currentExperiment.name],
+        datasets: stats.map((result, i) => {
+          return {
+            label: result.marker,
+            data: [result.sum],
+            backgroundColor: this.colors[i]
+          };
+        })
+      };
+    },
+    fillOptions() {
+      this.options = {
         scales: {
           xAxes: [
             {
@@ -90,36 +106,31 @@ export default {
             fontSize: 12,
             usePointStyle: false
           }
+        },
+        title: {
+          display: true,
+          text: "Amplification Count",
+          fontSize: 16
         }
-      }
-    };
-  },
-  methods: {
-    fillData() {
-      const stats = this.currentExperimentResults.statistics;
-      this.datacollection = {
-        labels: [this.currentExperiment.name],
-        datasets: stats.map((result, i) => {
-          return {
-            label: result.marker,
-            data: [result.sum],
-            backgroundColor: this.colors[i]
-          };
-        })
       };
     }
   },
   watch: {
     modificationSignal() {
       this.fillData();
+      this.fillOptions();
     },
 
     currentExperiment() {
-      if (this.currentExperiment) this.fillData();
+      if (this.currentExperiment) {
+        this.fillData();
+        this.fillOptions();
+      }
     },
 
     currentExperimentResults() {
       this.fillData();
+      this.fillOptions();
     }
   }
 };
