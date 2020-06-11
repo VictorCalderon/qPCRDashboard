@@ -171,11 +171,17 @@ const actions = {
 
     },
 
-    selectCurrentExperiment({ commit, getters }) {
-        if (getters.currentExperiment) {
-            commit('SELECT_EXPERIMENT', getters.currentExperiment.id)
-        }
+    updateCurrentExperiment({ commit, getters }) {
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}`).then(res => {
+            commit('SELECT_EXPERIMENT', res.data.experiment)
+        })
     },
+
+    // selectCurrentExperiment({ commit, getters }) {
+    //     if (getters.currentExperiment) {
+    //         commit('SELECT_EXPERIMENT', getters.currentExperiment.id)
+    //     }
+    // },
 
     loadLastExperiment({ commit }) {
         axios.get('api/v1/experiments/lastexperiment', {
