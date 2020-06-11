@@ -128,8 +128,14 @@
       <hr />
       <b-container>
         <b-row>
-          <b-col>
+          <b-col v-if='!uploading'>
             <b-button @click="sendExperiment" variant="outline-success" block>Upload Experiment</b-button>
+          </b-col>
+          <b-col v-if="uploading">
+            <b-button variant="info" disabled block>
+              <b-spinner small type="grow"></b-spinner>
+                Uploading...
+            </b-button>
           </b-col>
           <b-col>
             <b-button variant="outline-secondary" @click="hideModal" block>Close</b-button>
@@ -159,8 +165,8 @@ export default {
 
     async updateData() {
       await this.$store.dispatch("loadExperiments");
-      await this.$store.dispatch("loadLastExperiment");
-      await this.$store.dispatch("selectCurrentExperiment");
+      // await this.$store.dispatch("loadLastExperiment");
+      // await this.$store.dispatch("selectCurrentExperiment");
     },
 
     hideModal() {
@@ -174,6 +180,7 @@ export default {
     },
 
     async sendExperiment() {
+      this.uploading = true;
       // Empty form data
       let formData = new FormData();
 
@@ -192,8 +199,10 @@ export default {
           }
         })
         .then(res => {
+          this.uploading = false;
           this.message = res.data.msg;
           this.showMessage = true;
+          this.$store.dispatch("loadExperiments");
         })
         .catch(err => {
           this.message = err.response.data.msg;
@@ -233,6 +242,7 @@ export default {
       message: false,
       showMessage: false,
       showError: false,
+      uploading: false,
       methodDescription:
         "e.g. extraction method, primers and probes used and thermocycler configuration.",
       options: [
