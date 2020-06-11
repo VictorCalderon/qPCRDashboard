@@ -1,7 +1,7 @@
 <template>
   <b-container v-if="allExperiments">
     <b-row align-h="center" class="mt-5 mb-1">
-      <h1 class="font-weight-light">Detected Ratio</h1>
+      <h1 class="font-weight-light">Amplification Faction Time Series</h1>
     </b-row>
     <b-row align-h="center" py-0>
       <b-col cols="3">
@@ -123,8 +123,10 @@ export default {
               pointRadius: this.data["Total Experiments"].map(p => {
                 return p + 5;
               }),
-              fill: false,
-              borderColor: "#87CEEB",
+              fill: true,
+              backgroundColor: "#D5606285",
+              pointBackgroundColor: "#D5606255",
+              borderColor: "#D5606255",
               pointHoverRadius: 20
             }
           ]
@@ -150,6 +152,11 @@ export default {
             fontSize: 12,
             usePointStyle: false
           }
+        },
+        title: {
+          display: true,
+          text: this.marker,
+          fontsize: 16
         }
       };
     }
@@ -168,6 +175,7 @@ export default {
     async marker() {
       await this.getDashboardData();
       await this.fillData();
+      await this.fillSettings();
     }
   }
 };
