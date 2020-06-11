@@ -36,8 +36,7 @@ api.add_resource(ImportExperiment, '/experiments/import')
 api.add_resource(ExportExperiment, '/experiments/export/<int:experiment_id>')
 
 # Amplification time series and other dashboard data
-api.add_resource(AmplificationTimeSeriesResource, "/timeseries/<int:marker_id>")
-api.add_resource(AmplificationTimeSeriesResource2, "/timeseries")
+api.add_resource(AmplificationTimeSeriesResource, "/timeseries")
 api.add_resource(MarkerList, '/markers')
 
 
