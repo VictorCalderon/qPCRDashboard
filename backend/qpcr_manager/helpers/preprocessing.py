@@ -414,7 +414,7 @@ def export_results(experiment_id, current_user):
     return ''.join(stringed_results)
 
 
-def analyze_experiment(experiment_samples):
+def experiment_statistics(experiment_samples):
     """Analyze experiment
     """
 
@@ -466,15 +466,15 @@ def analyze_experiment(experiment_samples):
         results_df['PCA 2'] = pca.iloc[:, 1]
 
     # Data
-    data = results_df.to_dict('list')
-
-    # # Build extended Confidene dataframe
-    # confidence = results.pivot_table(index='sample', columns='marker', values='cq_confidence').to_dict()
+    cq_raw = results_df.to_dict('list')
 
     # Count amplifications
-    statistics = results.groupby('marker')['amp_status'].agg([np.mean, np.sum]).reset_index().to_dict('records')
+    amp_status = results.groupby('marker')['amp_status'].agg([np.mean, np.sum]).reset_index().to_dict('records')
+    amped_cq = results[results['amp_status'] > 0].groupby('marker')['amp_cq'].agg(
+        [np.mean, np.std]).reset_index().to_dict('records')
 
-    return samples, data, statistics
+    # Jsonify results
+    return {'samples': samples, 'cq_raw': cq_raw, 'amp_status': amp_status, 'amped_cq': amped_cq}
 
 
 def available_markers(current_user):
