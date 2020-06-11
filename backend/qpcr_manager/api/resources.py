@@ -311,6 +311,22 @@ class AmplificationTimeSeriesResource(Resource):
         return amped_timeseries(marker_id, current_user)
 
 
+class AmplificationTimeSeriesResource2(Resource):
+    """Get Overview of Experiment Results
+    """
+
+    method_decorators = [jwt_required]
+
+    def post(self):
+        """Query for such data
+        """
+
+        # Get query configuration
+        marker_id = request.args.get('marker_id')
+
+        return amped_timeseries(marker_id, current_user)
+
+
 class SampleSchema(ma.SQLAlchemyAutoSchema):
 
     id = ma.auto_field()
@@ -417,5 +433,5 @@ __all__ = [
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
-    'MarkerList'
+    'MarkerList', 'AmplificationTimeSeriesResource2'
 ]
