@@ -305,19 +305,7 @@ class AmplificationTimeSeriesResource(Resource):
 
     method_decorators = [jwt_required]
 
-    def get(self, marker_id):
-        """Query for such data
-        """
-        return amped_timeseries(marker_id, current_user)
-
-
-class AmplificationTimeSeriesResource2(Resource):
-    """Get Overview of Experiment Results
-    """
-
-    method_decorators = [jwt_required]
-
-    def post(self):
+    def get(self):
         """Query for such data
         """
 
@@ -433,5 +421,5 @@ __all__ = [
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
-    'MarkerList', 'AmplificationTimeSeriesResource2'
+    'MarkerList'
 ]
