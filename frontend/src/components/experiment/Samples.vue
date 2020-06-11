@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <div class="my-1 py-2">
+  <div class="mt-1" height="300px">
+    <div class="mb-1">
       <b-form-input v-model="filter" placeholder="Filter samples" class="text-center"></b-form-input>
     </div>
     <div class="sample-list">
       <b-row v-for="sample in filteredSamples" :key="sample.id" class="my-0">
         <b-col>
           <b-button
-            class="py-2 my-1 bg-light text-dark border"
+            class="py-2 mt-1 bg-light text-dark border"
             block
             @click="selectSample(sample.id)"
           >
@@ -72,7 +72,7 @@ export default {
 $GreyDarker: #505050;
 
 .sample-list {
-  height: 260px;
+  height: 280px;
   width: 100%;
   overflow-y: scroll;
   -ms-overflow-style: none;
