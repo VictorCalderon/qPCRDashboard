@@ -37,10 +37,10 @@
             <span>{{experiment.name | shortName }}</span>
           </b-dropdown-item>
         </b-nav-item-dropdown>-->
-        <b-nav-item v-b-modal.edit-experiments-modal class="mx-2">
+        <b-nav-item v-b-modal.edit-experiments-modal class="mx-2" v-if="currentExperiment">
           <i class="far fa-edit"></i>&nbsp;Edit
         </b-nav-item>
-        <b-nav-item v-b-modal.export-experiments-modal class="mx-2">
+        <b-nav-item v-b-modal.export-experiments-modal class="mx-2" v-if="currentExperiment">
           <i class="fas fa-file-export"></i>&nbsp;Export
         </b-nav-item>
         <b-nav-item disabled class="mx-2">
@@ -87,17 +87,13 @@ export default {
 
     currentExperiment() {
       if (this.$store.getters.currentExperiment == null) {
-        return {};
+        return null;
       }
       return this.$store.getters.currentExperiment;
     },
 
     currentUser() {
       return this.$store.getters.currentUser;
-    },
-
-    recentExperiments() {
-      return this.$store.getters.recentExperiments;
     }
   },
   methods: {
