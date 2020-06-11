@@ -452,18 +452,17 @@ def experiment_statistics(experiment_samples):
     samples = list(results_df.pop('sample'))
 
     # Lower dimensions of more than 2 markers
-    if len(markers) > 2:
 
-        # Build PCA pipeline
-        pipe = Pipeline([('scaler', StandardScaler()),
-                         ('reducer', PCA(n_components=2))])
+    # Build PCA pipeline
+    pipe = Pipeline([('scaler', StandardScaler()),
+                        ('reducer', PCA(n_components=2))])
 
-        # Process cq matrix
-        pca = pipe.fit_transform(results_df)
+    # Process cq matrix
+    pca = pipe.fit_transform(results_df)
 
-        # Add PCA components to dataframe
-        results_df['PCA 1'] = pca.iloc[:, 0]
-        results_df['PCA 2'] = pca.iloc[:, 1]
+    # Add PCA components to dataframe
+    results_df['PCA 1'] = pca[:, 0]
+    results_df['PCA 2'] = pca[:, 1]
 
     # Data
     cq_raw = results_df.to_dict('list')
