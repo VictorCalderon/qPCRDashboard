@@ -10,7 +10,14 @@
     scrollable
   >
     <b-container v-if="currentExperiment">
-      <b-alert v-model="showAlert" variant="info" class="text-center">{{ updateMsg }}</b-alert>
+      <b-alert
+        v-model="showAlert"
+        variant="info"
+        class="text-center"
+        fade
+        dismissible
+        @dismissed="hideModal()"
+      >{{ updateMsg }}</b-alert>
       <b-row class="mb-2">
         <b-col>
           <div class="text-center">
@@ -37,7 +44,6 @@
           </div>
         </b-col>
       </b-row>
-      <hr />
       <b-row class="mb-2" align-h="center">
         <b-col>
           <div class="text-center">
@@ -50,47 +56,62 @@
             ></b-form-input>
           </div>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="10" offset="1">
-          <hr />
+        <b-col>
           <div class="text-center">
-            <b-form-group label="Experiment status">
-              <b-row class="mt-2">
-                <b-col>
-                  <b-form-radio
-                    v-model="experiment.analyzed"
-                    name="analyzed-radios"
-                    value="true"
-                  >Analyzed</b-form-radio>
-                </b-col>
-                <b-col>
-                  <b-form-radio
-                    v-model="experiment.analyzed"
-                    name="analyzed-radios"
-                    value="false"
-                  >Pending</b-form-radio>
-                </b-col>
-              </b-row>
-              <hr />
-              <b-row class="mt-1">
-                <b-col>
-                  <label for="delete-experiment-button">Delete current experiment</label>
-                  <b-button
-                    id="delete-experiment-button"
-                    size="md"
-                    variant="outline-danger"
-                    @click="deleteCurrentExperiment"
-                    block
-                  >Delete</b-button>
-                </b-col>
-              </b-row>
-              <hr />
-            </b-form-group>
+            <label for="edit-experimentstatus">Experiment Status</label>
+            <b-form-checkbox
+              id="edit-experimentstatus"
+              v-model="experiment.analyzed"
+              name="check-button"
+              size="lg"
+              switch
+            >
+              <small>{{ experiment.analyzed ? 'Analyzed' : 'Not Analyzed' }}</small>
+            </b-form-checkbox>
           </div>
         </b-col>
       </b-row>
-      <b-row>
+      <hr />
+      <b-row align-h="center" v-if="!deleteConfirmation">
+        <b-col cols="6">
+          <div class="text-center">
+            <label for="delete-experiment-button">Delete experiment</label>
+            <b-button
+              id="delete-experiment-button"
+              size="md"
+              variant="outline-danger"
+              @click="deleteConfirmation = true"
+              block
+            >Delete</b-button>
+            <p class="text-secondary pt-1 my-1">This cannot be undone.</p>
+          </div>
+        </b-col>
+      </b-row>
+      <hr class="my-1" v-if="!deleteConfirmation" />
+      <b-row v-if="deleteConfirmation" align-h="center">
+        <div class="text-center">
+          <p class="text-center">Are you sure? This cannot be undone</p>
+        </div>
+        <b-col cols="6">
+          <b-button
+            id="delete-experiment-button-no"
+            size="md"
+            variant="outline-secondary"
+            @click="deleteConfirmation = false"
+            block
+          >No</b-button>
+        </b-col>
+        <b-col cols="6">
+          <b-button
+            id="delete-experiment-button-yes"
+            size="md"
+            variant="danger"
+            @click="deleteCurrentExperiment"
+            block
+          >Yes</b-button>
+        </b-col>
+      </b-row>
+      <b-row class="mt-2" v-if="!deleteConfirmation">
         <b-col>
           <b-button
             id="update-experiment-button"
@@ -125,13 +146,14 @@ export default {
     return {
       experiment: {
         name: null,
-        experiment_date: null,
+        date: null,
         analyzed: null,
         methodology: null,
         id: null
       },
       alert: null,
-      showAlert: false
+      showAlert: false,
+      deleteConfirmation: false
     };
   },
 
@@ -150,19 +172,21 @@ export default {
         .dispatch("updateExperiment", this.experiment)
         .then(() => {
           this.showAlert = true;
-          this.closeEdit();
+          this.$store.dispatch("updateCurrentExperiment");
         });
     },
 
     hideModal() {
+      this.$store.dispatch("loadExperiments");
+      this.$refs["edit-experiments-modal"].hide();
+      this.deleteConfirmation = false;
       this.experiment = {
         name: null,
-        experiment_date: null,
+        date: null,
         analyzed: null,
         id: null,
         methodology: null
       };
-      this.$refs["edit-experiments-modal"].hide();
     },
 
     async deleteCurrentExperiment() {
@@ -190,6 +214,12 @@ export default {
     },
     updateMsg() {
       return this.$store.getters.updateMsg;
+    }
+  },
+
+  watch: {
+    currentExperiment() {
+      this.experiment = this.currentExperiment;
     }
   }
 };
