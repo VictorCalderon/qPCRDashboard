@@ -1,15 +1,8 @@
 <template>
   <div>
-    <!-- <div class="amp-details">
-      <div class="amp-details-body">
-        <span class="amp-details-keys">&nbsp;Sample Name:&nbsp;</span>
-        <span class="amp-details-values">&nbsp;{{ currentSample.sample }}&nbsp;</span>&nbsp;|&nbsp;
-        <span class="amp-details-keys">&nbsp;Well&nbsp;:</span>
-        <span class="amp-details-values">&nbsp;{{ well }}&nbsp;</span>
-      </div>
-    </div>-->
     <div class="chart-body" v-if="currentSample">
-      <line-chart :chart-data="datacollection" :options="options" :height="325"></line-chart>
+      <h6 class="text-center"> {{ "Sample Name: " + this.currentSample.sample + " | Well: " + this.well }}</h6>
+      <line-chart :chart-data="datacollection" :options="options" :height="300"></line-chart>
     </div>
     <div v-else>
       <div>
@@ -81,13 +74,11 @@ export default {
       }
     },
 
-    // currentSample() {
-    //   if (Object.keys(this.fluorescenceData).length) {
-    //     this.fillData();
-    //     this.well = this.fluorescenceData[0].well;
-    //     this.changeSettings();
-    //   }
-    // },
+    currentSample() {
+      this.fillData();
+      this.well = this.fluorescenceData[0].well;
+      this.changeSettings();
+    },
   },
 
   methods: {
@@ -126,11 +117,11 @@ export default {
             usePointStyle: false
           }
         },
-        title: {
-          display: true,
-          text: "Sample Name: " + this.currentSample.sample + " | Well: " + this.well,
-          fontSize: 16
-        }
+        // title: {
+        //   display: true,
+        //   text: "Sample Name: " + this.currentSample.sample + " | Well: " + this.well,
+        //   fontSize: 16
+        // }
       };
     }
   }
