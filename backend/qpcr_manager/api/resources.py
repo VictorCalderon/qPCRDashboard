@@ -217,11 +217,8 @@ class ExperimentResults(Resource):
         # Get experiments
         experiment_samples = Experiment.query.get_or_404(experiment_id).samples
 
-        # Process data for visualization
-        samples, data, statistics = analyze_experiment(experiment_samples)
-
         # Return processed experiment results
-        return {'data': data, 'samples': samples, 'statistics': statistics}
+        return experiment_statistics(experiment_samples)
 
 
 class ExperimentsQuery(Resource):
