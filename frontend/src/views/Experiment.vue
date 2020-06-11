@@ -1,21 +1,33 @@
 <template>
   <div class="rounded" v-if="allExperiments">
     <div v-if="currentExperiment">
-      <b-row class="m-3" align-h="center">
-        <b-col cols="2" class="bg-light rounded m-1">
-          <Samples></Samples>
+      <b-row class="mx-1 pt-1 mt-2 mb-1" align-h="center">
+        <b-col cols="2" class="rounded mx-0">
+          <ExperimentDetails></ExperimentDetails>
         </b-col>
-        <b-col cols="8" class="bg-light rounded m-1">
-          <Amplification></Amplification>
+        <b-col cols="6" class="rounded">
+          <b-card>
+            <Amplification></Amplification>
+          </b-card>
         </b-col>
-        <b-col cols="5" class="bg-light rounded m-1">
-          <Clustering></Clustering>
-        </b-col>
-        <b-col cols="5" class="bg-light rounded m-1">
-          <ExperimentResults></ExperimentResults>
+        <b-col cols="2" class="rounded">
+          <b-card>
+            <Samples></Samples>
+          </b-card>
         </b-col>
       </b-row>
-      <b-row class="m-5" align-h="center"></b-row>
+      <b-row class="mx-1 mt-2" align-h="center">
+        <b-col cols="5" class="rounded">
+          <b-card>
+            <Clustering></Clustering>
+          </b-card>
+        </b-col>
+        <b-col cols="5" class="rounded">
+          <b-card>
+            <ExperimentResults></ExperimentResults>
+          </b-card>
+        </b-col>
+      </b-row>
     </div>
     <b-row v-else align-h="center">
       <b-card class="text-center mt-3 rounded">
@@ -44,18 +56,18 @@
 
 <script>
 import ExperimentResults from "@/components/experiment/ExperimentResults";
+import ExperimentDetails from "@/components/experiment/ExperimentDetails";
 import Amplification from "@/components/experiment/AmplificationPlot";
 import Clustering from "@/components/experiment/ClusterPlot";
 import Samples from "@/components/experiment/Samples";
-// import Experiments from "@/components/experiment/Experiments";
 
 export default {
   components: {
     Amplification,
     Clustering,
     Samples,
-    ExperimentResults
-    // Experiments
+    ExperimentResults,
+    ExperimentDetails
   },
 
   methods: {
