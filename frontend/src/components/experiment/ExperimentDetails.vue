@@ -6,7 +6,7 @@
     </div>
     <div class="overflow-results p-1" style="height: 250px">
       <div
-        v-for="(marker, i) in Object.keys(currentExperimentResults.cq_raw)"
+        v-for="(marker, i) in markers"
         :key="i"
         class="bg-light mb-3 rounded py-2"
       >
@@ -15,7 +15,7 @@
           <p
             class="my-0"
           >Cq -> &nbsp;&mu;: {{ basicStatistics(marker).mean }} &nbsp;&nbsp; &sigma;: {{ basicStatistics(marker).std }}</p>
-          <p class="my-0">Amp Fraction: &nbsp; {{ basicStatistics(marker).perc }}</p>
+          <p class="my-0">Amp Percentage: &nbsp; {{ basicStatistics(marker).perc }}</p>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@ export default {
       return {
         mean: Number(markerStats.mean.toFixed(2)),
         std: Number(markerStats.std.toFixed(2)),
-        perc: Number(markerAmp.mean.toFixed(2))
+        perc: Number(markerAmp.mean.toFixed(2)) * 100
       };
     }
   },
@@ -68,6 +68,13 @@ export default {
       if (this.currentExperimentResults) {
         return this.currentExperimentResults.samples.length;
       } else return 0;
+    },
+
+    markers() {
+      if (this.currentExperimentResults) {
+        return this.currentExperimentResults.amp_status.map(p => {return p.marker})
+      }
+      else return []
     }
   },
 
