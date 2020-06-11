@@ -37,8 +37,8 @@ export default {
       scatterData: {},
       options: {},
       currentSampleID: null,
-      xAxis: "SARS-CoV-2 Gene",
-      yAxis: "Internal Control"
+      xAxis: "PCA 1",
+      yAxis: "PCA 2"
     };
   },
 
@@ -177,7 +177,7 @@ export default {
         },
         title: {
           display: true,
-          text: "Amp Cycle Scatterplot",
+          text: "Cq Principal Component Analysis",
           fontSize: 16
         }
       };
