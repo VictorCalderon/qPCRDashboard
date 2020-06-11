@@ -10,7 +10,7 @@
       v-if="currentExperiment"
       centered
     >
-      <b-row>
+      <!-- <b-row>
         <b-col>
           <b-alert v-model="showMessage" variant="info" class="text-center">{{ message }}</b-alert>
         </b-col>
@@ -30,7 +30,7 @@
           </b-card>
         </b-col>
       </b-row>
-      <hr />
+      <hr />-->
       <b-container>
         <b-row>
           <b-col>
@@ -54,35 +54,6 @@ export default {
     hideModal() {
       this.$refs["export-experiments-modal"].hide();
     },
-
-    sum(input) {
-      if (toString.call(input) !== "[object Array]") return false;
-
-      let total = 0;
-      for (let i = 0; i < input.length; i++) {
-        if (isNaN(input[i])) {
-          continue;
-        }
-        total += Number(input[i]);
-      }
-      return total;
-    },
-
-    totalAmplified(marker) {
-      if (this.currentExperimentResults) {
-        // Empty sum
-        let total = 0;
-
-        // Iterate over samples (i)
-        for (let i = 0; i < this.totalSamples.length; i++) {
-          if (this.currentExperimentResults.data[marker][i] != 0) {
-            total = total + 1;
-          }
-        }
-        return total;
-      } else return 1;
-    },
-
     async exportCurrentExperiment() {
       axios
         .get(`api/v1/experiments/export/${this.currentExperiment.id}`)
@@ -109,16 +80,6 @@ export default {
   computed: {
     currentExperiment() {
       return this.$store.getters.currentExperiment;
-    },
-
-    currentExperimentResults() {
-      return this.$store.getters.currentExperimentResults;
-    },
-
-    totalSamples() {
-      if (this.currentExperimentResults) {
-        return this.currentExperimentResults.samples.length;
-      } else return 0;
     }
   },
 
