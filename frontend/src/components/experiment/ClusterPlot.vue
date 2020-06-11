@@ -1,14 +1,25 @@
 <template>
-  <div>
-    <div class="amp-details">
-      <div class="amp-details-body">
-        <span class="amp-details-keys">&nbsp;Sample Clusterization:&nbsp;</span>
-        <span class="amp-details-values">&nbsp;{{ currentExperiment.name }}&nbsp;</span>&nbsp;
+  <!-- <b-container>
+    <b-row align-h="end">
+      <div class="settings-cog mt-3">
+        <b-dropdown right size="sm" variant="outline-secondary">
+          <template v-slot:button-content>
+            <i class="fas fa-tags"></i>
+          </template>
+          <b-container class="text-center">
+            Change Axes
+            <hr />
+            <div class="mx-2">
+              <b-form-select v-model="xAxis" :options="options"></b-form-select>
+              <b-form-select v-model="yAxis" :options="options" size="sm" class="mt-3"></b-form-select>
+            </div>
+          </b-container>
+        </b-dropdown>
       </div>
-    </div>
-    <div class="chart-body">
-      <scatter-chart :chart-data="datacollection" :options="options" :height="300"></scatter-chart>
-    </div>
+    </b-row>
+  </b-container>-->
+  <div class="my-1">
+    <scatter-chart :chart-data="scatterData" :options="options" :height="330"></scatter-chart>
   </div>
 </template>
 
@@ -23,7 +34,7 @@ export default {
   // [SUGGESTION] (Clusterplot.vue) xAxis and yAxis MUST be dynamic on mount
   data() {
     return {
-      datacollection: {},
+      scatterData: {},
       options: {},
       currentSampleID: null,
       xAxis: "SARS-CoV-2 Gene",
@@ -76,13 +87,17 @@ export default {
       } else return [];
     },
 
+    plotName() {
+      return this.currentExperiment.name + " Cq Scatterplot";
+    },
+
     currentAxes() {
       if (this.currentExperimentResults) {
         return [
-          ...this.currentExperimentResults.data[this.xAxis].map((x, i) => {
+          ...this.currentExperimentResults.cq_raw[this.xAxis].map((x, i) => {
             return {
               x: x,
-              y: this.currentExperimentResults.data[this.yAxis][i]
+              y: this.currentExperimentResults.cq_raw[this.yAxis][i]
             };
           })
         ];
@@ -97,13 +112,13 @@ export default {
     },
 
     fillData() {
-      this.datacollection = {
+      this.scatterData = {
         labels: this.labels,
         datasets: [
           {
             data: this.currentAxes,
             pointRadius: 5,
-            backgroundColor: "#34a0e9"
+            backgroundColor: "#D5606285"
           }
         ]
       };
@@ -161,9 +176,9 @@ export default {
           }
         },
         title: {
-          display: false,
-          text: "ORF1ab Cycle vs RNase P Cycle",
-          fontSize: 12
+          display: true,
+          text: "Amp Cycle Scatterplot",
+          fontSize: 16
         }
       };
     }
