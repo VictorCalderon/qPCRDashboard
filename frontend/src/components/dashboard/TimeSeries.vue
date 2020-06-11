@@ -55,20 +55,12 @@ export default {
   },
 
   methods: {
-    async getDashboardData() {
-      if (this.marker) {
-        await axios.get(`api/v1/timeseries/${this.marker}`).then(res => {
-          this.data = res.data;
-        });
-      } else this.data = null;
-    },
-
     async getTimeSeries() {
       if (this.marker) {
         let params = {
           marker_id: this.marker
         };
-        await axios.post("api/v1/timeseries", null, params).then(res => {
+        await axios.get("api/v1/timeseries", { params: params }).then(res => {
           this.data = res.data;
         });
       } else this.data = null;
@@ -153,15 +145,13 @@ export default {
 
   watch: {
     async marker() {
-      // await this.getTimeSeries();
-      await this.getDashboardData();
+      await this.getTimeSeries();
       await this.fillData();
       await this.fillSettings();
     },
 
     async allExperiments() {
-      // await this.getTimeSeries();
-      await this.getDashboardData();
+      await this.getTimeSeries();
       await this.fillData();
       await this.fillSettings();
     }
