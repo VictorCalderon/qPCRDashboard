@@ -44,41 +44,9 @@ export default {
       markersExists: null,
       options: [{ value: null, text: "Choose a marker" }],
       chartData: {},
-      chartConfig: {
-        scales: {
-          xAxes: [{ display: true }],
-          yAxes: [{ ticks: { suggestedMax: 0.5, suggestedMin: 0 } }]
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        tooltips: {
-          // callbacks: {
-          //   label: function(tooltipItem) {
-          //     var label = this.data["Total Projects"][tooltipItem.index];
-          //     return (
-          //       label +
-          //       ": (" +
-          //       tooltipItem.xLabel +
-          //       ", " +
-          //       tooltipItem.yLabel +
-          //       ")"
-          //     );
-          //   }
-          // }
-        },
-        legend: {
-          position: "bottom",
-          align: "center",
-          labels: {
-            boxWidth: 20,
-            boxHeight: 10,
-            padding: 15,
-            fontSize: 12,
-            usePointStyle: false
-          }
-        }
-      },
-      data: null
+      chartConfig: {},
+      data: null,
+      yAxis: "Amplification Fraction"
     };
   },
 
@@ -90,6 +58,17 @@ export default {
     async getDashboardData() {
       if (this.marker) {
         await axios.get(`api/v1/timeseries/${this.marker}`).then(res => {
+          this.data = res.data;
+        });
+      } else this.data = null;
+    },
+
+    async getTimeSeries() {
+      if (this.marker) {
+        let params = {
+          marker_id: this.marker
+        };
+        await axios.post("api/v1/timeseries", null, params).then(res => {
           this.data = res.data;
         });
       } else this.data = null;
@@ -118,7 +97,9 @@ export default {
           labels: this.data["Date"],
           datasets: [
             {
-              label: "Percentage of Amplification",
+              label: this.options.filter(
+                marker => marker.value == this.marker
+              )[0].text,
               data: this.data["Amp Fraction"],
               pointRadius: this.data["Total Experiments"].map(p => {
                 return 2 * p + 5;
@@ -137,22 +118,26 @@ export default {
     fillSettings() {
       this.chartConfig = {
         scales: {
-          xAxes: [{ display: true }],
-          yAxes: [{ ticks: { suggestedMax: 1.2, suggestedMin: 0 } }]
+          xAxes: [{ display: true }]
+          // yAxes: [
+          //   { scaleLabel: { display: false, labelString: this.yAxis } },
+          //   { ticks: { suggestedMax: 0.5, suggestedMin: 0 } }
+          // ]
         },
         responsive: true,
         maintainAspectRatio: false,
+        tooltips: {},
         legend: {
-          position: "bottom",
-          align: "center",
-          labels: {
-            boxWidth: 20,
-            boxHeight: 10,
-            padding: 15,
-            fontSize: 12,
-            usePointStyle: false
-          }
-        },
+          position: "bottom"
+          // align: "center",
+          // labels: {
+          //   boxWidth: 20,
+          //   boxHeight: 10,
+          //   padding: 15,
+          //   fontSize: 12,
+          //   usePointStyle: false
+          // }
+        }
       };
     }
   },
@@ -168,12 +153,14 @@ export default {
 
   watch: {
     async marker() {
+      // await this.getTimeSeries();
       await this.getDashboardData();
       await this.fillData();
       await this.fillSettings();
     },
 
     async allExperiments() {
+      // await this.getTimeSeries();
       await this.getDashboardData();
       await this.fillData();
       await this.fillSettings();
