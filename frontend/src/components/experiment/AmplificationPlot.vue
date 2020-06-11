@@ -79,7 +79,15 @@ export default {
         this.well = this.fluorescenceData[0].well;
         this.changeSettings();
       }
-    }
+    },
+
+    // currentSample() {
+    //   if (Object.keys(this.fluorescenceData).length) {
+    //     this.fillData();
+    //     this.well = this.fluorescenceData[0].well;
+    //     this.changeSettings();
+    //   }
+    // },
   },
 
   methods: {
@@ -120,7 +128,7 @@ export default {
         },
         title: {
           display: true,
-          text: this.plotTitle,
+          text: "Sample Name: " + this.currentSample.sample + " | Well: " + this.well,
           fontSize: 16
         }
       };
