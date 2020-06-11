@@ -24,7 +24,6 @@ import AddExperiment from "@/components/modals/AddExperiments";
 import SearchDatabase from "@/components/modals/SearchDatabase";
 import EditExperiment from "@/components/modals/EditExperiment";
 import ExportExperiment from "@/components/modals/ExportExperiment";
-
 import Login from "@/components/modals/LoginModal";
 
 export default {
