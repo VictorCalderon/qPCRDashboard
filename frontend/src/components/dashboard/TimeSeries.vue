@@ -5,7 +5,16 @@
     </b-row>
     <b-row align-h="center" py-0>
       <b-col cols="3">
-        <b-form-select v-model="marker" :options="options" class="mt-1"></b-form-select>
+        <b-form-select v-model="marker" :options="options" class="mt-1 mr-1"></b-form-select>
+      </b-col>
+      <b-col cols="1">
+        <b-button
+          class="mt-1 ml-0 text-dark border"
+          variant="outline-light"
+          @click="downloadDataset"
+        >
+          <i class="fas fa-download"></i>
+        </b-button>
       </b-col>
     </b-row>
     <b-row class="m-5" align-h="center" v-if="marker">
@@ -36,6 +45,7 @@
 import LineChart from "@/components/charts/LineChart.js";
 // import palette from "@/components/dashboard/colors.js";
 import axios from "axios";
+import fileDownload from "js-file-download";
 
 export default {
   data() {
@@ -46,7 +56,9 @@ export default {
       chartData: {},
       chartConfig: {},
       data: null,
-      yAxis: "Amplification Fraction"
+      yAxis: "Amplification Fraction",
+      file: null,
+      rawMarkers: null
     };
   },
 
@@ -66,17 +78,36 @@ export default {
       } else this.data = null;
     },
 
+    async downloadDataset() {
+      if (this.marker) {
+        let params = {
+          marker_id: this.marker
+        };
+
+        await axios.get("api/v1/dataset", { params: params }).then(res => {
+          let file = res.data.file;
+
+          if (file != null) {
+            // Create a blob
+
+            file = new Blob([file], {
+              type: "text/plain"
+            });
+
+            // Download file
+
+            fileDownload(file, `qPCR-dataset-${this.currentMarker}.csv`);
+          }
+        });
+      }
+    },
+
     async getMarkers() {
       await axios.get("api/v1/markers").then(res => {
-        let markers = res.data.markers;
-        if (markers.length > 0) {
-          this.options = [
-            ...markers.map(m => {
-              return { value: m[0], text: m[1] };
-            }),
-            ...this.options
-          ];
-          this.marker = markers[1][0];
+        this.rawMarkers = res.data.markers;
+        if (this.rawMarkers.length > 0) {
+          this.options = [...this.markers, ...this.options];
+          this.marker = this.rawMarkers[1][0];
         } else {
           this.markers = null;
         }
@@ -89,9 +120,7 @@ export default {
           labels: this.data["Date"],
           datasets: [
             {
-              label: this.options.filter(
-                marker => marker.value == this.marker
-              )[0].text,
+              label: this.currentMarker,
               data: this.data["Amp Fraction"],
               pointRadius: this.data["Total Experiments"].map(p => {
                 return 2 * p + 5;
@@ -137,9 +166,20 @@ export default {
   mounted() {
     this.getMarkers();
   },
+
   computed: {
     allExperiments() {
       return this.$store.getters.allExperiments;
+    },
+
+    markers() {
+      return this.rawMarkers.map(m => {
+        return { value: m[0], text: m[1] };
+      });
+    },
+
+    currentMarker() {
+      return this.markers.filter(marker => marker.value == this.marker)[0].text;
     }
   },
 
