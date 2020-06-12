@@ -40,8 +40,11 @@
         <b-nav-item v-b-modal.edit-experiments-modal class="mx-2" v-if="currentExperiment">
           <i class="far fa-edit"></i>&nbsp;Edit
         </b-nav-item>
-        <b-nav-item v-b-modal.export-experiments-modal class="mx-2" v-if="currentExperiment">
-          <i class="fas fa-file-export"></i>&nbsp;Export
+        <b-nav-item @click="exportCurrentExperiment" class="mx-2" v-if="currentExperiment">
+          <i class="fas fa-file-export" v-if="!exportingExperiment"></i>&nbsp;Export
+        </b-nav-item>
+        <b-nav-item class="mx-2" v-if="exportingExperiment">
+          <b-spinner small type="grow" v-if="exportingExperiment"></b-spinner>Exporting...
         </b-nav-item>
         <b-nav-item disabled class="mx-2">
           <i class="fas fa-grip-lines-vertical"></i>
@@ -76,9 +79,16 @@
 
 
 <script>
+import FileDownload from "js-file-download";
+import axios from "axios";
+
 export default {
   data() {
-    return {};
+    return {
+      showMessage: null,
+      message: null,
+      exportingExperiment: false
+    };
   },
   computed: {
     allExperiments() {
@@ -101,6 +111,28 @@ export default {
       await this.$store.dispatch("selectExperiment", experiment);
       await this.$store.dispatch("loadCurrentSamples");
       await this.$store.dispatch("loadCurrentExperimentResults");
+    },
+
+    async exportCurrentExperiment() {
+      this.exportingExperiment = true;
+      axios
+        .get(`api/v1/experiments/export/${this.currentExperiment.id}`)
+        .then(res => {
+          let file = res.data.file;
+
+          if (file != null) {
+            // Make a blob with it
+            file = new Blob([file], {
+              type: "text/plain"
+            });
+
+            // Download file
+            FileDownload(file, `${this.currentExperiment.name}.csv`);
+          }
+        })
+        .then(() => {
+          this.exportingExperiment = false;
+        });
     },
 
     toggleAddExperiments() {
