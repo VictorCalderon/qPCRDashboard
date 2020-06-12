@@ -110,11 +110,11 @@ export default {
     fillSettings() {
       this.chartConfig = {
         scales: {
-          xAxes: [{ display: true }]
-          // yAxes: [
-          //   { scaleLabel: { display: false, labelString: this.yAxis } },
-          //   { ticks: { suggestedMax: 0.5, suggestedMin: 0 } }
-          // ]
+          xAxes: [{ display: true }],
+          yAxes: [
+            // { scaleLabel: { display: false, labelString: this.yAxis } },
+            { ticks: { suggestedMax: 0.5, suggestedMin: 0 } }
+          ]
         },
         responsive: true,
         maintainAspectRatio: false,
