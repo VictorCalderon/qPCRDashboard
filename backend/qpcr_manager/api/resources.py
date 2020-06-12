@@ -97,11 +97,11 @@ class ExperimentResource(Resource):
             experiment.date = request.json.get('date')
 
         # Change analyzed to true
-        if request.json.get('analyzed') == 'true':
+        if request.json.get('analyzed') == True:
             experiment.analyzed = True
 
         # Change analyzed to false
-        if request.json.get('analyzed') == 'false':
+        if request.json.get('analyzed') == False:
             experiment.analyzed = False
 
         # Change methodology
