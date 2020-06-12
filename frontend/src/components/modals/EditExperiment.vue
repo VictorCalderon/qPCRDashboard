@@ -168,11 +168,13 @@ export default {
     },
 
     async modifyExperiment() {
+      console.log(this.experiment);
       await this.$store
         .dispatch("updateExperiment", this.experiment)
         .then(() => {
           this.showAlert = true;
-          this.$store.dispatch("updateCurrentExperiment");
+          this.closeEdit();
+          // this.$store.dispatch("updateCurrentExperiment");
         });
     },
 
