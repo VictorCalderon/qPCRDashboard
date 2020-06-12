@@ -10,28 +10,28 @@
       v-if="currentExperiment"
       centered
     >
-      <!-- <b-row>
-        <b-col>
-          <b-alert v-model="showMessage" variant="info" class="text-center">{{ message }}</b-alert>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
-          <b-card
-            class="text-center pt-2"
-            :title="currentExperiment.name"
-            v-if="currentExperimentResults"
-          >
-            <b-card-text>Total Samples: {{ totalSamples }}</b-card-text>
-            <b-card-text v-for="(marker, i) in Object.keys(currentExperimentResults.data)" :key="i">
-              <h5 class="my-0">{{ marker }}</h5>
-              mean Cq: {{ sum(currentExperimentResults.data[marker]) / totalAmplified(marker) }}
-            </b-card-text>
-          </b-card>
-        </b-col>
-      </b-row>
-      <hr />-->
       <b-container>
+        <b-row class="my-1">
+          <b-col>
+            <div class="text-center">
+              <label for="input-separator">Choose a separator</label>
+              <b-form-select v-model="sep" :options="options" size="sm" class id="input-separator"></b-form-select>
+            </div>
+          </b-col>
+        </b-row>
+        <b-row class="mt-3">
+          <b-col>
+            <div class="text-center">
+              <label for="select-columns">Select data to export</label>
+              <b-button-group id="select-columns">
+                <b-button variant="outline-secondary">Experiment</b-button>
+                <b-button variant="outline-secondary">Date</b-button>
+                <b-button variant="outline-secondary">Sample</b-button>
+              </b-button-group>
+            </div>
+          </b-col>
+        </b-row>
+        <hr />
         <b-row>
           <b-col>
             <b-button @click="exportCurrentExperiment" variant="outline-info" block>Export</b-button>
@@ -50,13 +50,29 @@ import FileDownload from "js-file-download";
 import axios from "axios";
 
 export default {
+  data() {
+    return {
+      options: [
+        { value: ",", text: "comma" },
+        { value: "tab", text: "tab" }
+      ],
+      sep: ",",
+      showMessage: null,
+      message: null
+    };
+  },
   methods: {
     hideModal() {
       this.$refs["export-experiments-modal"].hide();
     },
     async exportCurrentExperiment() {
+      const params = {
+        sep: this.sep
+      };
       axios
-        .get(`api/v1/experiments/export/${this.currentExperiment.id}`)
+        .get(`api/v1/experiments/export/${this.currentExperiment.id}`, {
+          params: params
+        })
         .then(res => {
           let file = res.data.file;
 
@@ -81,14 +97,6 @@ export default {
     currentExperiment() {
       return this.$store.getters.currentExperiment;
     }
-  },
-
-  data() {
-    return {
-      sep: null,
-      showMessage: null,
-      message: null
-    };
   }
 };
 </script>
