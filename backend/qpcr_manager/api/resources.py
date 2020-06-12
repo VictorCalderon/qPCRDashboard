@@ -233,10 +233,10 @@ class ExperimentsQuery(Resource):
         schema = ExperimentSchema(many=True)
 
         # Parse params
-        name = request.args.get('name')
-        date = request.args.get('date')
-        analyzed = request.args.get('analyzed')
-        methodology = request.args.get('methodology')
+        name = request.args.get('name', None)
+        date = request.args.get('date', None)
+        analyzed = request.args.get('analyzed', None)
+        methodology = request.args.get('methodology', None)
 
         # Query db for users experiments
         query = Experiment.query.filter_by(user_id=current_user.id).order_by(Experiment.id.desc())
@@ -270,7 +270,7 @@ class ExperimentsQuery(Resource):
 
 
 class ExportExperiment(Resource):
-    """Export experiment to AS
+    """Export experiment data and results as a csv file
     """
 
     method_decorators = [jwt_required]
@@ -279,8 +279,16 @@ class ExportExperiment(Resource):
         """Get all sample from a sigle experiment
         """
 
+        # Define parameters
+        sep = request.args.get('sep', ',')
+        columns = request.args.get('columns', None)
+
+        # Parse columns
+        if columns:
+            columns = columns.split(',')
+
         # Result file
-        result_file = export_results(experiment_id, current_user)
+        result_file = export_results(experiment_id, current_user, params={'sep': sep, 'columns': columns})
 
         # Return response
         return {'file': result_file}
@@ -313,6 +321,27 @@ class AmplificationTimeSeriesResource(Resource):
         marker_id = request.args.get('marker_id')
 
         return amped_timeseries(marker_id, current_user)
+
+
+class MarkerSpecificDataset(Resource):
+    """Get a marker specific dataset
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Download specific dataset
+        """
+
+        # Get marker
+        marker_id = request.args.get('marker_id', None)
+
+        # Check for errors
+        if None:
+            return {'msg': 'Marker id required'}, 400
+
+        # Get dataset
+        return {'file': marker_dataset(marker_id, current_user)}
 
 
 class SampleSchema(ma.SQLAlchemyAutoSchema):
@@ -421,5 +450,5 @@ __all__ = [
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
-    'MarkerList'
+    'MarkerList', 'MarkerSpecificDataset'
 ]
