@@ -42,9 +42,7 @@ def query_samples(current_user, sample):
     """
 
     # Run in pandas
-    samples = pd.read_sql(query, con=db.session.bind)
-
-    return samples.to_dict(orient='records')
+    return pd.read_sql(query, con=db.session.bind).to_dict(orient='records')
 
 
 def import_DA2(buffered_zip):
@@ -379,13 +377,13 @@ def query_fluorescence(sample_id):
     return sorted(fluorescence_array, key=lambda x: x['marker'])
 
 
-def export_results(experiment_id, current_user):
+def export_results(experiment_id, current_user, params={'sep': ','}):
     """Export experiment
     """
 
     try:
         query = f"""
-        SELECT sample, marker, amp_status, amp_cq FROM experiments
+        SELECT name, date, sample, marker, amp_status, amp_cq FROM experiments
         JOIN samples on samples.experiment_id = experiments.id
         JOIN results on results.sample_id = samples.id
         JOIN markers on results.marker_id = markers.id
@@ -393,25 +391,19 @@ def export_results(experiment_id, current_user):
         """
 
         # Get results
-        query = db.session.execute(query)
-        # experiment = Experiment.query.filter_by(user_id=current_user.id, id=experiment_id).first()
+        query = pd.read_sql(query, db.session.bind)
 
         if query is None:
             raise ValueError('This experiment could not be exported')
 
-        def bool_to_string(x): return 'Amp' if x else 'No Amp'
-
-        # Get results (samples, results)
-        results = [[q[0], q[1], bool_to_string(q[2]), str(q[3])] for q in query]
-
     except:
         raise ValueError('You can only export your own experiments')
 
-    # Merge into a single string
-    stringed_results = [','.join(x) + '\n' for x in results]
+    # Set Amplification Name
+    query['amp_status'] = query['amp_status'].apply(lambda x: 'Amp' if x else 'No Amp')
 
-    # One big string
-    return ''.join(stringed_results)
+    # Apply to queried df
+    return query.to_csv(index=False, sep=params['sep'])
 
 
 def experiment_statistics(experiment_samples):
