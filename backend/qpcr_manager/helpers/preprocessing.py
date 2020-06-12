@@ -496,7 +496,7 @@ def amped_timeseries(marker_id, current_user):
     """
 
     # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
-    my_query = f"""
+    query = f"""
     SELECT date, CAST(COUNT(CASE WHEN amp_status THEN 1 END) as decimal) / COUNT(amp_status), COUNT(DISTINCT(sample)), COUNT(DISTINCT(name))
     FROM samples AS s
     JOIN experiments as p on s.experiment_id = p.id
@@ -507,7 +507,7 @@ def amped_timeseries(marker_id, current_user):
     """
 
     # Run query
-    data = db.session.execute(my_query)
+    data = db.session.execute(query)
 
     # Parse data
     data = [(str(d[0]), round(float(d[1]), 2), d[2], d[3]) for d in data]
@@ -517,3 +517,27 @@ def amped_timeseries(marker_id, current_user):
 
     # Return data
     return data.to_dict('list')
+
+
+def marker_dataset(marker_id, current_user):
+    """Query dashboard data (date, perc_cases, total_samples, total_experiments)
+    """
+
+    # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
+    query = f"""
+    SELECT name, date, methodology, sample, amp_status, amp_cq
+    FROM samples AS s
+    JOIN experiments as p on s.experiment_id = p.id
+    JOIN results as r on r.sample_id = s.id
+    JOIN markers as m on r.marker_id = m.id
+    WHERE m.id = {marker_id} AND p.user_id = {current_user.id}
+    """
+
+    # Run query in pandas
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Make Amp Status Binary
+    dataset['amp_status'] = dataset['amp_status'].apply(lambda x: 1 if x else 0)
+
+    # Return dataset as a csv
+    return dataset.to_csv(index=False)
