@@ -90,14 +90,13 @@ export default {
           let file = res.data.file;
 
           if (file != null) {
+            
             // Create a blob
-
             file = new Blob([file], {
               type: "text/plain"
             });
 
             // Download file
-
             fileDownload(file, `qPCR-dataset-${this.currentMarker}.csv`);
           }
         });
