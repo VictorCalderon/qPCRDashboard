@@ -1,9 +1,6 @@
 <template>
   <div class="overflow-auto mt-3 py-2 mb-2 bg-light rounded">
     <div v-if="allExperiments">
-      <!-- <b-row align-h="center" class="py-0">
-        <p class="py-0 my-0">Recent Experiments</p>
-      </b-row>-->
       <b-row class align-h="center">
         <b-button
           variant="outline-secondary"
@@ -17,14 +14,6 @@
         </b-button>
       </b-row>
     </div>
-    <!-- <div v-else class="my-3">
-      <b-row align-h="center">
-        <p class="upload-experiments">Upload a experiment to start analyzing your data</p>
-      </b-row>
-      <b-row align-h="center">
-        <b-button variant="info" v-b-modal.add-experiments-modal>Upload Experiment</b-button>
-      </b-row>
-    </div>-->
   </div>
 </template>
 
