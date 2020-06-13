@@ -214,11 +214,8 @@ class ExperimentResults(Resource):
         """Get results from experiment.
         """
 
-        # Get experiments
-        experiment_samples = Experiment.query.get_or_404(experiment_id).samples
-
         # Return processed experiment results
-        return experiment_statistics(experiment_samples)
+        return experiment_statistics(experiment_id, current_user)
 
 
 class ExperimentsQuery(Resource):
