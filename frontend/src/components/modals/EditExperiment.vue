@@ -168,7 +168,6 @@ export default {
     },
 
     async modifyExperiment() {
-      console.log(this.experiment);
       await this.$store
         .dispatch("updateExperiment", this.experiment)
         .then(() => {
