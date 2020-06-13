@@ -15,20 +15,6 @@
         </div>
       </div>
     </div>
-    <!-- <div>
-      <b-row align-h="center" class="mb-1 mt-2">
-        <b-col>
-          <b-button v-b-modal.edit-experiments-modal class block variant="outline-secondary">
-            <i class="far fa-edit"></i>&nbsp;Edit
-          </b-button>
-        </b-col>
-        <b-col>
-          <b-button v-b-modal.export-experiments-modal variant="outline-secondary" block>
-            <i class="fas fa-download"></i>&nbsp;Export
-          </b-button>
-        </b-col>
-      </b-row>
-    </div>-->
   </div>
 </template>
 
