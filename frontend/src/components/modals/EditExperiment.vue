@@ -173,7 +173,6 @@ export default {
         .then(() => {
           this.showAlert = true;
           this.closeEdit();
-          // this.$store.dispatch("updateCurrentExperiment");
         });
     },
 
