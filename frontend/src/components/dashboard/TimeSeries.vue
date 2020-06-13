@@ -12,9 +12,13 @@
           class="mt-1 ml-0 text-dark border"
           variant="outline-light"
           @click="downloadDataset"
+          id='download-dataset'
         >
           <i class="fas fa-download"></i>
         </b-button>
+        <b-tooltip target="download-dataset" triggers="hover" v-if="currentMarker" placement="right" variant="info">
+          Download your dataset for <b>{{ currentMarker ? currentMarker : '' }}</b>
+        </b-tooltip>
       </b-col>
     </b-row>
     <b-row class="m-5" align-h="center" v-if="marker">
@@ -43,7 +47,6 @@
 
 <script>
 import LineChart from "@/components/charts/LineChart.js";
-// import palette from "@/components/dashboard/colors.js";
 import axios from "axios";
 import fileDownload from "js-file-download";
 
@@ -141,21 +144,14 @@ export default {
         tooltips: {},
         legend: {
           position: "bottom"
-          // align: "center",
-          // labels: {
-          //   boxWidth: 20,
-          //   boxHeight: 10,
-          //   padding: 15,
-          //   fontSize: 12,
-          //   usePointStyle: false
-          // }
+
         }
       };
     }
   },
 
-  mounted() {
-    this.getMarkers();
+  beforeCreate() {
+    this.$store.dispatch('getMarkers');
   },
 
   computed: {
@@ -168,7 +164,10 @@ export default {
     },
 
     currentMarker() {
-      return this.markers.filter(marker => marker.value == this.marker)[0].text;
+      if (this.markers && this.marker) {
+        return this.markers.filter(marker => marker.value == this.marker)[0].text;
+      }
+      else return ''
     },
 
     options() {
