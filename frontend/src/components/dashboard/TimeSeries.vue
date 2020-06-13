@@ -52,7 +52,6 @@ export default {
     return {
       marker: null,
       markersExists: null,
-      // options: [{ value: null, text: "Choose a marker" }],
       chartData: {},
       chartConfig: {},
       data: null,
@@ -101,18 +100,6 @@ export default {
         });
       }
     },
-
-    // async getMarkers() {
-    //   await axios.get("api/v1/markers").then(res => {
-    //     this.rawMarkers = res.data.markers;
-    //     if (this.rawMarkers.length > 0) {
-    //       this.options = [...this.markers, ...this.options];
-    //       this.marker = this.rawMarkers[1][0];
-    //     } else {
-    //       this.markers = null;
-    //     }
-    //   });
-    // },
 
     async getMarkers() {
       await this.$store.dispatch('getMarkers')
