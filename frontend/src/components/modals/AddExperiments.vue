@@ -164,8 +164,6 @@ export default {
 
     async updateData() {
       await this.$store.dispatch("loadExperiments");
-      // await this.$store.dispatch("loadLastExperiment");
-      // await this.$store.dispatch("selectCurrentExperiment");
     },
 
     hideModal() {
