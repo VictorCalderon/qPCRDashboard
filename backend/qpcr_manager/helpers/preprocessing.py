@@ -60,44 +60,49 @@ def import_DA2(buffered_zip):
     filename = dir_uuid + '/zipped_experiment.zip'
     buffered_zip.save(filename)
 
-    # Open file
-    with ZipFile(filename, 'r') as zippedObj:
+    try:
 
-        # Extract data to temporary dir_uuid folder
-        zippedObj.extractall(dir_uuid)
+        # Open file
+        with ZipFile(filename, 'r') as zippedObj:
 
-        # Make a data container with relevant data
-        data_container = {}
+            # Extract data to temporary dir_uuid folder
+            zippedObj.extractall(dir_uuid)
 
-        # Get Results, Amplification and Sample data
-        try:
-            amp_data = glob(f'{dir_uuid}/*Amplification*')[0]
-            results = glob(f'{dir_uuid}/*Results*')[0]
+            # Make a data container with relevant data
+            data_container = {}
 
-        except:
-            raise ValueError('The Zip Folder must contain Amplification and Results csv')
+            # Get Results, Amplification and Sample data
+            try:
+                amp_data = glob(f'{dir_uuid}/*Amplification*')[0]
+                results = glob(f'{dir_uuid}/*Results*')[0]
 
-        # Open dataframes
-        amp_data = pd.read_csv(amp_data, comment='#').replace('', pd.NA).dropna()
-        results = pd.read_csv(results, comment='#').replace('', pd.NA).dropna()
+            except:
+                raise ValueError('The Zip Folder must contain Amplification and Results csv')
 
-        # Change Undetermined to 0
-        results = results.replace('Undetermined', 0)
+            # Open dataframes
+            amp_data = pd.read_csv(amp_data, comment='#').replace('', pd.NA).dropna()
+            results = pd.read_csv(results, comment='#').replace('', pd.NA).dropna()
 
-        # Column order
-        amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
-        results_columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq', 'Cq Confidence']
+            # Change Undetermined to 0
+            results = results.replace('Undetermined', 0)
 
-        # Make them the correct datatype
-        amp_data = amp_data.astype({
-            'Well Position': str, 'Sample': str,
-            'Cycle Number': int, 'Target': str, 'Rn': float
-        })
+            # Column order
+            amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
+            results_columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
 
-        results = results.astype({
-            'Well Position': str, 'Sample': str, 'Target': str,
-            'Amp Status': str, 'Cq': float, 'Cq Confidence': float
-        })
+            # Make them the correct datatype
+            amp_data = amp_data.astype({
+                'Well Position': str, 'Sample': str,
+                'Cycle Number': int, 'Target': str, 'Rn': float
+            })
+
+            results = results.astype({
+                'Well Position': str, 'Sample': str, 'Target': str,
+                'Amp Status': str, 'Cq': float
+            })
+
+    except:
+        raise 'Data could not be parsed'
 
     # Remove files
     rmtree(dir_uuid, ignore_errors=True)
@@ -159,31 +164,66 @@ def parse_7500(data_container, sep='\t'):
 
     # Get Sample Data and instantiate dataframe
     try:
-        samples = [record.split(sep) for record in data_container['Sample']]
-        samples = pd.DataFrame.from_records(data=samples[1:], columns=samples[0])
+        results = [record.split(sep) for record in data_container['Results']]
+        results = pd.DataFrame.from_records(data=results[1:], columns=results[0])
 
     except KeyError:
         raise('[Sample Setup] header was not found in file')
 
     # Get qPCR data and instantiate dataframe
     try:
-        qpcrs = [record.split(sep) for record in data_container['Amplification']]
-        qpcrs = pd.DataFrame.from_records(data=qpcrs[1:], columns=qpcrs[0])
+        amp = [record.split(sep) for record in data_container['Amplification']]
+        amp = pd.DataFrame.from_records(data=amp[1:], columns=amp[0])
 
     except KeyError:
         raise('[Amplification Data] header not found in file')
 
     # Merge data
     try:
-        qpcrs_with_samples = pd.merge(qpcrs, samples, how='inner', on=['Well', 'Target Name'])
+        amp_with_results = pd.merge(amp, results, how='inner', on=['Well', 'Target Name'])
+
     except:
-        raise('Both [Sample Setup] and [Amplification Data] must share columns `Well` and `Target Name`')
+        raise('Both [Results] and [Amplification Data] must share columns `Well` and `Target Name`')
 
     # Filter necessary data
-    qs = qpcrs_with_samples[['Well', 'Cycle', 'Sample Name', 'Target Name', 'Rn']]  # 'ΔRn'
+    amp = amp_with_results[['Well', 'Sample Name', 'Cycle', 'Target Name', 'Rn']]  # 'ΔRn'
 
-    # Remove empty spaces and NaNs
-    return qs.replace('', pd.NA).dropna()
+    # Remove empty spaces
+    amp = amp.replace('', pd.NA).dropna()
+
+    # Change amp dtype
+    amp = amp.astype({
+        'Well': str, 'Sample Name': str,
+        'Cycle': int, 'Target Name': str, 'Rn': float
+    })
+
+    # Change amp column names for consistency
+    amp.columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
+
+    # Extract columns from results
+    results = results[['Well', 'Sample Name', 'Target Name', 'Cт']]
+
+    # Change Undetermined to 0
+    results = results.replace('Undetermined', 0)
+
+    # Remove empty spaces
+    results = results.replace('', pd.NA).dropna()
+
+    # Generate Amplification Status column
+    amp_status = results['Cт'].astype('float').apply(lambda x: 'Amp' if x > 0 else 'No Amp')
+
+    # Insert into dataframe
+    results.insert(3, 'Amp Status', amp_status)
+
+    # Rename columns for consistency
+    results.columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
+
+    # Change dtypes
+    results = results.astype({'Well Position': str, 'Sample': str, 'Target': 'category',
+                              'Amp Status': 'category', 'Cq': float})
+
+    # Remove empty spaces and NaNs and
+    return amp, results
 
 
 @lru_cache(maxsize=10)
@@ -282,8 +322,7 @@ def feed_DA2(filebuffer, current_experiment, current_user):
 
             # Instantiate Result
             result = Result(
-                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3),
-                cq_confidence=round(result[6], 3), marker_id=marker_id, sample=sample
+                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), marker_id=marker_id, sample=sample
             )
 
     # Add experiment to DB
@@ -295,30 +334,30 @@ def feed_7500(filebuffer, current_experiment, current_user):
     """Add data to database
     """
     # Import data
-    data_container = import_qpcr(filebuffer)
+    data_container = import_7500(filebuffer)
 
-    # Parse qPCRs
-    qs = parse_qpcr(data_container)
+    # Parse Fluorescence and Results
+    amp, results = parse_7500(data_container)
 
     # Get unique samples
-    unique_samples = qs['Sample Name'].unique()
+    unique_samples = results['Sample'].unique()
 
     # Unique Markers
-    unique_markers = qs['Target Name'].unique()
+    unique_markers = results['Target'].unique()
 
-    # Get M_Hash
+    # Get Marker Hash
     m_hash = add_markers(unique_markers)
 
-    # Iterate over unique samples
+    # Iterate over samples
     for sample_name in unique_samples:
 
-        # Instantiate a sample
+        # Instantiate sample
         sample = Sample(sample=sample_name, experiment=current_experiment)
 
-        # Mask dataframe for sample qPCRS
-        sample_qpcrs = qs[qs['Sample Name'] == sample_name]
+        # Mask dataframe for qPCRs
+        sample_qpcrs = amp[amp['Sample'] == sample_name]
 
-        # Iterate over qpcrs
+        # Iterate over qpcrs cycles
         for qpcr in sample_qpcrs.itertuples():
 
             # Get marker_id
@@ -326,8 +365,22 @@ def feed_7500(filebuffer, current_experiment, current_user):
 
             # Instantiate qPCR
             qpcr = Fluorescence(
-                well=qpcr[1], cycle=qpcr[2],
+                well=qpcr[1], cycle=qpcr[3],
                 rn=qpcr[5], sample=sample, marker_id=marker_id)
+
+        # Mask for results
+        sample_results = results[results['Sample'] == sample_name]
+
+        # Iterate over sample results
+        for result in sample_results.itertuples():
+
+            # Get marker_id
+            marker_id = m_hash[result[3]]
+
+            # Instantiate Result
+            result = Result(
+                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), marker_id=marker_id, sample=sample
+            )
 
     # Add experiment to DB
     db.session.add(current_experiment)
@@ -406,44 +459,30 @@ def export_results(experiment_id, current_user, params={'sep': ','}):
     return query.to_csv(index=False, sep=params['sep'])
 
 
-def experiment_statistics(experiment_samples):
+def experiment_statistics(experiment_id, current_user):
     """Analyze experiment
     """
 
-    # Set column names
-    column_names = ['sample', 'marker', 'amp_status', 'amp_cq', 'cq_confidence']
+    # Write query
+    query = f"""
+    SELECT sample, marker, amp_status, amp_cq FROM samples
+    JOIN experiments on samples.experiment_id = experiments.id
+    JOIN results on results.sample_id = samples.id
+    JOIN markers on results.marker_id = markers.id
+    WHERE experiments.user_id = {current_user.id} AND experiments.id = {experiment_id}
+    """
 
-    # Get records from set
-    records = deque()
-
-    # Iterate over query
-    for s in experiment_samples:
-
-        # Iterate over results
-        for r in s.results:
-
-            # Add result to records
-            records.append([s.sample, r.marker_id, r.amp_status, r.amp_cq, r.cq_confidence])
-
-    # Build dataframe from deque
-    results = pd.DataFrame.from_records(records)
-
-    # Set columns
-    results.columns = column_names
-
-    # Get marker name
-    results['marker'] = results['marker'].apply(query_marker)
-
-    # Get ordered markers
-    markers = list(results['marker'].unique())
+    # Run query on pandas
+    results = pd.read_sql(query, db.session.bind)
 
     # Build extended Cq dataframe
     results_df = results.pivot_table(index='sample', columns='marker', values='amp_cq').reset_index()
 
+    # Remove controls
+    results_df = results_df.dropna()
+
     # Get samples
     samples = list(results_df.pop('sample'))
-
-    # Lower dimensions of more than 2 markers
 
     # Build PCA pipeline
     pipe = Pipeline([('scaler', StandardScaler()),
@@ -456,13 +495,15 @@ def experiment_statistics(experiment_samples):
     results_df['PCA 1'] = np.round(pca[:, 0], 4)
     results_df['PCA 2'] = np.round(pca[:, 1], 4)
 
+    # [SUGGESTION] preprocessing.py Find a better way of dealing with this
+
     # Data
     cq_raw = results_df.to_dict('list')
 
     # Count amplifications
     amp_status = results.groupby('marker')['amp_status'].agg([np.mean, np.sum]).reset_index().to_dict('records')
-    amped_cq = results[results['amp_status'] > 0].groupby('marker')['amp_cq'].agg(
-        [np.mean, np.std]).reset_index().to_dict('records')
+    amped_cq = results[results['amp_status'] > 0]
+    amped_cq = amped_cq.groupby('marker')['amp_cq'].agg([np.mean, np.std]).reset_index().to_dict('records')
 
     # Jsonify results
     return {'samples': samples, 'cq_raw': cq_raw, 'amp_status': amp_status, 'amped_cq': amped_cq}
