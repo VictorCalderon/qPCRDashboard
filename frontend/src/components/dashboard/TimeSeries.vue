@@ -154,6 +154,22 @@ export default {
   },
 
   computed: {
+    datasets() {
+      if (this.data) {
+        return this.data.map((d, i) => {
+          return {
+            label: d.marker,
+            data: d['Amp Fraction'],
+            pointRadius: d['Total Experiments'].map(p => { return 2 * p + 5}),
+            fill: true,
+            backgroundColor: this.colors[i] + "85",
+            borderColor: this.colors[i] + "85",
+            pointHoverRadius: d['Total Samples'].map(p => { return 0.2 * p + 5}),
+          }
+        })
+      }
+      else return []
+    },
     allExperiments() {
       return this.$store.getters.allExperiments;
     },
