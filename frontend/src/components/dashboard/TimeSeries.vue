@@ -7,7 +7,7 @@
       <b-col cols="3">
         <b-form-select v-model="marker" :options="options" class="mt-1 mr-1"></b-form-select>
       </b-col>
-      <b-col cols="1">
+      <b-col cols="1" v-if="currentMarker">
         <b-button
           class="mt-1 ml-0 text-dark border"
           variant="outline-light"
@@ -16,7 +16,7 @@
         >
           <i class="fas fa-download"></i>
         </b-button>
-        <b-tooltip target="download-dataset" triggers="hover" v-if="currentMarker" placement="right" variant="info">
+        <b-tooltip target="download-dataset" triggers="hover" placement="right" variant="secondary">
           Download your dataset for <b>{{ currentMarker ? currentMarker : '' }}</b>
         </b-tooltip>
       </b-col>
