@@ -203,6 +203,8 @@ export default {
           this.message = res.data.msg;
           this.showMessage = true;
           this.$store.dispatch("loadExperiments");
+          this.$store.dispatch("getMarkers");
+
         })
         .catch(err => {
           this.message = err.response.data.msg;
