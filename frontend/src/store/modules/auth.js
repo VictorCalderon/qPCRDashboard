@@ -82,6 +82,11 @@ const actions = {
 
   clearToken({ commit }) {
     commit('CLEAR_TOKEN')
+  },
+
+  authLogOut({ commit, dispatch }) {
+    commit('CLEAR_TOKEN')
+    dispatch('selectExperiment', null)
   }
 }
 
