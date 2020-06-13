@@ -125,7 +125,7 @@ const actions = {
 
     async getMarkers({ commit }) {
         await axios.get("api/v1/markers").then(res => {
-            commit('AVAILABLE_MARKERS', res.data.marker);
+            commit('AVAILABLE_MARKERS', res.data.markers);
         });
     },
 
@@ -295,7 +295,9 @@ const getters = {
     },
 
     availableMarkers(state) {
-        return state.availableMarkers ? state.availableMarkers : null
+        return state.availableMarkers ? state.availableMarkers.map(m => {
+            return { value: m[0], text: m[1] };
+          }) : null
     }
 }
 
