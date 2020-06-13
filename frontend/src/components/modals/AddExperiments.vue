@@ -128,13 +128,12 @@
       <hr />
       <b-container>
         <b-row>
-          <b-col v-if='!uploading'>
+          <b-col v-if="!uploading">
             <b-button @click="sendExperiment" variant="outline-success" block>Upload Experiment</b-button>
           </b-col>
           <b-col v-if="uploading">
             <b-button variant="info" disabled block>
               <b-spinner small type="grow"></b-spinner>
-                Uploading...
             </b-button>
           </b-col>
           <b-col>
@@ -177,6 +176,7 @@ export default {
       this.showMessage = false;
       this.method = "";
       this.showError = false;
+      this.uploading = false;
     },
 
     async sendExperiment() {
@@ -207,6 +207,7 @@ export default {
         .catch(err => {
           this.message = err.response.data.msg;
           this.showError = true;
+          this.uploading = false;
         });
     }
   },
