@@ -1,15 +1,11 @@
 <template>
   <div class="text-center mt-4" v-if="currentExperimentResults">
     <div class="px-1 py-2 mb-1 rounded">
-      <h3 class="thin-font">{{ currentExperiment.name}}</h3>
+      <h4 class="thin-font">{{ currentExperiment.name}}</h4>
       <p class="my-0">Total Samples: {{ totalSamples }}</p>
     </div>
-    <div class="overflow-results p-1" style="height: 250px">
-      <div
-        v-for="(marker, i) in markers"
-        :key="i"
-        class="bg-light mb-3 rounded py-2"
-      >
+    <div class="overflow-results p-1" style="max-height: 260px">
+      <div v-for="(marker, i) in markers" :key="i" class="bg-light mb-3 rounded py-2">
         <h5 class="my-0 rounded thin-font">{{ marker }}</h5>
         <div>
           <p
@@ -48,11 +44,19 @@ export default {
         p => p.marker == marker
       )[0];
 
-      return {
-        mean: Number(markerStats.mean.toFixed(2)),
-        std: Number(markerStats.std.toFixed(2)),
-        perc: Number(markerAmp.mean.toFixed(2)) * 100
-      };
+      if (markerStats) {
+        return {
+          mean: Number(markerStats.mean.toFixed(2)),
+          std: Number(markerStats.std.toFixed(2)),
+          perc: Number(markerAmp.mean.toFixed(2)) * 100
+        };
+      } else {
+        return {
+          mean: 0.0,
+          std: 0.0,
+          perc: Number(markerAmp.mean.toFixed(2)) * 100
+        };
+      }
     }
   },
   computed: {
@@ -72,9 +76,10 @@ export default {
 
     markers() {
       if (this.currentExperimentResults) {
-        return this.currentExperimentResults.amp_status.map(p => {return p.marker})
-      }
-      else return []
+        return this.currentExperimentResults.amp_status.map(p => {
+          return p.marker;
+        });
+      } else return [];
     }
   },
 
