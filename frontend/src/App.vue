@@ -1,21 +1,25 @@
 <template>
-  <div class="wrapper">
-    <modal-Login v-if="!accessToken"></modal-Login>
-    <div v-else>
-      <modal-SearchDatabase></modal-SearchDatabase>
-      <modal-AddExperiments></modal-AddExperiments>
-      <modal-EditExperiment></modal-EditExperiment>
-      <modal-ExportExperiment></modal-ExportExperiment>
-      <Menu></Menu>
-      <b-row class="mx-0">
+<div>
+  <div v-if="!accessToken">
+    <modal-Login></modal-Login>
+  </div>
+  <div v-else>
+    <modal-SearchDatabase></modal-SearchDatabase>
+    <modal-AddExperiments></modal-AddExperiments>
+    <modal-EditExperiment></modal-EditExperiment>
+    <modal-ExportExperiment></modal-ExportExperiment>
+    <Menu></Menu>
+
+    <b-row class="mx-0">
         <b-col>
           <keep-alive>
             <router-view />
           </keep-alive>
         </b-col>
       </b-row>
-    </div>
   </div>
+</div>
+
 </template>
 
 <script>
