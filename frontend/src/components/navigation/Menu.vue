@@ -22,21 +22,6 @@
         <b-nav-item v-b-modal.search-experiments-modal class="mx-2">
           <i class="fas fa-search"></i>&nbsp;Search
         </b-nav-item>
-        <!-- <b-nav-item-dropdown right class="mx-2">
-          <template v-slot:button-content>
-            <span>
-              <i class="fas fa-clock"></i>&nbsp;Recent
-            </span>
-          </template>
-          <b-dropdown-item
-            v-for="experiment in recentExperiments"
-            :key="experiment.id"
-            @click="selectExperiment(experiment)"
-            class="m-1"
-          >
-            <span>{{experiment.name | shortName }}</span>
-          </b-dropdown-item>
-        </b-nav-item-dropdown>-->
         <b-nav-item v-b-modal.edit-experiments-modal class="mx-2" v-if="currentExperiment">
           <i class="far fa-edit"></i>&nbsp;Edit
         </b-nav-item>
@@ -115,8 +100,9 @@ export default {
 
     async exportCurrentExperiment() {
       this.exportingExperiment = true;
+      let currentId = this.currentExperiment.id
       axios
-        .get(`api/v1/experiments/export/${this.currentExperiment.id}`)
+        .get(`api/v1/experiments/export/${currentId}`)
         .then(res => {
           let file = res.data.file;
 
@@ -148,7 +134,7 @@ export default {
     },
 
     logOut() {
-      this.$store.dispatch("clearToken");
+      this.$store.dispatch("authLogOut");
     }
   }
 };
