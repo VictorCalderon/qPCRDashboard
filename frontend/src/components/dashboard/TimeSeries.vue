@@ -52,7 +52,7 @@ export default {
     return {
       marker: null,
       markersExists: null,
-      options: [{ value: null, text: "Choose a marker" }],
+      // options: [{ value: null, text: "Choose a marker" }],
       chartData: {},
       chartConfig: {},
       data: null,
@@ -102,16 +102,20 @@ export default {
       }
     },
 
+    // async getMarkers() {
+    //   await axios.get("api/v1/markers").then(res => {
+    //     this.rawMarkers = res.data.markers;
+    //     if (this.rawMarkers.length > 0) {
+    //       this.options = [...this.markers, ...this.options];
+    //       this.marker = this.rawMarkers[1][0];
+    //     } else {
+    //       this.markers = null;
+    //     }
+    //   });
+    // },
+
     async getMarkers() {
-      await axios.get("api/v1/markers").then(res => {
-        this.rawMarkers = res.data.markers;
-        if (this.rawMarkers.length > 0) {
-          this.options = [...this.markers, ...this.options];
-          this.marker = this.rawMarkers[1][0];
-        } else {
-          this.markers = null;
-        }
-      });
+      await this.$store.dispatch('getMarkers')
     },
 
     fillData() {
@@ -173,13 +177,18 @@ export default {
     },
 
     markers() {
-      return this.rawMarkers.map(m => {
-        return { value: m[0], text: m[1] };
-      });
+      return this.$store.getters.availableMarkers;
     },
 
     currentMarker() {
       return this.markers.filter(marker => marker.value == this.marker)[0].text;
+    },
+
+    options() {
+      if (this.markers) {
+        return [{ value: null, text: "Choose a marker" }, ...this.markers]
+      }
+      else return [{ value: null, text: "Choose a marker" }]
     }
   },
 
