@@ -2,10 +2,10 @@
   <div class="rounded" v-if="allExperiments">
     <div v-if="currentExperiment" class="mx-5">
       <b-row class="mx-1 pt-1 mt-2 mb-1" align-h="center">
-        <b-col cols="3" class="rounded mx-0">
+        <b-col cols="2" class="rounded mx-0">
           <ExperimentDetails></ExperimentDetails>
         </b-col>
-        <b-col cols="6" class="rounded">
+        <b-col class="rounded">
           <b-card>
             <Amplification></Amplification>
           </b-card>
