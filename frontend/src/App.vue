@@ -52,13 +52,16 @@ export default {
 
   methods: {
     startApp() {
+      this.$store.dispatch('initExperiments');
       this.$store.dispatch("loadExperiments");
     }
   },
 
   watch: {
     accessToken() {
-      this.startApp();
+      if (this.accessToken != null) {
+        this.startApp();
+      }
     }
   }
 };
