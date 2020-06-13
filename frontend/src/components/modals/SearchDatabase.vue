@@ -11,6 +11,7 @@
       header-text-variant="light"
       title="Search qPCR Database"
       hide-footer
+      @shown="queryExperiments"
     >
       <b-tabs content-class="mt-3" fill>
         <b-tab title="Experiments" lazy>
