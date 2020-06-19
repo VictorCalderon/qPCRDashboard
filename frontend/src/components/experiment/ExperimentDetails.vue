@@ -1,17 +1,17 @@
 <template>
-  <div class="text-center mt-4" v-if="currentExperimentResults">
-    <div class="px-1 py-2 mb-1 rounded">
+  <div class="text-center mt-1" v-if="currentExperimentResults">
+    <div class="px-1 py-1 mb-1 rounded">
       <h4 class="thin-font">{{ currentExperiment.name}}</h4>
-      <p class="my-0">Total Samples: {{ totalSamples }}</p>
+      <p class="my-0 smaller-font">Total Samples: {{ totalSamples }}</p>
     </div>
-    <div class="overflow-results p-1" style="max-height: 260px">
+    <div class="overflow-results p-1" style="max-height: 300px">
       <div v-for="(marker, i) in markers" :key="i" class="bg-light mb-3 rounded py-2">
-        <h5 class="my-0 rounded thin-font">{{ marker }}</h5>
+        <h5 class="my-0 rounded thin-font small-font">{{ marker }}</h5>
         <div>
           <p
-            class="my-0"
+            class="my-0 smaller-font"
           >Cq -> &nbsp;&mu;: {{ basicStatistics(marker).mean }} &nbsp;&nbsp; &sigma;: {{ basicStatistics(marker).std }}</p>
-          <p class="my-0">Amp Percentage: &nbsp; {{ basicStatistics(marker).perc }}%</p>
+          <p class="my-0">Amp Percentage: &nbsp; {{ Math.round(basicStatistics(marker).perc, 2) }}%</p>
         </div>
       </div>
     </div>
@@ -89,6 +89,14 @@ export default {
 }
 
 .thin-font {
-  font-weight: 300 !important;
+  font-weight: 390 !important;
+}
+
+.small-font {
+  font-size: 1rem !important;
+}
+
+.smaller-font {
+  font-size: 0.9rem !important;
 }
 </style>
