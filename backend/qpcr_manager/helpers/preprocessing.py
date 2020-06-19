@@ -500,7 +500,6 @@ def experiment_statistics(experiment_id, current_user):
     results_df['PCA 2'] = np.round(pca[:, 1], 4)
 
     # [SUGGESTION] preprocessing.py Find a better way of dealing with this
-
     # Data
     cq_raw = results_df.to_dict('list')
 
