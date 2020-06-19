@@ -59,7 +59,7 @@ export default {
   },
   data() {
     return {
-      colors: ["#F49F0A", "#00A6A6", "#BBDEF0", "F08700"],
+      colors: ["#E9EDDE", "#ef476f", "#26547c", "#ffd166", "#eff6ee"],
       datacollection: {},
       options: {}
     };
@@ -166,6 +166,14 @@ $Indicator: #539ee4;
     color: $GreyDarker;
     font-weight: 400;
     font-size: 0.9rem;
+  }
+
+  .colors {
+    background: #ac80a0;
+    background: #ef476f;
+    background: #ffd166;
+    background: #26547c;
+    background: #eff6ee;
   }
 }
 </style>
