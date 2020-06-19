@@ -1,20 +1,24 @@
 <template>
-  <div class="my-1 mx-0">
-    <b-row align-h="center" class="my-1">
+  <div>
+    <b-row class="text-center hue-selector text-secondary" align-h="center">
+      <b-col cols="5" offset="1">
+        <p class="mt-0">Principal Component Analysis</p>
+      </b-col>
       <b-col>
-        <div class="my-1 mx-0 px-0 text-center">
-          <p class="my-auto hue-selector text-secondary">Principal Component Analysis</p>
-          <b-button
-            v-for="(m, i) in availableMarkers"
-            :key="i"
-            @click="setMarker(m)"
-            class="m-md-1"
-            :variant="marker == m ? 'secondary' : 'outline-secondary'"
-          >{{ m }}</b-button>
-        </div>
-        <div>
-          <scatter-chart :chart-data="scatterData" :options="options" :height="330" v-if="marker"></scatter-chart>
-        </div>
+        <span>Hue&nbsp;</span>
+        <b-button
+          v-for="(m, i) in availableMarkers"
+          :key="i"
+          @click="setMarker(m)"
+          class="mx-md-1 py-1"
+          size="sm"
+          :variant="marker == m ? 'secondary' : 'outline-secondary'"
+        >{{ m }}</b-button>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <scatter-chart :chart-data="scatterData" :options="options" :height="295" v-if="marker"></scatter-chart>
       </b-col>
     </b-row>
   </div>
