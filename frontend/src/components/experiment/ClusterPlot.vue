@@ -53,7 +53,7 @@ export default {
 
     currentExperimentResults() {
       this.fillChart();
-      this.marker = null;
+      this.marker = Object.keys(this.currentExperimentResults.amp_raw)[-1];
     },
 
     marker() {
@@ -241,7 +241,6 @@ $Somered: #f14343;
   font-size: 1.2rem;
   font-weight: 400;
   text-align: center;
-  padding-bottom: 6px;
 }
 
 .no-marker {

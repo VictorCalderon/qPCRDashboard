@@ -100,7 +100,7 @@ export default {
 
     async exportCurrentExperiment() {
       this.exportingExperiment = true;
-      let currentId = this.currentExperiment.id
+      let currentId = this.currentExperiment.id;
       axios
         .get(`api/v1/experiments/export/${currentId}`)
         .then(res => {
