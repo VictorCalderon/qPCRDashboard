@@ -12,12 +12,13 @@
           class="mt-1 ml-0 text-dark border"
           variant="outline-light"
           @click="downloadDataset"
-          id='download-dataset'
+          id="download-dataset"
         >
           <i class="fas fa-download"></i>
         </b-button>
         <b-tooltip target="download-dataset" triggers="hover" placement="right" variant="secondary">
-          Download your dataset for <b>{{ currentMarker ? currentMarker : '' }}</b>
+          Download your dataset for
+          <b>{{ currentMarker ? currentMarker : '' }}</b>
         </b-tooltip>
       </b-col>
     </b-row>
@@ -90,7 +91,6 @@ export default {
           let file = res.data.file;
 
           if (file != null) {
-            
             // Create a blob
             file = new Blob([file], {
               type: "text/plain"
@@ -104,7 +104,7 @@ export default {
     },
 
     async getMarkers() {
-      await this.$store.dispatch('getMarkers')
+      await this.$store.dispatch("getMarkers");
     },
 
     fillData() {
@@ -116,7 +116,7 @@ export default {
               label: this.currentMarker,
               data: this.data["Amp Fraction"],
               pointRadius: this.data["Total Experiments"].map(p => {
-                return 2 * p + 5;
+                return 1.2 * p + 5;
               }),
               fill: true,
               backgroundColor: "#D5606285",
@@ -143,14 +143,13 @@ export default {
         tooltips: {},
         legend: {
           position: "bottom"
-
         }
       };
     }
   },
 
   beforeCreate() {
-    this.$store.dispatch('getMarkers');
+    this.$store.dispatch("getMarkers");
   },
 
   computed: {
@@ -159,16 +158,19 @@ export default {
         return this.data.map((d, i) => {
           return {
             label: d.marker,
-            data: d['Amp Fraction'],
-            pointRadius: d['Total Experiments'].map(p => { return 2 * p + 5}),
+            data: d["Amp Fraction"],
+            pointRadius: d["Total Experiments"].map(p => {
+              return 2 * p + 5;
+            }),
             fill: true,
             backgroundColor: this.colors[i] + "85",
             borderColor: this.colors[i] + "85",
-            pointHoverRadius: d['Total Samples'].map(p => { return 0.2 * p + 5}),
-          }
-        })
-      }
-      else return []
+            pointHoverRadius: d["Total Samples"].map(p => {
+              return 0.2 * p + 5;
+            })
+          };
+        });
+      } else return [];
     },
     allExperiments() {
       return this.$store.getters.allExperiments;
@@ -180,16 +182,15 @@ export default {
 
     currentMarker() {
       if (this.markers && this.marker) {
-        return this.markers.filter(marker => marker.value == this.marker)[0].text;
-      }
-      else return ''
+        return this.markers.filter(marker => marker.value == this.marker)[0]
+          .text;
+      } else return "";
     },
 
     options() {
       if (this.markers) {
-        return [{ value: null, text: "Choose a marker" }, ...this.markers]
-      }
-      else return [{ value: null, text: "Choose a marker" }]
+        return [{ value: null, text: "Choose a marker" }, ...this.markers];
+      } else return [{ value: null, text: "Choose a marker" }];
     }
   },
 
