@@ -119,9 +119,9 @@ export default {
                 return 1.2 * p + 5;
               }),
               fill: true,
-              backgroundColor: "#D5606285",
-              pointBackgroundColor: "#D5606255",
-              borderColor: "#D5606255",
+              backgroundColor: "#27304385",
+              pointBackgroundColor: "#27304355",
+              borderColor: "#27304355",
               pointHoverRadius: 20
             }
           ]
