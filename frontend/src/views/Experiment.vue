@@ -17,12 +17,12 @@
         </b-col>
       </b-row>
       <b-row class="mx-1 mt-4" align-h="center">
-        <b-col cols="6" class="rounded mx-0">
+        <b-col cols="7" class="rounded mx-0">
           <b-card>
             <Clustering></Clustering>
           </b-card>
         </b-col>
-        <b-col cols="6" class="rounded">
+        <b-col cols="5" class="rounded">
           <b-card>
             <ExperimentResults></ExperimentResults>
           </b-card>
