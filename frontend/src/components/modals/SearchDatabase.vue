@@ -285,7 +285,7 @@ export default {
           this.selectedExperiment[0]
         );
         await this.$store.dispatch("loadCurrentSamples");
-        await this.$store.dispatch("loadExperimentFluorescences");
+        // await this.$store.dispatch("loadExperimentFluorescences");
         await this.$store.dispatch("loadCurrentExperimentResults");
         this.selectedExperiment = null;
         this.hideModal();
@@ -296,7 +296,6 @@ export default {
       if (this.selectSample) {
         await this.$store.dispatch("selectExperiment", this.selectedSample[0]);
         await this.$store.dispatch("loadCurrentSamples");
-        await this.$store.dispatch("loadExperimentFluorescences");
         await this.$store.dispatch("loadCurrentExperimentResults");
         // await this.$store.dispatch(
         //   "filterSamples",
