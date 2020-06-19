@@ -5,7 +5,7 @@
         <p class="mt-0">Principal Component Analysis</p>
       </b-col>
       <b-col>
-        <span>Hue:&nbsp;</span>
+        <span>Hue&nbsp;</span>
         <b-button
           v-for="(m, i) in availableMarkers"
           :key="i"
