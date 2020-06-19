@@ -29,7 +29,6 @@ export default {
     async selectExperiment(experiment) {
       await this.$store.dispatch("selectExperiment", experiment);
       await this.$store.dispatch("loadCurrentSamples");
-      await this.$store.dispatch("loadExperimentFluorescences");
     }
   },
   computed: {
