@@ -1,25 +1,22 @@
 <template>
-  <!-- <b-container>
-    <b-row align-h="end">
-      <div class="settings-cog mt-3">
-        <b-dropdown right size="sm" variant="outline-secondary">
-          <template v-slot:button-content>
-            <i class="fas fa-tags"></i>
-          </template>
-          <b-container class="text-center">
-            Change Axes
-            <hr />
-            <div class="mx-2">
-              <b-form-select v-model="xAxis" :options="options"></b-form-select>
-              <b-form-select v-model="yAxis" :options="options" size="sm" class="mt-3"></b-form-select>
-            </div>
-          </b-container>
-        </b-dropdown>
-      </div>
+  <div class="my-1 mx-0">
+    <b-row align-h="center" class="my-1">
+      <b-col>
+        <div class="my-1 mx-0 px-0 text-center">
+          <p class="my-auto hue-selector text-secondary">Principal Component Analysis</p>
+          <b-button
+            v-for="(m, i) in availableMarkers"
+            :key="i"
+            @click="setMarker(m)"
+            class="m-md-1"
+            :variant="marker == m ? 'secondary' : 'outline-secondary'"
+          >{{ m }}</b-button>
+        </div>
+        <div>
+          <scatter-chart :chart-data="scatterData" :options="options" :height="330" v-if="marker"></scatter-chart>
+        </div>
+      </b-col>
     </b-row>
-  </b-container>-->
-  <div class="my-1">
-    <scatter-chart :chart-data="scatterData" :options="options" :height="330"></scatter-chart>
   </div>
 </template>
 
@@ -38,7 +35,10 @@ export default {
       options: {},
       currentSampleID: null,
       xAxis: "PCA 1",
-      yAxis: "PCA 2"
+      yAxis: "PCA 2",
+      marker: null,
+      notAmped: "#f1434350",
+      amped: "#539ee480"
     };
   },
 
@@ -48,6 +48,11 @@ export default {
     },
 
     currentExperimentResults() {
+      this.fillChart();
+      this.marker = null;
+    },
+
+    marker() {
       this.fillChart();
     },
 
@@ -61,6 +66,11 @@ export default {
   },
 
   computed: {
+    markerHue() {
+      if (this.marker) {
+        return `Current hue: ${this.marker}`;
+      } else return "";
+    },
     currentExperiment() {
       return this.$store.getters.currentExperiment;
     },
@@ -71,6 +81,12 @@ export default {
 
     currentExperimentResults() {
       return this.$store.getters.currentExperimentResults;
+    },
+
+    availableMarkers() {
+      if (this.currentExperimentResults) {
+        return Object.keys(this.currentExperimentResults.amp_raw);
+      } else return null;
     },
 
     labels() {
@@ -102,6 +118,17 @@ export default {
           })
         ];
       } else return [];
+    },
+
+    pointBackgroundColor() {
+      if (this.currentExperimentResults) {
+        let status = this.currentExperimentResults.amp_raw[this.marker];
+        if (status) {
+          return status.map(s => {
+            return s ? this.amped : this.notAmped;
+          });
+        } else return null;
+      } else return [];
     }
   },
 
@@ -111,6 +138,10 @@ export default {
       this.changeSettings();
     },
 
+    setMarker(marker) {
+      this.marker = marker;
+    },
+
     fillData() {
       this.scatterData = {
         labels: this.labels,
@@ -118,7 +149,7 @@ export default {
           {
             data: this.currentAxes,
             pointRadius: 5,
-            backgroundColor: "#D5606285"
+            pointBackgroundColor: this.pointBackgroundColor
           }
         ]
       };
@@ -176,8 +207,8 @@ export default {
           }
         },
         title: {
-          display: true,
-          text: "Cq Principal Component Analysis",
+          display: false,
+          text: "Principal Component Analysis",
           fontSize: 16
         }
       };
@@ -196,56 +227,23 @@ $GreyDarker: #505050;
 $GreyBackground: #e6e6e6;
 $GreyBackgroundDark: #535353;
 $Indicator: #539ee4;
+$Somered: #f14343;
 
 .chart-body {
   align-items: center;
 }
 
-.amp-details {
-  .settings-cog {
-    position: absolute;
-    right: 0px;
-    top: -5px;
-    color: $GreyDarker;
-    font-size: 1rem;
+.hue-selector {
+  font-size: 1.2rem;
+  font-weight: 400;
+  text-align: center;
+  padding-bottom: 6px;
+}
 
-    .fas {
-      position: relative;
-      top: 1px;
-      font-size: 1.3rem;
-    }
-  }
-  .amp-details-header {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: 300;
-  }
-
-  .amp-details-body {
-    position: relative;
-    top: 5px;
-    text-align: center;
-    margin: 9px;
-
-    .amp-details-values {
-      color: $GreyDarker;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .amp-details-keys {
-      color: $GreyDarker;
-      font-weight: 400;
-      font-size: 0.9rem;
-    }
-
-    .amp-details-sample {
-      color: $GreyDarker;
-      font-weight: 400;
-      font-size: 1.2rem;
-      // padding: 0px 10px;
-      margin-bottom: 0px;
-    }
-  }
+.no-marker {
+  font-size: 2rem;
+  font-weight: 300;
+  text-align: center;
+  margin-top: 5%;
 }
 </style>
