@@ -29,7 +29,7 @@ export default {
 
   data() {
     return {
-      colors: ["#F49F0A", "#00A6A6", "#BBDEF0", "F08700"],
+      colors: ["#969696", "#ef476f", "#26547c", "#ffd166", "#eff6ee"],
       well: null,
       datacollection: {},
       options: {}
@@ -132,7 +132,7 @@ export default {
 <style lang='scss' scoped>
 $GreyLight: #d8d8d8;
 $GreyDark: #969696;
-$GreenRef: #00843d;
+$GreenRef: #a1a1a1;
 $GreenRefDark: #005c2b;
 $GreenRefLight: #01a34d;
 $GreyDarker: #505050;
