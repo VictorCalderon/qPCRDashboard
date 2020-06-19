@@ -476,7 +476,11 @@ def experiment_statistics(experiment_id, current_user):
     results = pd.read_sql(query, db.session.bind)
 
     # Build extended Cq dataframe
-    results_df = results.pivot_table(index='sample', columns='marker', values='amp_cq').reset_index()
+    results_df = results.pivot_table(
+        index='sample', columns='marker', values='amp_cq').reset_index()
+
+    amped_df = results.pivot_table(
+        index='sample', columns='marker', values='amp_status').to_dict('list')
 
     # Remove controls
     results_df = results_df.dropna()
@@ -506,7 +510,7 @@ def experiment_statistics(experiment_id, current_user):
     amped_cq = amped_cq.groupby('marker')['amp_cq'].agg([np.mean, np.std]).reset_index().to_dict('records')
 
     # Jsonify results
-    return {'samples': samples, 'cq_raw': cq_raw, 'amp_status': amp_status, 'amped_cq': amped_cq}
+    return {'samples': samples, 'cq_raw': cq_raw, 'amp_status': amp_status, 'amped_cq': amped_cq, 'amp_raw': amped_df}
 
 
 def available_markers(current_user):
