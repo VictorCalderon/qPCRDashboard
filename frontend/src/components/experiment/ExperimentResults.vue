@@ -59,7 +59,7 @@ export default {
   },
   data() {
     return {
-      colors: ["#E9EDDE", "#ef476f", "#26547c", "#ffd166", "#eff6ee"],
+      colors: ["#969696", "#ef476f", "#26547c", "#ffd166", "#eff6ee"],
       datacollection: {},
       options: {}
     };
