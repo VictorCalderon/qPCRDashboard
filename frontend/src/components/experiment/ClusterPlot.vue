@@ -53,7 +53,7 @@ export default {
 
     currentExperimentResults() {
       this.fillChart();
-      this.marker = Object.keys(this.currentExperimentResults.amp_raw)[-1];
+      this.marker = this.availableMarkers[0];
     },
 
     marker() {
