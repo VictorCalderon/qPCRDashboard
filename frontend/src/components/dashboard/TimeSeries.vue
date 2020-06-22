@@ -205,6 +205,12 @@ export default {
       await this.getTimeSeries();
       await this.fillData();
       await this.fillSettings();
+    },
+
+    markers() {
+      if (this.markers) {
+        this.marker = this.markers[0].value;
+      }
     }
   }
 };
