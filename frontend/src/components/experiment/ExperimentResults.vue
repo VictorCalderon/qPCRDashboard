@@ -1,7 +1,7 @@
 <template>
   <div id="experiment-statistics" v-if="currentExperiment">
     <div class="chart-body">
-      <bar-chart :chart-data="datacollection" :options="options" :height="340"></bar-chart>
+      <bar-chart :chart-data="datacollection" :options="options" :height="325"></bar-chart>
     </div>
   </div>
 </template>
