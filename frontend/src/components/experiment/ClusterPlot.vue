@@ -1,19 +1,8 @@
 <template>
   <div>
-    <b-row class="text-center hue-selector text-secondary" align-h="center">
-      <b-col cols="5" offset="1">
-        <p class="mt-0">Principal Component Analysis</p>
-      </b-col>
-      <b-col>
-        <span>Hue&nbsp;</span>
-        <b-button
-          v-for="(m, i) in availableMarkers"
-          :key="i"
-          @click="setMarker(m)"
-          class="mx-md-1 py-1"
-          size="sm"
-          :variant="marker == m ? 'secondary' : 'outline-secondary'"
-        >{{ m }}</b-button>
+    <b-row class="hue-selector" align-h="end">
+      <b-col cols="3" class="my-0 py-0">
+        <b-form-select v-model="marker" :options="availableMarkers" size="sm"></b-form-select>
       </b-col>
     </b-row>
     <b-row>
@@ -70,11 +59,6 @@ export default {
   },
 
   computed: {
-    markerHue() {
-      if (this.marker) {
-        return `Current hue: ${this.marker}`;
-      } else return "";
-    },
     currentExperiment() {
       return this.$store.getters.currentExperiment;
     },
@@ -211,7 +195,7 @@ export default {
           }
         },
         title: {
-          display: false,
+          display: true,
           text: "Principal Component Analysis",
           fontSize: 16
         }
@@ -238,8 +222,12 @@ $Somered: #f14343;
 }
 
 .hue-selector {
-  font-size: 1.2rem;
-  font-weight: 400;
+  position: relative;
+  margin: 0;
+  font-size: 1rem;
+  // margin-top: 15px;
+  // margin-right: 0px;
+  font-weight: 300;
   text-align: center;
 }
 
