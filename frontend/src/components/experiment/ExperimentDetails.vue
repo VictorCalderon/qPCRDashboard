@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center mt-1" v-if="currentExperimentResults">
+  <div class="text-center mt-2" v-if="currentExperimentResults">
     <div class="px-1 py-1 mb-1 rounded">
       <h4 class="thin-font">{{ currentExperiment.name}}</h4>
       <p class="my-0 smaller-font">Total Samples: {{ totalSamples }}</p>
