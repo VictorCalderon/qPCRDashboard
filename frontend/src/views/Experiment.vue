@@ -2,7 +2,7 @@
   <div class="rounded" v-if="allExperiments">
     <div v-if="currentExperiment" class="mx-5">
       <b-row class="mx-1 pt-1 mt-2 mb-1" align-h="center">
-        <b-col cols="2" class="rounded mx-0">
+        <b-col cols="2" class="border rounded mx-0 ml-3">
           <ExperimentDetails></ExperimentDetails>
         </b-col>
         <b-col class="rounded">
@@ -10,19 +10,19 @@
             <Amplification></Amplification>
           </b-card>
         </b-col>
-        <b-col cols="3" class="rounded">
+        <b-col cols="3" class="rounded pl-0">
           <b-card>
             <Samples></Samples>
           </b-card>
         </b-col>
       </b-row>
-      <b-row class="mx-1 mt-4" align-h="center">
+      <b-row class="mx-1 mt-2" align-h="center">
         <b-col cols="7" class="rounded mx-0">
           <b-card>
             <Clustering></Clustering>
           </b-card>
         </b-col>
-        <b-col cols="5" class="rounded">
+        <b-col cols="5" class="rounded mx-0 pl-0">
           <b-card>
             <ExperimentResults></ExperimentResults>
           </b-card>
