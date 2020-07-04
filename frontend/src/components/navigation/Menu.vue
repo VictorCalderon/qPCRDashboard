@@ -1,9 +1,14 @@
 <template>
   <div fixed="top">
     <b-navbar type="dark" variant="dark">
+      <a class="navbar-brand" href="#">
+        <img src="@/assets/qpcr.png" width="35" height="35" alt loading="lazy" />
+      </a>
       <b-navbar-nav>
         <b-link class="navbar nav text-light" exact-active-class to="/">
-          <span>Dashboard</span>
+          <span
+            :class="this.$route.name == 'Dashboard' ? 'custom-active-link' : 'custom-inactive-link'"
+          >Dashboard</span>
         </b-link>
         <b-link
           class="navbar nav text-light"
@@ -11,7 +16,19 @@
           to="/Experiments"
           v-if="allExperiments"
         >
-          <span>Experiments</span>
+          <span
+            :class="this.$route.name == 'Experiments' ? 'custom-active-link' : 'custom-inactive-link'"
+          >Experiments</span>
+        </b-link>
+        <b-link
+          class="navbar nav text-light"
+          exact-active-class
+          to="/Adjustments"
+          v-if="allExperiments"
+        >
+          <span
+            :class="this.$route.name == 'Adjustments' ? 'custom-active-link' : 'custom-inactive-link'"
+          >Adjustments</span>
         </b-link>
       </b-navbar-nav>
 
@@ -50,9 +67,11 @@
         <b-nav-item-dropdown right>
           <template v-slot:button-content>
             <span>
-              <i class="fas fa-user"></i>&nbsp;User
+              <i class="fas fa-user"></i>
             </span>
           </template>
+          <b-dropdown-item href="#">Logged as: {{ currentUser }}</b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item href="#" @click="logOut">
             <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
           </b-dropdown-item>
@@ -141,4 +160,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.custom-active-link {
+  color: white;
+}
+
+.custom-inactive-link {
+  color: rgb(158, 158, 158);
+}
 </style>

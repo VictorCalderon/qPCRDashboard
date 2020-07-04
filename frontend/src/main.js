@@ -3,16 +3,14 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-// import { Promise } from 'es6-promise'
-
-// Import BootstrapVue
+// Import BootstrapVue & Leaflet
 import { BootstrapVue } from 'bootstrap-vue'
 
 // Import CSS
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-// Install BootstrapVue
+// Use BootstrapVue and Leaflet
 Vue.use(BootstrapVue)
 
 // Add HTTP functionality

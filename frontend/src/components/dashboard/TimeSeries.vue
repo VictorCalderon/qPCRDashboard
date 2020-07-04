@@ -23,13 +23,7 @@
       </b-col>
     </b-row>
     <b-row class="m-5" align-h="center" v-if="marker">
-      <LineChart
-        :width="1300"
-        :height="400"
-        :chartData="chartData"
-        :options="chartConfig"
-        class="bg-light px-5 pt-5 pb-4"
-      ></LineChart>
+      <LineChart :chartData="chartData" :options="chartConfig" class="bg-light px-5 pt-5 pb-4"></LineChart>
     </b-row>
   </b-container>
   <b-container v-else>
