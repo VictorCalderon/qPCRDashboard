@@ -5,7 +5,7 @@
         <img src="@/assets/qpcr.png" width="35" height="35" alt loading="lazy" />
       </a>
       <b-navbar-nav>
-        <b-link class="navbar nav text-light" exact-active-class to="/">
+        <b-link class="navbar nav text-light" exact-active-class to="/Dashboard">
           <span
             :class="this.$route.name == 'Dashboard' ? 'custom-active-link' : 'custom-inactive-link'"
           >Dashboard</span>

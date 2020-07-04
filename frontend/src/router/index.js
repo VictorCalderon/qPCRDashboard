@@ -19,7 +19,7 @@ const router = new VueRouter({
 // Configure routes
 const routes = [
   {
-    path: '/',
+    path: '/Dashboard',
     name: 'Dashboard',
     component: Dashboard,
   },
