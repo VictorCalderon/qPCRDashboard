@@ -15,7 +15,7 @@ export default {
         labels: ["Sede Central", "Naco", "Santiago", "La Vega", "Punta Cana"],
         datasets: [
           {
-            label: "Muestras Procesadas",
+            label: "Samples analyzed",
             data: [3212, 1232, 1921, 802, 989, 0],
             backgroundColor: [
               "#DD614A",
