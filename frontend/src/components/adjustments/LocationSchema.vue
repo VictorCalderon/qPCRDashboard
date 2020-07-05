@@ -25,6 +25,20 @@
             @click="toggleAddSchema"
             size="sm"
             class="px-1"
+            v-if="visible"
+          >
+            <i class="fas fa-minus-square"></i>
+          </b-button>
+        </b-col>
+        <b-col cols="1" class="ml-auto">
+          <b-button
+            id="add-schema"
+            block
+            variant="secondary"
+            :disabled="disableAddSchema"
+            @click="toggleAddSchema"
+            size="sm"
+            class="px-1"
           >
             <i class="fas fa-plus-square"></i>
           </b-button>
@@ -87,13 +101,6 @@
       >Add Schema</b-button>
       <b-button
         v-if="modification"
-        class="mt-3"
-        size="sm"
-        variant="warning"
-        @click="modifySchema"
-      >Modify Schema</b-button>
-      <b-button
-        v-if="modification"
         class="mt-3 mx-2"
         size="sm"
         variant="secondary"
@@ -127,8 +134,21 @@
             @click="toggleModifySchema"
             :disabled="!selectedSchema"
             size="md"
+            v-if="!modification"
           >
             <i class="fas fa-edit"></i>
+          </b-button>
+          <b-button
+            id="modify-schema"
+            class="px-1"
+            block
+            variant="success"
+            @click="modifySchema"
+            :disabled="!selectedSchema"
+            size="md"
+            v-if="modification"
+          >
+            <i class="fas fa-check-square"></i>
           </b-button>
         </b-col>
         <b-col cols="2">
@@ -170,6 +190,7 @@ export default {
       fields: ["key", "location", "latitude", "longitude"],
       selectedSchema: null,
       newSchema: {
+        id: null,
         key: null,
         location: null,
         latitude: null,
@@ -177,21 +198,21 @@ export default {
       },
       schemas: [
         {
-          id: 1,
+          id: 0,
           key: "001",
           location: "Sede Central",
           latitude: "18.4358",
           longitude: "-69.9853"
         },
         {
-          id: 2,
+          id: 1,
           key: "002",
           location: "Piantini",
           latitude: "18.4772",
           longitude: "-69.9263"
         },
         {
-          id: 3,
+          id: 2,
           key: "003",
           location: "Santiago",
           latitude: "19.4548",
@@ -224,9 +245,6 @@ export default {
       // Add schema and clear inputs
       else this.schemas.push({ ...this.newSchema });
 
-      // Toggle schema
-      this.toggleCollapse();
-
       // Clear schema
       this.cleanSchema();
     },
@@ -252,26 +270,30 @@ export default {
       this.schemas.splice(deleteIndex, 1);
     },
 
-    modifySchema() {
-      // Iterate over array
-      this.schemas.forEach(schema => {
-        if (schema.key == this.newSchema.key) {
-          schema = this.newSchema;
-        }
-      });
-
-      // Set modification layout
-      this.toggleCollapse();
-      this.modification = !this.modification;
-    },
-
     toggleModifySchema() {
       // Set current select item as the item
       this.newSchema = { ...this.selectedSchema };
 
       // Toggle the modification collapse
-      this.modification = true;
       this.visible = true;
+      this.modification = true;
+    },
+
+    modifySchema() {
+      // Find id
+      const schemaID = this.schemas.findIndex(s => s.id == this.newSchema.id);
+
+      // Set new schema
+      this.schemas[schemaID].key = this.newSchema.key;
+      this.schemas[schemaID].name = this.newSchema.name;
+      this.schemas[schemaID].latitude = this.newSchema.latitude;
+      this.schemas[schemaID].longitude = this.newSchema.longitude;
+
+      // Set modification layout
+      this.toggleCollapse();
+      this.modification = !this.modification;
+
+      //
     },
 
     toggleAddSchema() {
