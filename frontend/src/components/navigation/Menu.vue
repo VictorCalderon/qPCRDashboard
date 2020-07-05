@@ -1,9 +1,6 @@
 <template>
   <div fixed="top">
     <b-navbar type="dark" variant="dark">
-      <a class="navbar-brand" href="#">
-        <img src="@/assets/qpcr.png" width="35" height="35" alt loading="lazy" />
-      </a>
       <b-navbar-nav>
         <b-link class="navbar nav text-light" exact-active-class to="/Dashboard">
           <span
