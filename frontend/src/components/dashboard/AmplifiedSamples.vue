@@ -1,5 +1,5 @@
 <template>
-  <LineChart :chartData="chartData" :options="chartConfig" :height="200"></LineChart>
+  <LineChart :chartData="chartData" :options="chartConfig" :height="180"></LineChart>
 </template>
 
 <script>
@@ -12,11 +12,20 @@ export default {
   data() {
     return {
       chartData: {
-        labels: ["29 Jun", "30 Jun", "1 Jul", "2 Jul", "3 Jul"],
+        labels: [
+          "26 Jun",
+          "27 Jun",
+          "28 Jun",
+          "29 Jun",
+          "30 Jun",
+          "1 Jul",
+          "2 Jul",
+          "3 Jul"
+        ],
         datasets: [
           {
             label: "RNAse P",
-            data: [100, 100, 100, 100, 100, 100, 0],
+            data: [99, 98, 99, 99, 99, 98, 99, 97, 100, 0],
             backgroundColor: "#4C5454",
             fill: true,
             hoverWidth: 2,
@@ -24,18 +33,18 @@ export default {
             order: 3
           },
           {
-            label: "ORF1ab",
-            data: [25, 21, 20, 21, 20, 20, 0],
-            backgroundColor: "#FF715B",
+            label: "E Gene",
+            data: [21, 23, 27, 26, 22, 20, 21, 20, 20, 0],
+            backgroundColor: "#1EA896",
             fill: true,
             hoverWidth: 2,
             hoverColor: "#000",
             order: 2
           },
           {
-            label: "E Gene",
-            data: [19, 20, 18, 17, 23, 26, 0],
-            backgroundColor: "#1EA896",
+            label: "ORF1ab",
+            data: [15, 18, 19, 25, 21, 19, 18, 17, 19, 0],
+            backgroundColor: "#FF715B",
             fill: true,
             hoverWidth: 2,
             hoverColor: "#000",
@@ -95,7 +104,7 @@ export default {
                 callback: function(value) {
                   return value + "%";
                 },
-                suggestedMax: 30,
+                suggestedMax: 100,
                 suggestedMin: 0
               }
             }
@@ -104,7 +113,7 @@ export default {
 
         elements: {
           point: {
-            radius: 1
+            radius: 5
           }
         }
       }
