@@ -1,5 +1,5 @@
 <template>
-  <DoughnutChart :chartData="chartData" :options="chartConfig" :height="200"></DoughnutChart>
+  <DoughnutChart :chartData="chartData" :options="chartConfig" :height="180"></DoughnutChart>
 </template>
 
 <script>
@@ -12,10 +12,10 @@ export default {
   data() {
     return {
       chartData: {
-        labels: ["Reportados", "Pendientes"],
+        labels: ["Done", "Pending"],
         datasets: [
           {
-            label: "Proyectos",
+            label: "Projects",
             data: [5, 3],
             backgroundColor: ["#4F772D", "#90A955"],
             hoverWidth: 2,
