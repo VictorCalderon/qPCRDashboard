@@ -1,5 +1,5 @@
 <template>
-  <PieChart :chartData="chartData" :options="chartConfig" :height="200"></PieChart>
+  <PieChart :chartData="chartData" :options="chartConfig" :height="180"></PieChart>
 </template>
 
 <script>
@@ -40,7 +40,7 @@ export default {
         reponsive: true,
         title: {
           display: false,
-          text: "Método de Extracción",
+          text: "Extraction Method",
           fontSize: 25,
           fontColor: "#DC602E"
         },
