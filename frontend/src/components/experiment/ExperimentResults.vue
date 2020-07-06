@@ -1,9 +1,21 @@
 <template>
-  <div id="experiment-statistics" v-if="currentExperiment">
-    <div class="chart-body">
-      <bar-chart :chart-data="datacollection" :options="options" :height="325"></bar-chart>
-    </div>
-  </div>
+  <b-card
+    bg-variant="light"
+    align="center"
+    header-bg-variant="dark"
+    header-text-variant="white"
+    class="m-2"
+    v-if="currentExperiment"
+  >
+    <template v-slot:header>
+      <h5 class="mb-0 my-1 thin-font">Marker Amplification Count</h5>
+    </template>
+    <b-form-row>
+      <b-col>
+        <bar-chart :chart-data="datacollection" :options="options" :height="295"></bar-chart>
+      </b-col>
+    </b-form-row>
+  </b-card>
 </template>
 
 <script>
@@ -108,7 +120,7 @@ export default {
           }
         },
         title: {
-          display: true,
+          display: false,
           text: "Amplification Count",
           fontSize: 16
         }
