@@ -5,7 +5,7 @@
         <LocationSchema></LocationSchema>
       </b-col>
       <b-col sm="12" md="10" lg="6" class="text-center">
-        <UserSettings></UserSettings>
+        <DashboardSettings></DashboardSettings>
       </b-col>
     </b-form-row>
   </b-container>
@@ -13,12 +13,12 @@
 
 <script>
 import LocationSchema from "@/components/adjustments/LocationSchema.vue";
-import UserSettings from "@/components/adjustments/UserSettings.vue";
+import DashboardSettings from "@/components/adjustments/DashboardSettings.vue";
 
 export default {
   components: {
     LocationSchema,
-    UserSettings
+    DashboardSettings
   }
 };
 </script>
