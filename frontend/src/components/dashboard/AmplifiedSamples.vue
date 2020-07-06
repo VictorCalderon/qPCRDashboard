@@ -1,5 +1,5 @@
 <template>
-  <LineChart :chartData="chartData" :options="chartConfig" :height="180"></LineChart>
+  <LineChart :chartData="chartData" :options="chartConfig" :height="150"></LineChart>
 </template>
 
 <script>
@@ -34,7 +34,7 @@ export default {
           },
           {
             label: "E Gene",
-            data: [21, 23, 27, 26, 22, 20, 21, 20, 20, 0],
+            data: [21, 23, 27, 26, 24, 20, 21, 20, 20, 0],
             backgroundColor: "#1EA896",
             fill: true,
             hoverWidth: 2,
@@ -43,7 +43,7 @@ export default {
           },
           {
             label: "ORF1ab",
-            data: [15, 18, 19, 25, 21, 19, 18, 17, 19, 0],
+            data: [15, 18, 19, 22, 21, 18, 18, 17, 19, 0],
             backgroundColor: "#FF715B",
             fill: true,
             hoverWidth: 2,
