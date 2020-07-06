@@ -25,6 +25,7 @@
                     v-model="name"
                     class="text-center"
                     placeholder="Enter experiment name"
+                    type="text"
                   ></b-form-input>
                 </div>
               </b-col>
@@ -36,6 +37,7 @@
                     v-model="date"
                     class="text-center"
                     placeholder="Format: YYYY-MM-DD"
+                    type="date"
                   ></b-form-input>
                 </div>
               </b-col>
