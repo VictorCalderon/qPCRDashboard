@@ -1,70 +1,49 @@
 <template>
-  <div class="rounded" v-if="allExperiments">
-    <div v-if="currentExperiment" class="mx-5">
-      <b-row class="mx-1 pt-1 mt-2 mb-1" align-h="center">
-        <b-col cols="2" class="border rounded mx-0 ml-3">
-          <ExperimentDetails></ExperimentDetails>
-        </b-col>
-        <b-col class="rounded">
-          <b-card>
-            <Amplification></Amplification>
-          </b-card>
-        </b-col>
-        <b-col cols="3" class="rounded pl-0">
-          <b-card>
-            <Samples></Samples>
-          </b-card>
-        </b-col>
-      </b-row>
-      <b-row class="mx-1 mt-2" align-h="center">
-        <b-col cols="7" class="rounded mx-0">
-          <b-card>
-            <Clustering></Clustering>
-          </b-card>
-        </b-col>
-        <b-col cols="5" class="rounded mx-0 pl-0">
-          <b-card>
-            <ExperimentResults></ExperimentResults>
-          </b-card>
-        </b-col>
-      </b-row>
-    </div>
-    <b-row v-else align-h="center">
-      <b-card class="text-center mt-3 rounded">
-        <div
-          class="rounded py-2"
-        >You don't seem to be working on any experiments right now. Use the engine to search for experiments.</div>
-        <b-row align-h="center" class="mt-3">
-          <b-button variant="info" v-b-modal.search-experiments-modal>Search Experiment</b-button>
-        </b-row>
-      </b-card>
-    </b-row>
-  </div>
-  <div v-else>
-    <b-row align-h="center">
-      <b-card class="text-center mt-5 rounded">
-        <div
-          class="rounded py-2"
-        >You don't have any experiments. Add a new experiment and start analyzing your data.</div>
-        <b-row align-h="center" class="mt-3">
-          <b-button variant="info" v-b-modal.add-experiments-modal>Add Experiment</b-button>
-        </b-row>
-      </b-card>
-    </b-row>
+  <div>
+    <b-form-row class="m-3 mt-3" v-if="currentExperiment">
+      <b-col lg="3" md="4" sm="12" xs="12">
+        <ExperimentDetails></ExperimentDetails>
+      </b-col>
+      <b-col lg="6" md="6" sm="12" xs="12">
+        <AmplificationPlot></AmplificationPlot>
+      </b-col>
+      <b-col lg="3" md="6" sm="12" xs="12">
+        <Samples></Samples>
+      </b-col>
+      <b-col lg="6" md="6" sm="12" xs="12">
+        <PCAPlot></PCAPlot>
+      </b-col>
+      <b-col lg="6" md="6" sm="12" xs="12">
+        <ExperimentResults></ExperimentResults>
+      </b-col>
+    </b-form-row>
+
+    <b-form-row>
+      <b-col v-if="!currentExperiment" cols="12">
+        <b-card class="text-center mt-3 rounded">
+          <div
+            class="rounded py-2"
+          >You don't seem to be working on any experiments right now. Use the engine to search for experiments.</div>
+          <b-row align-h="center" class="mt-3">
+            <b-button variant="info" v-b-modal.search-experiments-modal>Search Experiment</b-button>
+          </b-row>
+        </b-card>
+      </b-col>
+    </b-form-row>
   </div>
 </template>
 
 <script>
 import ExperimentResults from "@/components/experiment/ExperimentResults";
 import ExperimentDetails from "@/components/experiment/ExperimentDetails";
-import Amplification from "@/components/experiment/AmplificationPlot";
-import Clustering from "@/components/experiment/ClusterPlot";
+import AmplificationPlot from "@/components/experiment/AmplificationPlot";
+import PCAPlot from "@/components/experiment/ClusterPlot";
 import Samples from "@/components/experiment/Samples";
 
 export default {
   components: {
-    Amplification,
-    Clustering,
+    AmplificationPlot,
+    PCAPlot,
     Samples,
     ExperimentResults,
     ExperimentDetails
