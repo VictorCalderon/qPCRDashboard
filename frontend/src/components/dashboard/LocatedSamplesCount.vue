@@ -1,13 +1,13 @@
 <template>
-  <BarChart :chartData="chartData" :options="chartConfig" :height="200"></BarChart>
+  <HBarChart :chartData="chartData" :options="chartConfig" :height="200"></HBarChart>
 </template>
 
 <script>
-import BarChart from "@/components/charts/BarChart.js";
+import HBarChart from "@/components/charts/HBarChart.js";
 
 export default {
   components: {
-    BarChart
+    HBarChart
   },
   data() {
     return {
@@ -16,7 +16,7 @@ export default {
         datasets: [
           {
             label: "Samples analyzed",
-            data: [3212, 1232, 1921, 802, 989, 0],
+            data: [3212, 1921, 1232, 989, 802, 0],
             backgroundColor: [
               "#DD614A",
               "#F48668",
