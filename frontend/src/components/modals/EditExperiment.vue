@@ -247,7 +247,10 @@ export default {
   watch: {
     currentExperiment() {
       this.experiment = this.currentExperiment;
-      this.experiment.tags = this.experiment.tags.split(";");
+
+      if (this.experiment.tags) {
+        this.experiment.tags = this.experiment.tags.split(";");
+      }
     }
   }
 };
