@@ -1,18 +1,23 @@
 <template>
-  <div>
-    <div class="chart-body" v-if="currentSample">
-      <h6
-        class="text-center"
-      >{{ "Sample Name: " + this.currentSample.sample + " | Well: " + this.well }}</h6>
-      <line-chart :chart-data="datacollection" :options="options" :height="300"></line-chart>
-    </div>
-    <div v-else>
-      <div>
-        <h1 class="no-sample" v-if="!currentExperiment">Select an experiment</h1>
-        <h1 class="no-sample" v-else>Select a sample</h1>
-      </div>
-    </div>
-  </div>
+  <b-card
+    bg-variant="light"
+    align="center"
+    header-bg-variant="dark"
+    header-text-variant="white"
+    class="m-2"
+    v-if="currentSample"
+  >
+    <template v-slot:header>
+      <h5 class="mb-0 thin-font">{{ currentSample.sample }}</h5>
+      <p class="my-0 smaller-font">{{ well }}</p>
+    </template>
+
+    <b-form-row v-if="currentExperiment">
+      <b-col>
+        <line-chart :chart-data="datacollection" :options="options" :height="250"></line-chart>
+      </b-col>
+    </b-form-row>
+  </b-card>
 </template>
 
 <script>
