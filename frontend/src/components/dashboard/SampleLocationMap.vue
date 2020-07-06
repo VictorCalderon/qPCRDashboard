@@ -1,11 +1,10 @@
 <template>
-  <div style="height: 405px; width: 100%">
+  <b-form-row>
     <l-map
-      v-if="showMap"
       :zoom="zoom"
-      :center="center"
+      :center="mapCenter"
       :options="mapOptions"
-      style="height: 100%"
+      style="height: 440px"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate"
     >
@@ -24,7 +23,8 @@
         </l-circle>
       </div>
     </l-map>
-  </div>
+  </b-form-row>
+  <!-- <div style="height: 100%; width: 100%"></div> -->
 </template>
 
 <script>
@@ -51,40 +51,40 @@ export default {
       mapOptions: {
         zoomSnap: 0.5
       },
-      showMap: true,
       siteColor: ["#DD614A", "#F48668", "#5AB1BB", "#A5C882", "#F7DD72"]
     };
   },
   computed: {
+    mapCenter() {
+      return this.$store.getters.mapCenter;
+    },
+
     samplingSites() {
-      return [
-        {
-          loc: latLng(18.4358, -69.9853),
-          name: "Sede Central",
-          totalSamples: 19800
-        },
-        {
-          loc: latLng(19.4548, -70.6929),
-          name: "Santiago",
-          totalSamples: 12800
-        },
-        {
-          loc: latLng(19.22064, -70.5632),
-          name: "La Vega",
-          totalSamples: 11000
-        }
-      ];
+      return this.$store.getters.samplingSites;
     }
   },
+
   methods: {
     zoomUpdate(zoom) {
       this.currentZoom = zoom;
     },
+
     centerUpdate(center) {
       this.currentCenter = center;
     },
+
     innerClick(description) {
       alert(description);
+    }
+  },
+
+  mounted() {
+    this.$store.dispatch("updateSamplingSites");
+  },
+
+  watch: {
+    mapCenter() {
+      this.centerUpdate();
     }
   }
 };
