@@ -1,36 +1,61 @@
 <template>
-  <div class="mt-1" height="300px">
-    <div class="mb-1">
-      <b-form-input v-model="filter" placeholder="Filter samples" class="text-center"></b-form-input>
-    </div>
-    <div class="sample-list">
-      <b-row v-for="sample in filteredSamples" :key="sample.id" class="my-0">
+  <b-card
+    bg-variant="light"
+    align="center"
+    header-bg-variant="dark"
+    header-text-variant="white"
+    class="m-2"
+  >
+    <template v-slot:header>
+      <b-form-row class="justify-content-end">
+        <b-col cols="8">
+          <h5 class="mb-0 thin-font">Experiment Samples</h5>
+          <p class="my-0 smaller-font">Total: {{ totalSamples }}</p>
+        </b-col>
+        <b-col cols="2">
+          <b-button size="sm" id="filter-popover" class="mt-2">
+            <i class="fas fa-filter"></i>
+          </b-button>
+        </b-col>
+      </b-form-row>
+
+      <b-popover target="filter-popover" placement="bottom">
+        <template v-slot:title>
+          <b-form-input
+            v-model="filter"
+            placeholder="Filter samples"
+            class="placeholder-light text-center bg-light borderless border-bottom"
+          ></b-form-input>
+        </template>
+      </b-popover>
+    </template>
+
+    <div class="sample-list" :height="250">
+      <b-row v-for="sample in filteredSamples" :key="sample.id" class="my-0 mt-0">
         <b-col>
           <b-button
-            class="py-2 mt-1 bg-secondary text-light border"
+            class="py-2 mt-1 border"
+            :class="currentSample.sample == sample.sample ? 'bg-secondary text-light' : 'bg-light text-dark'"
             block
             @click="selectSample(sample.id)"
-          >
-            {{ sample.sample | shortName }}
-          </b-button>
+          >{{ sample.sample | shortName }}</b-button>
         </b-col>
       </b-row>
     </div>
-  </div>
+  </b-card>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      filter: null,
+      filter: null
     };
   },
 
   methods: {
     selectSample(id) {
-      this.$store.dispatch("selectSample", id).then(
-      );
+      this.$store.dispatch("selectSample", id).then();
     }
   },
 
@@ -46,6 +71,20 @@ export default {
     searchFilter() {
       if (this.filter == "") return null;
       else return this.filter;
+    },
+
+    currentSample() {
+      return this.$store.getters.currentSample;
+    },
+
+    currentExperimentResults() {
+      return this.$store.getters.currentExperimentResults;
+    },
+
+    totalSamples() {
+      if (this.currentExperimentResults) {
+        return this.currentExperimentResults.samples.length;
+      } else return 0;
     }
   },
 
@@ -56,7 +95,7 @@ export default {
       const firstSample = this.filteredSamples.slice(0, 1);
       this.selectSample(firstSample[0].id);
     },
-    
+
     searchFilter() {
       this.$store.dispatch("filterSamples", this.filter);
     }
@@ -68,7 +107,7 @@ export default {
 $GreyDarker: #505050;
 
 .sample-list {
-  height: 280px;
+  height: 250px;
   width: 100%;
   overflow-y: scroll;
   -ms-overflow-style: none;
@@ -89,5 +128,11 @@ $GreyDarker: #505050;
   font-size: 1.2rem;
   font-weight: 500;
   padding-top: 100%;
+}
+
+.placeholder-light {
+  ::placeholder {
+    color: white !important;
+  }
 }
 </style>
