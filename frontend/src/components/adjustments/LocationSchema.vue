@@ -91,6 +91,18 @@
             size="sm"
           ></b-form-input>
         </b-col>
+        <b-col cols="3" class="my-1">
+          <label for="location-color">Color</label>
+          <b-form-input
+            type="color"
+            id="location-color"
+            aria-label="Color"
+            placeholder="#FFFFFF"
+            v-model="newSchema.color"
+            class="text-center"
+            size="sm"
+          ></b-form-input>
+        </b-col>
       </b-form-row>
       <b-button
         v-if="!modification"
@@ -112,15 +124,19 @@
     <b-row v-if="schemas.length > 0" class="justify-content-center">
       <b-col>
         <b-table
-          hover
-          :items="schemas"
           borderless
           selectable
-          @row-selected="onRowSelected"
+          hover
+          :fields="fields"
+          :items="schemas"
           responsive="sm"
           select-mode="single"
-          :fields="fields"
-        ></b-table>
+          @row-selected="onRowSelected"
+        >
+          <template v-slot:cell(color)="data">
+            <b :style="{color: data.item.color }">{{ data.item.color.toUpperCase() }}</b>
+          </template>
+        </b-table>
       </b-col>
     </b-row>
     <template v-slot:footer>
@@ -187,38 +203,17 @@ export default {
     return {
       visible: false,
       modification: false,
-      fields: ["key", "location", "latitude", "longitude"],
+      fields: ["key", "location", "latitude", "longitude", "color"],
       selectedSchema: null,
       newSchema: {
         id: null,
         key: null,
         location: null,
         latitude: null,
-        longitude: null
+        longitude: null,
+        color: null
       },
-      schemas: [
-        {
-          id: 0,
-          key: "001",
-          location: "Sede Central",
-          latitude: "18.4358",
-          longitude: "-69.9853"
-        },
-        {
-          id: 1,
-          key: "002",
-          location: "Piantini",
-          latitude: "18.4772",
-          longitude: "-69.9263"
-        },
-        {
-          id: 2,
-          key: "003",
-          location: "Santiago",
-          latitude: "19.4548",
-          longitude: "-70.6929"
-        }
-      ]
+      schemas: []
     };
   },
   methods: {
@@ -250,17 +245,20 @@ export default {
     },
 
     cleanSchema() {
-      // Add key
+      // Clear key
       this.newSchema.key = null;
 
-      // Add location
+      // Clear location
       this.newSchema.location = null;
 
-      // Add location
+      // Clear location
       this.newSchema.latitude = null;
 
-      // Add location
+      // Clear location
       this.newSchema.longitude = null;
+
+      // Clear color
+      this.newSchema.color = null;
     },
 
     removeSchema() {
@@ -288,6 +286,7 @@ export default {
       this.schemas[schemaID].name = this.newSchema.name;
       this.schemas[schemaID].latitude = this.newSchema.latitude;
       this.schemas[schemaID].longitude = this.newSchema.longitude;
+      this.schemas[schemaID].color = this.newSchema.color;
 
       // Set modification layout
       this.toggleCollapse();
@@ -306,15 +305,24 @@ export default {
     },
 
     saveSchemas() {
-      console.log("Implement me please");
+      this.$store.dispatch("updateSampleLocationSchemas", this.schemas);
     }
   },
   computed: {
+    allSchemas() {
+      return this.$store.getters.allSchemas;
+    },
+
     disableAddSchema() {
       if (this.newSchema) {
         return false;
       } else return true;
     }
+  },
+
+  mounted() {
+    // Initialize schemas
+    this.schemas = [...this.allSchemas];
   }
 };
 </script>
