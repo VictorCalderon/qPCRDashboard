@@ -8,12 +8,14 @@ Vue.use(Vuex)
 import Experiments from '@/store/modules/experiments'
 import Samples from '@/store/modules/samples'
 import Auth from '@/store/modules/auth'
+import Dashboard from '@/store/modules/dashboard'
 
 // Export Modules
 export default new Vuex.Store({
   modules: {
     Experiments,
     Samples,
-    Auth
+    Auth,
+    Dashboard
   }
 })
