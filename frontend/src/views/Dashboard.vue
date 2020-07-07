@@ -61,15 +61,11 @@
             header-text-variant="white"
             class="m-2"
           >
-            <b-card-text>Sample collection site distribution</b-card-text>
             <LocatedSamplesCount></LocatedSamplesCount>
           </b-card>
         </b-col>
       </b-form-row>
     </b-col>
-    <!-- <b-col lg="8" md="6" sm="10"></b-col>
-
-    <b-col lg="6" md="6" sm="10"></b-col>-->
   </b-form-row>
 </template>
 
