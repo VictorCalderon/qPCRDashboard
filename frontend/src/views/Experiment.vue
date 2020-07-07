@@ -8,7 +8,7 @@
         <AmplificationPlot></AmplificationPlot>
       </b-col>
       <b-col lg="3" md="6" sm="12" xs="12">
-        <Samples></Samples>
+        <ExperimentSamples></ExperimentSamples>
       </b-col>
       <b-col lg="6" md="6" sm="12" xs="12">
         <PCAPlot></PCAPlot>
@@ -37,14 +37,14 @@
 import ExperimentResults from "@/components/experiment/ExperimentResults";
 import ExperimentDetails from "@/components/experiment/ExperimentDetails";
 import AmplificationPlot from "@/components/experiment/AmplificationPlot";
-import PCAPlot from "@/components/experiment/ClusterPlot";
-import Samples from "@/components/experiment/Samples";
+import PCAPlot from "@/components/experiment/PCAPlot";
+import ExperimentSamples from "@/components/experiment/ExperimentSamples";
 
 export default {
   components: {
     AmplificationPlot,
     PCAPlot,
-    Samples,
+    ExperimentSamples,
     ExperimentResults,
     ExperimentDetails
   },
