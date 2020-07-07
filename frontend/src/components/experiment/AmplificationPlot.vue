@@ -1,15 +1,17 @@
 <template>
   <b-card
     bg-variant="light"
-    align="center"
     header-bg-variant="dark"
     header-text-variant="white"
     class="m-2"
+    align="center"
     v-if="currentSample"
   >
     <template v-slot:header>
-      <h5 class="mb-0 thin-font">{{ currentSample.sample }}</h5>
-      <p class="my-0 smaller-font">{{ well }}</p>
+      <h5 class="mb-0 thin-font">
+        {{ currentSample.sample }}&nbsp;
+        <span class="my-0 smaller-font">|&nbsp;{{ well }}</span>
+      </h5>
     </template>
 
     <b-form-row v-if="currentExperiment">
