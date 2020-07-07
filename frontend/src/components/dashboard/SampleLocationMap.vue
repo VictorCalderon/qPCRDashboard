@@ -4,7 +4,7 @@
       :zoom="zoom"
       :center="mapCenter"
       :options="mapOptions"
-      style="height: 440px"
+      style="height: 410px"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate"
     >
@@ -24,7 +24,6 @@
       </div>
     </l-map>
   </b-form-row>
-  <!-- <div style="height: 100%; width: 100%"></div> -->
 </template>
 
 <script>
