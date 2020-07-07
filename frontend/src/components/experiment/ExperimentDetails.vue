@@ -8,8 +8,12 @@
     v-if="currentExperimentResults"
   >
     <template v-slot:header>
-      <h5 class="mb-0 thin-font">{{ currentExperiment.name }}</h5>
-      <p class="my-0 smaller-font">{{ currentExperiment.date }}</p>
+      <h5 class="mb-0 thin-font">
+        {{ currentExperiment.name }}&nbsp;
+        <span
+          class="my-0 smaller-font"
+        >|&nbsp;{{ currentExperiment.date }}</span>
+      </h5>
     </template>
 
     <div class="text-center">
