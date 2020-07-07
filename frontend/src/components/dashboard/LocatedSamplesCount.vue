@@ -1,5 +1,5 @@
 <template>
-  <HBarChart :chartData="chartData" :options="chartConfig" :height="200"></HBarChart>
+  <HBarChart :chartData="chartData" :options="chartConfig" :height="280"></HBarChart>
 </template>
 
 <script>
@@ -12,12 +12,26 @@ export default {
   data() {
     return {
       chartData: {
-        labels: ["Sede Central", "Naco", "Santiago", "La Vega", "Punta Cana"],
+        labels: [
+          "Sede Central",
+          "Naco",
+          "Santiago",
+          "La Vega",
+          "Punta Cana",
+          "Samaná",
+          "San Juan",
+          "Monte Cristi"
+        ],
         datasets: [
           {
             label: "Samples analyzed",
-            data: [3212, 1921, 1232, 989, 802, 0],
+            data: [3212, 1921, 1232, 989, 802, 702, 501, 339, 121, 0],
             backgroundColor: [
+              "#DD614A",
+              "#F48668",
+              "#5AB1BB",
+              "#A5C882",
+              "#F7DD72",
               "#DD614A",
               "#F48668",
               "#5AB1BB",
