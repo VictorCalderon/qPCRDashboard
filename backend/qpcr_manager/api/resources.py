@@ -445,6 +445,79 @@ class SampleFluorescenceResource(Resource):
         return {'fluorescence_data': fluorescence_data}
 
 
+class ProjectBrief(Resource):
+    """Get Project Briefing of amount of experiments and samples performed
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Return a two element list with total experiments and samples processed by mode (daily: 1, all-time: 0)
+        """
+        return get_brief()
+
+
+class AmpStatData(Resource):
+    """Get amplification data from experiments
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Time-based amplification status from each sample"""
+
+        return amp_stat_data()
+
+
+class TagDistribution(Resource):
+    """Get tag distribution from experiments
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        return tag_distrib()
+
+
+class LocationSchema(ma.SQLAlchemyAutoSchema):
+
+    id = ma.Int(dump_only=True)
+    name = ma.String(required=True)
+    latitude = ma.String(required=True)
+    longitude = ma.String(required=True)
+    color = ma.String(required=True)
+
+    class Meta:
+        model = Location
+        sqla_session = db.session
+
+
+class LocationList(Resource):
+    """Sample location manipulation
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        schema = LocationSchema(many=True)
+        locations = Location.query.filter_by(user_id=current_user.id).order_by('id')
+        return schema.dump(locations)
+
+    def post(self):
+
+        # Grab locations from request
+        locations = request.args.get('locations')
+
+        # Make necessary changes and what not
+        rv = location_moficiations(locations)
+
+        if (rv):
+            return {'msg': 'Modification successful'}, 201
+
+        else:
+            return {'msg': 'Modification unsucessful'}, 400
+
+
 # Wilcard export overwrite
 __all__ = [
     'UserResource', 'UserList',
@@ -452,5 +525,6 @@ __all__ = [
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
-    'MarkerList', 'MarkerSpecificDataset'
+    'MarkerList', 'MarkerSpecificDataset', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
+    'LocationList'
 ]

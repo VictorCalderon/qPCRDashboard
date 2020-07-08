@@ -6,6 +6,7 @@
     header-bg-variant="dark"
     header-text-variant="white"
     class="m-2"
+    v-if="sampleLocationSchemas"
   >
     <b-tooltip target="add-schema" triggers="hover" placement="right" variant="info">
       Schema keys can be alpha-numerical and must be present in each sample's name
@@ -308,9 +309,10 @@ export default {
       this.$store.dispatch("updateSampleLocationSchemas", this.schemas);
     }
   },
+
   computed: {
-    allSchemas() {
-      return this.$store.getters.allSchemas;
+    sampleLocationSchemas() {
+      return this.$store.getters.sampleLocationSchemas;
     },
 
     disableAddSchema() {
@@ -320,9 +322,21 @@ export default {
     }
   },
 
-  mounted() {
-    // Initialize schemas
-    this.schemas = [...this.allSchemas];
+  async mounted() {
+    // Get schemas
+    await this.$store.dispatch("getSampleLocationSchemas").then(() => {
+      this.schemas = [...this.sampleLocationSchemas];
+    });
+    // // Initialize schemas
+    // () => {
+    //   this.schemas = [...this.sampleLocationSchemas];
+    // }
+  },
+
+  watch: {
+    sampleLocationSchemas() {
+      this.schemas = [...this.sampleLocationSchemas];
+    }
   }
 };
 </script>

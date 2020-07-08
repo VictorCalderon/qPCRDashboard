@@ -5,32 +5,33 @@ const state = {
     sampleModifiedSignal: false,
     currentSample: [],
     queriedSamples: [],
-    sampleLocationSchemas: [
-        {
-            id: 0,
-            key: "001",
-            location: "Sede Central",
-            latitude: "18.4358",
-            longitude: "-69.9853",
-            color: '#DD614A'
-        },
-        {
-            id: 1,
-            key: "002",
-            location: "Piantini",
-            latitude: "18.4772",
-            longitude: "-69.9263",
-            color: '#F48668'
-        },
-        {
-            id: 2,
-            key: "003",
-            location: "Santiago",
-            latitude: "19.4548",
-            longitude: "-70.6929",
-            color: '#5AB1BB'
-        }
-    ],
+    sampleLocationSchemas: null,
+    // sampleLocationSchemas: [
+    //     {
+    //         id: 0,
+    //         key: "001",
+    //         location: "Sede Central",
+    //         latitude: "18.4358",
+    //         longitude: "-69.9853",
+    //         color: '#DD614A'
+    //     },
+    //     {
+    //         id: 1,
+    //         key: "002",
+    //         location: "Piantini",
+    //         latitude: "18.4772",
+    //         longitude: "-69.9263",
+    //         color: '#F48668'
+    //     },
+    //     {
+    //         id: 2,
+    //         key: "003",
+    //         location: "Santiago",
+    //         latitude: "19.4548",
+    //         longitude: "-70.6929",
+    //         color: '#5AB1BB'
+    //     }
+    // ],
 }
 
 const mutations = {
@@ -82,8 +83,16 @@ const mutations = {
 
 const actions = {
 
+    getSampleLocationSchemas({ commit }) {
+        axios.get('api/v1/dashboard/samplelocation').then(res => {
+            commit('UPDATE_SAMPLE_LOCATION_SCHEMAS', res.data)
+        })
+    },
+
     updateSampleLocationSchemas({ commit }, schemas) {
-        commit('UPDATE_SAMPLE_LOCATION_SCHEMAS', schemas)
+        axios.post('api/v1/dashboard/samplelocation', { locations: schemas }).then(() => {
+            commit('UPDATE_SAMPLE_LOCATION_SCHEMAS', schemas)
+        })
     },
 
     loadSamples({ commit }) {
@@ -142,7 +151,7 @@ const getters = {
         return state.allSamples
     },
 
-    allSchemas(state) {
+    sampleLocationSchemas(state) {
         return state.sampleLocationSchemas
     },
 

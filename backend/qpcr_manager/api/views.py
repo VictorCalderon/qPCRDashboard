@@ -30,15 +30,18 @@ api.add_resource(SampleResource, "/samples/<int:sample_id>")
 api.add_resource(SampleFluorescenceResource, "/samples/<int:sample_id>/fluorescences")
 api.add_resource(SamplesQuery, "/samples/query")
 
-
 # Import/Export functionality for experiments
 api.add_resource(ImportExperiment, '/experiments/import')
 api.add_resource(ExportExperiment, '/experiments/export/<int:experiment_id>')
 
 # Amplification time series and other dashboard data
-api.add_resource(AmplificationTimeSeriesResource, "/timeseries")
-api.add_resource(MarkerSpecificDataset, "/dataset")
-api.add_resource(MarkerList, '/markers')
+# api.add_resource(AmplificationTimeSeriesResource, "/timeseries")
+# api.add_resource(MarkerSpecificDataset, "/dataset")
+# api.add_resource(MarkerList, '/markers')
+api.add_resource(ProjectBrief, '/dashboard/briefing')
+api.add_resource(AmpStatData, '/dashboard/ampstatdata')
+api.add_resource(TagDistribution, '/dashboard/tagdistrib')
+api.add_resource(LocationList, '/dashboard/samplelocation')
 
 
 @blueprint.before_app_first_request

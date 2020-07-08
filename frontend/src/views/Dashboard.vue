@@ -46,7 +46,6 @@
             header-text-variant="white"
             class="m-2"
           >
-            <b-card-text>Ordered experiment tags from each experiment</b-card-text>
             <ExperimentObservations></ExperimentObservations>
           </b-card>
         </b-col>

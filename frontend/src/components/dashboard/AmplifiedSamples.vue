@@ -1,57 +1,56 @@
 <template>
-  <LineChart :chartData="chartData" :options="chartConfig" :height="150"></LineChart>
+  <LineChart
+    :chartData="ampPercDatasets"
+    :options="chartConfig"
+    :height="150"
+    v-if="ampPercDatasets"
+  ></LineChart>
 </template>
 
 <script>
 import LineChart from "@/components/charts/LineChart.js";
 
 export default {
+  mounted() {
+    this.$store.dispatch("ampStatusTimeline");
+  },
+
   components: {
     LineChart
   },
+
+  computed: {
+    ampPercDatasets() {
+      // Check chart data exists
+      if (this.$store.getters.ampPercData) {
+        // Chart labels
+        const chartDates = this.$store.getters.ampPercData.dates;
+
+        // Chart data
+        const chartRawData = this.$store.getters.ampPercData.datasets;
+
+        // Add chart options to dataset
+        let chartData = chartRawData.map((d, i) => {
+          return {
+            label: d.marker,
+            data: d.data,
+            backgroundColor: this.colors[i],
+            fill: true,
+            hoverWidth: 2,
+            hoverColor: "#000",
+            order: i + 1
+          };
+        });
+
+        // Return processed data
+        return { labels: chartDates, datasets: chartData };
+      } else return {};
+    }
+  },
+
   data() {
     return {
-      chartData: {
-        labels: [
-          "26 Jun",
-          "27 Jun",
-          "28 Jun",
-          "29 Jun",
-          "30 Jun",
-          "1 Jul",
-          "2 Jul",
-          "3 Jul"
-        ],
-        datasets: [
-          {
-            label: "RNAse P",
-            data: [99, 98, 99, 99, 99, 98, 99, 97, 100, 0],
-            backgroundColor: "#4C5454",
-            fill: true,
-            hoverWidth: 2,
-            hoverColor: "#000",
-            order: 3
-          },
-          {
-            label: "E Gene",
-            data: [21, 23, 27, 26, 24, 20, 21, 20, 20, 0],
-            backgroundColor: "#1EA896",
-            fill: true,
-            hoverWidth: 2,
-            hoverColor: "#000",
-            order: 2
-          },
-          {
-            label: "ORF1ab",
-            data: [15, 18, 19, 22, 21, 18, 18, 17, 19, 0],
-            backgroundColor: "#FF715B",
-            fill: true,
-            hoverWidth: 2,
-            hoverColor: "#000",
-            order: 1
-          }
-        ]
-      },
+      colors: ["#2E5266", "#6E8898", "#D3D0CB", "#E2C044"],
       chartConfig: {
         maintainAspectRatio: true,
         reponsive: true,
@@ -75,7 +74,6 @@ export default {
           position: "bottom",
           maxWidth: 100,
           labels: {
-            // fontColor: "#05A8AA",
             boxWidth: 20,
             fontSize: 12
           }

@@ -1,13 +1,13 @@
 <template>
-  <HBarChart :chartData="chartData" :options="chartConfig" :height="280"></HBarChart>
+  <PieChart :chartData="chartData" :options="chartConfig" :height="320"></PieChart>
 </template>
 
 <script>
-import HBarChart from "@/components/charts/HBarChart.js";
+import PieChart from "@/components/charts/PieChart.js";
 
 export default {
   components: {
-    HBarChart
+    PieChart
   },
   data() {
     return {
@@ -44,15 +44,15 @@ export default {
         ]
       },
       chartConfig: {
-        scales: {
-          xAxes: [
-            {
-              ticks: {
-                fontSize: 12
-              }
-            }
-          ]
-        },
+        // scales: {
+        //   xAxes: [
+        //     {
+        //       ticks: {
+        //         fontSize: 12
+        //       }
+        //     }
+        //   ]
+        // },
         maintainAspectRatio: true,
         reponsive: true,
         legend: {

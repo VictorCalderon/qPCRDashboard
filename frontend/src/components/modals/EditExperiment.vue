@@ -248,8 +248,8 @@ export default {
     currentExperiment() {
       this.experiment = this.currentExperiment;
 
-      if (this.experiment.tags) {
-        this.experiment.tags = this.experiment.tags.split(";");
+      if (this.currentExperiment.tags) {
+        this.experiment.tags = this.currentExperiment.tags.split(";");
       }
     }
   }

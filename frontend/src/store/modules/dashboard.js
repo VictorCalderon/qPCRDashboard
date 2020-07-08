@@ -5,6 +5,8 @@ const state = {
     mapCenter: [19.007237, -70.41502],
     samplingSites: [],
     briefingData: { 'samples': 56812, 'experiments': 1232 },
+    ampPercData: null,
+    tagDistribution: null
 }
 
 const mutations = {
@@ -18,14 +20,38 @@ const mutations = {
 
     SET_BRIEFING_DATA(state, briefingData) {
         Vue.set(state, 'briefingData', briefingData)
+    },
+
+    SET_AMP_PERC(state, ampPercData) {
+        Vue.set(state, 'ampPercData', ampPercData)
+    },
+
+    SET_TAG_DISTRIBUTION(state, tagDistribution) {
+        Vue.set(state, 'tagDistribution', tagDistribution)
     }
 }
 
 const actions = {
-    updateBriefingData({ commit }, mode) {
-        axios.get(`api/v1/dashboard/briefing/${mode}`).then(
+
+    updateTagDistribution({ commit }) {
+        axios.get('api/v1/dashboard/tagdistrib').then(
+            res => {
+                commit('SET_TAG_DISTRIBUTION', res.data)
+            }
+        )
+    },
+    updateBriefingData({ commit }) {
+        axios.get('api/v1/dashboard/briefing').then(
             res => {
                 commit('SET_BRIEFING_DATA', res.data)
+            }
+        )
+    },
+
+    ampStatusTimeline({ commit }) {
+        axios.get('api/v1/dashboard/ampstatdata').then(
+            res => {
+                commit('SET_AMP_PERC', res.data)
             }
         )
     },
@@ -72,6 +98,14 @@ const getters = {
 
     briefingData(state) {
         return state.briefingData
+    },
+
+    ampPercData() {
+        return state.ampPercData
+    },
+
+    tagDistribution() {
+        return state.tagDistribution
     }
 }
 
