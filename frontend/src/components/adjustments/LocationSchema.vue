@@ -48,7 +48,7 @@
     </template>
     <b-collapse id="schema-form" v-model="visible">
       <b-form-row class="justify-content-center">
-        <b-col cols="3" class="my-1">
+        <b-col cols="2" class="my-1">
           <label for="location-key">Key</label>
           <b-form-input
             id="location-key"
@@ -79,11 +79,13 @@
             v-model="newSchema.latitude"
             class="text-center"
             size="sm"
+            type="number"
           ></b-form-input>
         </b-col>
         <b-col cols="3" class="my-1">
           <label for="location-longitude">Longitude</label>
           <b-form-input
+            type="number"
             id="location-longitude"
             aria-label="Longitude"
             placeholder="0.1874"
@@ -92,34 +94,49 @@
             size="sm"
           ></b-form-input>
         </b-col>
-        <b-col cols="3" class="my-1">
-          <label for="location-color">Color</label>
+        <b-col cols="1" class="my-1">
+          <label for="location-color" class="text-light">Color</label>
           <b-form-input
             type="color"
             id="location-color"
             aria-label="Color"
-            placeholder="#FFFFFF"
+            placeholder="#FFFFFF0"
             v-model="newSchema.color"
             class="text-center"
             size="sm"
           ></b-form-input>
         </b-col>
       </b-form-row>
-      <b-button
-        v-if="!modification"
-        class="mt-3"
-        size="sm"
-        variant="success"
-        @click="addSchema"
-      >Add Schema</b-button>
-      <b-button
-        v-if="modification"
-        class="mt-3 mx-2"
-        size="sm"
-        variant="secondary"
-        @click="modifySchema"
-      >Cancel</b-button>
-      <hr class="my-3" />
+      <b-form-row class="justify-content-center">
+        <b-col cols="2">
+          <label for="secret-text" class="text-light">Save</label>
+          <b-button
+            block
+            class="px-1"
+            size="md"
+            variant="info"
+            id="secret-text"
+            @click="saveSchema"
+            :disabled="!formReady"
+          >
+            <i class="fas fa-save"></i>
+          </b-button>
+        </b-col>
+        <b-col cols="2">
+          <label for="cancel-schema" class="text-light">Cancel</label>
+          <b-button
+            block
+            class="px-1"
+            size="md"
+            variant="warning"
+            id="cancel-schema"
+            @click="toggleAddSchema"
+          >
+            <i class="fas fa-window-close"></i>
+          </b-button>
+        </b-col>
+      </b-form-row>
+      <hr />
     </b-collapse>
 
     <b-row v-if="schemas.length > 0" class="justify-content-center">
@@ -155,18 +172,6 @@
           >
             <i class="fas fa-edit"></i>
           </b-button>
-          <b-button
-            id="modify-schema"
-            class="px-1"
-            block
-            variant="success"
-            @click="modifySchema"
-            :disabled="!selectedSchema"
-            size="md"
-            v-if="modification"
-          >
-            <i class="fas fa-check-square"></i>
-          </b-button>
         </b-col>
         <b-col cols="2">
           <b-button
@@ -174,23 +179,11 @@
             id="delete-schema"
             block
             variant="danger"
-            @click="removeSchema"
+            @click="deleteSchema"
             :disabled="!selectedSchema"
             size="md"
           >
             <i class="fas fa-trash"></i>
-          </b-button>
-        </b-col>
-        <b-col cols="2">
-          <b-button
-            id="save-schemas"
-            block
-            variant="info"
-            @click="saveSchemas"
-            class="px-1"
-            size="md"
-          >
-            <i class="fas fa-save"></i>
           </b-button>
         </b-col>
       </b-form-row>
@@ -207,7 +200,6 @@ export default {
       fields: ["key", "location", "latitude", "longitude", "color"],
       selectedSchema: null,
       newSchema: {
-        id: null,
         key: null,
         location: null,
         latitude: null,
@@ -260,13 +252,9 @@ export default {
 
       // Clear color
       this.newSchema.color = null;
-    },
 
-    removeSchema() {
-      const deleteIndex = this.schemas.findIndex(
-        s => s.key == this.selectedSchema.key
-      );
-      this.schemas.splice(deleteIndex, 1);
+      // Clear id
+      this.newSchema.id = null;
     },
 
     toggleModifySchema() {
@@ -277,23 +265,12 @@ export default {
       this.visible = true;
       this.modification = true;
     },
-
-    modifySchema() {
-      // Find id
-      const schemaID = this.schemas.findIndex(s => s.id == this.newSchema.id);
-
-      // Set new schema
-      this.schemas[schemaID].key = this.newSchema.key;
-      this.schemas[schemaID].name = this.newSchema.name;
-      this.schemas[schemaID].latitude = this.newSchema.latitude;
-      this.schemas[schemaID].longitude = this.newSchema.longitude;
-      this.schemas[schemaID].color = this.newSchema.color;
-
-      // Set modification layout
-      this.toggleCollapse();
-      this.modification = !this.modification;
-
-      //
+    deleteSchema() {
+      this.$store
+        .dispatch("deleteSampleLocationSchema", this.selectedSchema.id)
+        .then(() => {
+          this.loadSchemas();
+        });
     },
 
     toggleAddSchema() {
@@ -305,8 +282,22 @@ export default {
       this.visible = !this.visible;
     },
 
-    saveSchemas() {
-      this.$store.dispatch("updateSampleLocationSchemas", this.schemas);
+    saveSchema() {
+      const newSchema = { ...this.newSchema };
+      this.$store
+        .dispatch("updateSampleLocationSchemas", newSchema)
+        .then(() => {
+          this.cleanSchema();
+        })
+        .then(() => {
+          this.loadSchemas();
+        });
+    },
+
+    async loadSchemas() {
+      await this.$store.dispatch("getSampleLocationSchemas").then(() => {
+        this.schemas = [...this.sampleLocationSchemas];
+      });
     }
   },
 
@@ -319,14 +310,24 @@ export default {
       if (this.newSchema) {
         return false;
       } else return true;
+    },
+
+    formReady() {
+      if (
+        this.newSchema.key &&
+        this.newSchema.location &&
+        this.newSchema.latitude &&
+        this.newSchema.longitude &&
+        this.newSchema.color
+      ) {
+        return true;
+      } else return false;
     }
   },
 
   async mounted() {
     // Get schemas
-    await this.$store.dispatch("getSampleLocationSchemas").then(() => {
-      this.schemas = [...this.sampleLocationSchemas];
-    });
+    this.loadSchemas();
     // // Initialize schemas
     // () => {
     //   this.schemas = [...this.sampleLocationSchemas];
@@ -336,6 +337,10 @@ export default {
   watch: {
     sampleLocationSchemas() {
       this.schemas = [...this.sampleLocationSchemas];
+    },
+
+    selectedSchema() {
+      this.newSchema = { ...this.selectedSchema };
     }
   }
 };
