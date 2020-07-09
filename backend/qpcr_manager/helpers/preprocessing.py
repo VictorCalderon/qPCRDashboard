@@ -2,7 +2,7 @@
 """
 
 # Database and models
-from qpcr_manager.models import Fluorescence, Experiment, Sample, Marker, Result
+from qpcr_manager.models import *
 from flask_jwt_extended import current_user
 from qpcr_manager.extensions import db
 
@@ -633,7 +633,7 @@ def amp_stat_data():
 
     # Prepare query
     query = f"""
-        SELECT date, sample, amp_status, amp_cq, marker 
+        SELECT date, sample, amp_status, amp_cq, marker
         FROM samples
         JOIN experiments ON experiments.id = samples.experiment_id
         JOIN results ON results.sample_id = samples.id
@@ -698,7 +698,7 @@ def tag_distrib():
 
     # Prepare query
     query = f"""
-    SELECT tags FROM experiments 
+    SELECT tags FROM experiments
     WHERE experiments.user_id = {current_user.id}
     """
 
@@ -714,6 +714,9 @@ def tag_distrib():
     # Count data
     tag_counter = Counter(tags)
 
+    # Sorted count data
+    tag_counter = dict(tag_counter.most_common(len(tag_counter.keys())))
+
     return {'labels': list(tag_counter.keys()), 'dataset': list(tag_counter.values())}
 
 
@@ -724,11 +727,13 @@ def location_moficiations(locations):
     # Iterate over locations
     for loc in locations:
 
-        # Query that specific entry
-        location_entry = Location.query.get_or_404(loc.id)
+        # Get location id
+        loc_id = loc.get('id', 0)
 
-        # If found
-        if (location_entry):
+        if loc_id:
+
+            # Query that specific entry
+            location_entry = Location.query.get_or_404(loc_id)
 
             # Change all values
             for k in loc:
@@ -745,3 +750,62 @@ def location_moficiations(locations):
     db.session.commit()
 
     return 1
+
+
+def get_located_samples():
+    """ Combine sample name data to map each sample to a sampling site
+        Output format:
+
+        [
+            {
+                'loc': [18.4358, -69.9853],
+                'name': "Sede Central",
+                'totalSamples': 19800,
+                'bgColor': '#C81D25'
+            },
+            ...
+        ]
+
+    """
+
+    # Get sample data
+    sample_query = f"""
+    SELECT sample FROM samples
+    JOIN experiments ON samples.experiment_id = experiments.id
+    WHERE experiments.user_id = {current_user.id}
+    """
+
+    # Run sample query
+    sample_df = pd.read_sql(sample_query, db.session.bind)
+
+    # Get location data
+    location_query = f"""
+    SELECT key, location, latitude, longitude, color FROM locations
+    WHERE locations.user_id = {current_user.id}
+    """
+
+    # Run location query
+    location_df = pd.read_sql(location_query, db.session.bind)
+
+    # Find key inside sample names
+    counter = Counter(x[2:5] for x in sample_df['sample'])
+
+    # Filter counter for unwanted locations
+    locs = {k: v for k, v in counter.items() if k in list(location_df['key'])}
+
+    # Add to location dataframe
+    location_df['count'] = location_df['key'].apply(lambda x: locs.get(x, 0))
+
+    # Transform to json structure
+    rv = [
+        {
+            'loc': [x['latitude'], x['longitude']],
+            'name': x['location'],
+            'totalSamples': x['count'],
+            'bgColor': x['color']
+        }
+        for i, x in location_df.iterrows()
+    ]
+
+    # Return dataset
+    return rv
