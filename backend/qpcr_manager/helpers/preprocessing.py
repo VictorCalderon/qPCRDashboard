@@ -2,7 +2,8 @@
 """
 
 # Database and models
-from qpcr_manager.models import Fluorescence, Experiment, Sample, Marker, Result
+from qpcr_manager.models import *
+from flask_jwt_extended import current_user
 from qpcr_manager.extensions import db
 
 # Utilities
@@ -16,7 +17,7 @@ from datetime import date
 from zipfile import ZipFile
 
 # Data Structures
-from collections import defaultdict, deque
+from collections import defaultdict, deque, Counter
 
 # Data manipulation
 import pandas as pd
@@ -585,3 +586,227 @@ def marker_dataset(marker_id, current_user):
 
     # Return dataset as a csv
     return dataset.to_csv(index=False)
+
+
+def get_brief():
+    """Count the number of experiments and samples processed
+    """
+
+    query = f"""
+    SELECT s.sample, e.name FROM samples AS s
+    JOIN experiments AS e ON s.experiment_id = e.id
+    WHERE e.user_id = {current_user.id}
+    """
+
+    # Run query
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Make unique
+    exps, samples = len(dataset['name'].unique()), len(dataset['sample'])
+
+    # Return dataset
+    return {"experiments": exps, "samples": samples}
+
+
+def amp_stat_data():
+    """ Return the following data structure:
+        {
+            labels: ["26 Jun", "27 Jun", "28 Jun", "29 Jun"],
+            datasets: [
+                {
+                    label: "Marker 1",
+                    data: [19, 18, 19, 22]
+                },
+                {
+                    label: 'Marker 2',
+                    data: [21, 23, 27, 26],
+                },
+                {
+                    label: 'Marker 3',
+                    data: [99, 98, 99, 99],
+                }, ...
+            ]
+        }
+
+        The order of datasets must be decreasing by mean data
+    """
+
+    # Prepare query
+    query = f"""
+        SELECT date, sample, amp_status, amp_cq, marker
+        FROM samples
+        JOIN experiments ON experiments.id = samples.experiment_id
+        JOIN results ON results.sample_id = samples.id
+        JOIN markers ON results.marker_id = markers.id
+        WHERE experiments.user_id = {current_user.id}
+        """
+
+    # Run query
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Parse date as datetime
+    dataset['date'] = pd.to_datetime(dataset['date'])
+
+    # # Resample if length is >100 days
+    # if len(dataset) > 2:
+
+    #     # Run resample
+    #     dataset = dataset.resample('W', on='date')['amp_status'].mean().reset_index()
+
+    # Group by date and marker and calculate amplification (binary mean) percentages
+    dataset = dataset.groupby(['date', 'marker'])['amp_status'].mean().reset_index()
+
+    # Parse dates
+    dataset['day'] = dataset['date'].dt.day
+    dataset['month'] = dataset['date'].dt.month_name()
+
+    # Make then pretty
+    dataset['day-month'] = dataset['day'].astype(str) + '-' + dataset['month'].astype(str)
+
+    # Instantiate data struct [{'marker': 'example 1, 'data': [1, 2, 3]}]
+    datasets = []
+
+    # Generate parsed dataset
+    for marker in dataset['marker'].unique():
+
+        # Mask dataset to keep marker specific
+        df = dataset[dataset['marker'] == marker]
+
+        # Get dataset
+        percs = df['amp_status'] * 100
+
+        # Add data to struct
+        datasets.append({'marker': marker, 'data': percs.to_list()})
+
+    # Sort list of dictionaries
+    datasets = sorted(datasets, key=lambda i: np.mean(i['data']))
+
+    # Use last iteration day-month column
+    return {'dates': df['day-month'].to_list(), 'datasets': datasets}
+
+
+def tag_distrib():
+    """ Return the following data structure:
+        {
+            labels: ["Tag1", "Tag2", "Tag3", "Tag4"],
+            dataset: [2000, 1232, 1232, 412, 10]
+            ]
+        }
+
+        dataset order: decreasing
+    """
+
+    # Prepare query
+    query = f"""
+    SELECT tags FROM experiments
+    WHERE experiments.user_id = {current_user.id}
+    """
+
+    # Run query with pandas
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Get split list of lists
+    tags = [t.split(';') for t in dataset['tags']]
+
+    # Flatten tags
+    tags = [item for sublist in tags for item in sublist]
+
+    # Count data
+    tag_counter = Counter(tags)
+
+    # Sorted count data
+    tag_counter = dict(tag_counter.most_common(len(tag_counter.keys())))
+
+    return {'labels': list(tag_counter.keys()), 'dataset': list(tag_counter.values())}
+
+
+def location_moficiations(locations):
+    """Manipulate location data from a single user
+    """
+
+    # Iterate over locations
+    for loc in locations:
+
+        # Get location id
+        loc_id = loc.get('id', 0)
+
+        if loc_id:
+
+            # Query that specific entry
+            location_entry = Location.query.get_or_404(loc_id)
+
+            # Change all values
+            for k in loc:
+                setattr(location_entry, k, loc[k])
+
+        # If new
+        else:
+
+            # Add to database
+            new_loc = Location(**loc)
+            db.session.add(new_loc)
+
+    # Commit changes
+    db.session.commit()
+
+    return 1
+
+
+def get_located_samples():
+    """ Combine sample name data to map each sample to a sampling site
+        Output format:
+
+        [
+            {
+                'loc': [18.4358, -69.9853],
+                'name': "Sede Central",
+                'totalSamples': 19800,
+                'bgColor': '#C81D25'
+            },
+            ...
+        ]
+
+    """
+
+    # Get sample data
+    sample_query = f"""
+    SELECT sample FROM samples
+    JOIN experiments ON samples.experiment_id = experiments.id
+    WHERE experiments.user_id = {current_user.id}
+    """
+
+    # Run sample query
+    sample_df = pd.read_sql(sample_query, db.session.bind)
+
+    # Get location data
+    location_query = f"""
+    SELECT key, location, latitude, longitude, color FROM locations
+    WHERE locations.user_id = {current_user.id}
+    """
+
+    # Run location query
+    location_df = pd.read_sql(location_query, db.session.bind)
+
+    # Find key inside sample names
+    counter = Counter(x[2:5] for x in sample_df['sample'])
+
+    # Filter counter for unwanted locations
+    locs = {k: v for k, v in counter.items() if k in list(location_df['key'])}
+
+    # Add to location dataframe
+    location_df['count'] = location_df['key'].apply(lambda x: locs.get(x, 0))
+
+    # Transform to json structure
+    rv = [
+        {
+            'loc': [x['latitude'], x['longitude']],
+            'name': x['location'],
+            'count': x['count'],
+            'bgColor': x['color']
+        }
+        for i, x in location_df.iterrows()
+        if x['count'] > 0
+    ]
+
+    # Sort by largest count
+    return sorted(rv, key=lambda x: x['count'], reverse=True)

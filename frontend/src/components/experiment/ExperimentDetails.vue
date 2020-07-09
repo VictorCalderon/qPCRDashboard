@@ -1,21 +1,39 @@
 <template>
-  <div class="text-center mt-2" v-if="currentExperimentResults">
-    <div class="px-1 py-1 mb-1 rounded">
-      <h4 class="thin-font">{{ currentExperiment.name}}</h4>
-      <p class="my-0 smaller-font">Total Samples: {{ totalSamples }}</p>
-    </div>
-    <div class="overflow-results p-1" style="max-height: 300px">
-      <div v-for="(marker, i) in markers" :key="i" class="bg-light mb-3 rounded py-2">
-        <h5 class="my-0 rounded thin-font small-font">{{ marker }}</h5>
-        <div>
-          <p
-            class="my-0 smaller-font"
-          >Cq -> &nbsp;&mu;: {{ basicStatistics(marker).mean }} &nbsp;&nbsp; &sigma;: {{ basicStatistics(marker).std }}</p>
-          <p class="my-0">Amp Percentage: &nbsp; {{ Math.round(basicStatistics(marker).perc, 2) }}%</p>
+  <b-card
+    bg-variant="light"
+    align="center"
+    header-bg-variant="dark"
+    header-text-variant="white"
+    class="m-2"
+    v-if="currentExperimentResults"
+  >
+    <template v-slot:header>
+      <h5 class="mb-0 thin-font">
+        {{ currentExperiment.name }}&nbsp;
+        <span
+          class="my-0 smaller-font"
+        >|&nbsp;{{ currentExperiment.date }}</span>
+      </h5>
+    </template>
+
+    <div class="text-center">
+      <div class="overflow-results p-1" style="max-height: 250px">
+        <div v-for="(marker, i) in markers" :key="i" class="bg-light mb-2 rounded py-1">
+          <b-card>
+            <h6 class="my-0 rounded thin-font small-font">{{ marker }}</h6>
+            <div>
+              <p
+                class="my-0 smaller-font"
+              >Cq -> &nbsp;&mu;: {{ basicStatistics(marker).mean }} &nbsp;&nbsp; &sigma;: {{ basicStatistics(marker).std }}</p>
+              <p
+                class="my-0"
+              >Amp Percentage: &nbsp; {{ Math.round(basicStatistics(marker).perc, 2) }}%</p>
+            </div>
+          </b-card>
         </div>
       </div>
     </div>
-  </div>
+  </b-card>
 </template>
 
 <script>

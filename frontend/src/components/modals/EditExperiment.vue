@@ -47,27 +47,31 @@
       <b-row class="mb-2" align-h="center">
         <b-col>
           <div class="text-center">
-            <label for="edit-experimentmethod">Methodology</label>
+            <label for="edit-experimentobservations">Observations</label>
             <b-form-input
-              id="edit-experimentmethod"
-              v-model="experiment.methodology"
+              id="edit-experimentobservations"
+              v-model="experiment.observations"
               class="text-center"
-              :placeholder="currentExperiment.methodology"
+              :placeholder="currentExperiment.observations"
             ></b-form-input>
           </div>
         </b-col>
+      </b-row>
+      <b-row class="mb-2" align-h="center">
         <b-col>
-          <div class="text-center">
-            <label for="edit-experimentstatus">Experiment Status</label>
-            <b-form-checkbox
-              id="edit-experimentstatus"
-              v-model="experiment.analyzed"
-              name="check-button"
-              size="lg"
-              switch
-            >
-              <small>{{ experiment.analyzed ? 'Analyzed' : 'Not Analyzed' }}</small>
-            </b-form-checkbox>
+          <div class="text-center mt-1">
+            <label for="edit-experimenttags">Experiment tags</label>
+            <b-form-tags
+              id="tags"
+              v-model="experiment.tags"
+              class="text-center"
+              tag-pills
+              tag-variant="info"
+              size="md"
+              separator=" ,;"
+              :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+              remove-on-delete
+            ></b-form-tags>
           </div>
         </b-col>
       </b-row>
@@ -86,6 +90,26 @@
             <p class="text-secondary pt-1 my-1">This cannot be undone.</p>
           </div>
         </b-col>
+        <b-col>
+          <div class="text-center">
+            <label for="edit-experimentstatus">Experiment Status</label>
+            <b-form-checkbox
+              id="edit-experimentstatus"
+              v-model="experiment.analyzed"
+              name="check-button"
+              size="lg"
+              switch
+              class="mt-1"
+            >
+              <span class="text-secondary">
+                <small>{{ experiment.analyzed ? 'Yes' : 'No' }}</small>
+              </span>
+            </b-form-checkbox>
+            <p
+              class="text-secondary pt-2 my-1"
+            >{{ experiment.analyzed ? "Experiment analyzed" : "Analysis pending..."}}</p>
+          </div>
+        </b-col>
       </b-row>
       <hr class="my-1" v-if="!deleteConfirmation" />
       <b-row v-if="deleteConfirmation" align-h="center">
@@ -99,7 +123,7 @@
             variant="outline-secondary"
             @click="deleteConfirmation = false"
             block
-          >No</b-button>
+          >Cancel</b-button>
         </b-col>
         <b-col cols="6">
           <b-button
@@ -108,7 +132,7 @@
             variant="danger"
             @click="deleteCurrentExperiment"
             block
-          >Yes</b-button>
+          >Delete</b-button>
         </b-col>
       </b-row>
       <b-row class="mt-2" v-if="!deleteConfirmation">
@@ -148,7 +172,8 @@ export default {
         name: null,
         date: null,
         analyzed: null,
-        methodology: null,
+        observations: null,
+        tags: [],
         id: null
       },
       alert: null,
@@ -185,7 +210,8 @@ export default {
         date: null,
         analyzed: null,
         id: null,
-        methodology: null
+        observations: null,
+        tags: null
       };
     },
 
@@ -212,6 +238,7 @@ export default {
     currentExperiment() {
       return this.$store.getters.currentExperiment;
     },
+
     updateMsg() {
       return this.$store.getters.updateMsg;
     }
@@ -220,6 +247,10 @@ export default {
   watch: {
     currentExperiment() {
       this.experiment = this.currentExperiment;
+
+      if (this.currentExperiment.tags) {
+        this.experiment.tags = this.currentExperiment.tags.split(";");
+      }
     }
   }
 };

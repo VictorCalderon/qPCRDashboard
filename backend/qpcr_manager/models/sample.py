@@ -10,9 +10,6 @@ class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sample = db.Column(db.String, nullable=False)
     description = db.Column(db.Text)
-    location = db.Column(db.String)
-    latitude = db.Column(db.Float)
-    longitiude = db.Column(db.Float)
 
     experiment_id = db.Column(db.Integer, db.ForeignKey(
         'experiments.id', ondelete='CASCADE'))

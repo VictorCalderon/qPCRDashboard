@@ -5,12 +5,43 @@ const state = {
     sampleModifiedSignal: false,
     currentSample: [],
     queriedSamples: [],
+    sampleLocationSchemas: null,
+    // sampleLocationSchemas: [
+    //     {
+    //         id: 0,
+    //         key: "001",
+    //         location: "Sede Central",
+    //         latitude: "18.4358",
+    //         longitude: "-69.9853",
+    //         color: '#DD614A'
+    //     },
+    //     {
+    //         id: 1,
+    //         key: "002",
+    //         location: "Piantini",
+    //         latitude: "18.4772",
+    //         longitude: "-69.9263",
+    //         color: '#F48668'
+    //     },
+    //     {
+    //         id: 2,
+    //         key: "003",
+    //         location: "Santiago",
+    //         latitude: "19.4548",
+    //         longitude: "-70.6929",
+    //         color: '#5AB1BB'
+    //     }
+    // ],
 }
 
 const mutations = {
 
     'LOAD_SAMPLES'(state, allSamples) {
         Vue.set(state, 'allSamples', allSamples)
+    },
+
+    'UPDATE_SAMPLE_LOCATION_SCHEMAS'(state, allSchemas) {
+        Vue.set(state, 'sampleLocationSchemas', allSchemas)
     },
 
     'LOAD_NEXT_SAMPLES'(state, nextUrl) {
@@ -51,6 +82,24 @@ const mutations = {
 }
 
 const actions = {
+
+    getSampleLocationSchemas({ commit }) {
+        axios.get('api/v1/dashboard/samplelocation').then(res => {
+            commit('UPDATE_SAMPLE_LOCATION_SCHEMAS', res.data)
+        })
+    },
+
+    updateSampleLocationSchemas({ commit }, schema) {
+        axios.post('api/v1/dashboard/samplelocation', schema).then(() => {
+            commit('SAMPLE_MODIFIED');
+        })
+    },
+
+    deleteSampleLocationSchema({ commit }, schema_id) {
+        axios.delete(`api/v1/dashboard/samplelocation/${schema_id}`).then(() => {
+            commit('SAMPLE_MODIFIED');
+        })
+    },
 
     loadSamples({ commit }) {
         axios.get('api/v1/samples', {
@@ -106,6 +155,10 @@ const actions = {
 const getters = {
     allSamples(state) {
         return state.allSamples
+    },
+
+    sampleLocationSchemas(state) {
+        return state.sampleLocationSchemas
     },
 
     currentSamples(state) {

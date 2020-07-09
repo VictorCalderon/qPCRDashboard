@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 // Import views
 import Experiment from '../views/Experiment.vue'
 import Dashboard from '../views/Dashboard.vue'
+import Adjustments from '../views/Adjustments.vue'
+// import Login from '../components/navigation/Login.vue'
 
 // User plugin
 Vue.use(VueRouter)
@@ -17,7 +19,7 @@ const router = new VueRouter({
 // Configure routes
 const routes = [
   {
-    path: '/',
+    path: '/Dashboard',
     name: 'Dashboard',
     component: Dashboard,
   },
@@ -25,7 +27,17 @@ const routes = [
     path: '/Experiments',
     name: 'Experiments',
     component: Experiment,
-  }
+  },
+  {
+    path: '/Adjustments',
+    name: 'Adjustments',
+    component: Adjustments,
+  },
+  // {
+  //   path: "/Login",
+  //   name: 'Login',
+  //   component: Login,
+  // }
 ]
 
 // Add routes

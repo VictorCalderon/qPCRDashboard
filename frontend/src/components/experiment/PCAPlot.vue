@@ -1,16 +1,34 @@
 <template>
-  <div>
-    <b-row class="hue-selector" align-h="end">
-      <b-col cols="3" class="my-0 py-0">
-        <b-form-select v-model="marker" :options="availableMarkers" size="sm"></b-form-select>
-      </b-col>
-    </b-row>
-    <b-row>
+  <b-card
+    bg-variant="light"
+    align="center"
+    header-bg-variant="dark"
+    header-text-variant="white"
+    class="m-2"
+    v-if="currentExperimentResults"
+  >
+    <template v-slot:header>
+      <b-row class="hue-selector" align-h="end">
+        <b-col>
+          <h5 class="mb-0 mt-1 thin-font">Principal Component Analysis</h5>
+        </b-col>
+        <b-col cols="5" class="my-0 py-0">
+          <b-form-select
+            v-model="marker"
+            :options="availableMarkers"
+            size="sm"
+            v-b-tooltip.hover="'Color samples based on their amplification status'"
+          ></b-form-select>
+        </b-col>
+      </b-row>
+    </template>
+
+    <b-form-row>
       <b-col>
         <scatter-chart :chart-data="scatterData" :options="options" :height="295" v-if="marker"></scatter-chart>
       </b-col>
-    </b-row>
-  </div>
+    </b-form-row>
+  </b-card>
 </template>
 
 <script>
@@ -21,7 +39,6 @@ export default {
     ScatterChart
   },
 
-  // [SUGGESTION] (Clusterplot.vue) xAxis and yAxis MUST be dynamic on mount
   data() {
     return {
       scatterData: {},
@@ -30,8 +47,8 @@ export default {
       xAxis: "PCA 1",
       yAxis: "PCA 2",
       marker: null,
-      notAmped: "#f1434350",
-      amped: "#539ee480"
+      notAmped: "#ffffff50",
+      amped: "#00000080"
     };
   },
 
@@ -171,7 +188,7 @@ export default {
           xAxes: [
             {
               scaleLabel: {
-                display: true,
+                display: false,
                 labelString: this.xAxis
               }
             }
@@ -179,7 +196,7 @@ export default {
           yAxes: [
             {
               scaleLabel: {
-                display: true,
+                display: false,
                 labelString: this.yAxis
               }
             }
@@ -195,7 +212,7 @@ export default {
           }
         },
         title: {
-          display: true,
+          display: false,
           text: "Principal Component Analysis",
           fontSize: 16
         }

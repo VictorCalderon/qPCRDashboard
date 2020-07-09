@@ -66,7 +66,8 @@ class ExperimentSchema(ma.SQLAlchemyAutoSchema):
     name = ma.auto_field()
     date = ma.auto_field()
     analyzed = ma.auto_field()
-    methodology = ma.auto_field()
+    observations = ma.auto_field()
+    tags = ma.auto_field()
 
     class Meta:
         model = Experiment
@@ -104,9 +105,13 @@ class ExperimentResource(Resource):
         if request.json.get('analyzed') == False:
             experiment.analyzed = False
 
-        # Change methodology
-        if request.json.get('methodology'):
-            experiment.methodology = request.json.get('methodology')
+        # Change observations
+        if request.json.get('observations'):
+            experiment.observations = request.json.get('observations')
+
+        # Changes or add tags
+        if request.json.get('tags'):
+            experiment.tags = ';'.join(request.json.get('tags'))
 
         # Add experiment to session and commit change
         db.session.add(experiment)
@@ -173,14 +178,14 @@ class ImportExperiment(Resource):
         # Experiment name and experiment Date
         name = request.form.get('name', None)
         date = request.form.get('date', None)
-        methodology = request.form.get('methodology', None)
+        observations = request.form.get('observations', None)
         fmt = request.form.get('format', None)
 
         if (name is None) or (date is None) or (file is None) or (fmt is None):
             return {'msg': 'Experiment is missing information'}, 400
 
         # Experiment instantiation
-        current_experiment = Experiment(name=name, date=date, user=current_user, methodology=methodology)
+        current_experiment = Experiment(name=name, date=date, user=current_user, observations=observations)
 
         try:
             if fmt == 'DA2':
@@ -233,7 +238,7 @@ class ExperimentsQuery(Resource):
         name = request.args.get('name', None)
         date = request.args.get('date', None)
         analyzed = request.args.get('analyzed', None)
-        methodology = request.args.get('methodology', None)
+        observations = request.args.get('observations', None)
 
         # Query db for users experiments
         query = Experiment.query.filter_by(user_id=current_user.id).order_by(Experiment.id.desc())
@@ -257,10 +262,10 @@ class ExperimentsQuery(Resource):
             query = query.filter_by(date=date)
 
         # Filter by date
-        if methodology:
+        if observations:
 
             # Apply filter
-            query = query.filter_by(methodology=methodology)
+            query = query.filter_by(observations=observations)
 
         # Return query
         return paginate(query, schema)
@@ -440,6 +445,132 @@ class SampleFluorescenceResource(Resource):
         return {'fluorescence_data': fluorescence_data}
 
 
+class ProjectBrief(Resource):
+    """Get Project Briefing of amount of experiments and samples performed
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Return a two element list with total experiments and samples processed by mode (daily: 1, all-time: 0)
+        """
+        return get_brief()
+
+
+class AmpStatData(Resource):
+    """Get amplification data from experiments
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Time-based amplification status from each sample"""
+
+        return amp_stat_data()
+
+
+class TagDistribution(Resource):
+    """Get tag distribution from experiments
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        return tag_distrib()
+
+
+class LocationSchema(ma.SQLAlchemyAutoSchema):
+
+    id = ma.Int(dump_only=True)
+    location = ma.String(required=True)
+    latitude = ma.Float(required=True)
+    longitude = ma.Float(required=True)
+    color = ma.String(required=True)
+
+    class Meta:
+        model = Location
+        sqla_session = db.session
+
+
+class LocationList(Resource):
+    """Sample location manipulation
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        schema = LocationSchema(many=True)
+        locations = Location.query.filter_by(user_id=current_user.id).order_by('id')
+        return schema.dump(locations)
+
+    def post(self):
+
+        # Load schema
+        schema = LocationSchema()
+
+        # Check if already in database
+        old_id = request.json.get('id', None)
+
+        if old_id:
+
+            # Get location
+            location = Location.query.get_or_404(old_id)
+
+            # Run modifications
+            for k, v in request.json.items():
+                setattr(location, k, v)
+
+            # Commit modification
+            db.session.add(location)
+            db.session.commit()
+
+            return {"msg": "location modified", "location": schema.dump(location)}, 201
+
+        else:
+
+            # Location schema
+            location = Location(**request.json)
+
+            # Add user
+            location.user_id = current_user.id
+
+            db.session.add(location)
+            db.session.commit()
+
+            return {"msg": "location created", "location": schema.dump(location)}, 201
+
+
+class LocationResource(Resource):
+    """ Single resource for locations
+    """
+
+    method_decorators = [jwt_required]
+
+    def delete(self, location_id):
+        location = Location.query.get_or_404(location_id)
+        db.session.delete(location)
+        db.session.commit()
+
+        return {"msg": "location deleted"}, 201
+
+
+class LocatedSamples(Resource):
+    """ Locate samples within the map thought locations and sample name
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Count samples per sampling site
+        """
+
+        # Run location function
+        located_samples = get_located_samples()
+
+        # Return data
+        return located_samples
+
+
 # Wilcard export overwrite
 __all__ = [
     'UserResource', 'UserList',
@@ -447,5 +578,6 @@ __all__ = [
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
-    'MarkerList', 'MarkerSpecificDataset'
+    'MarkerList', 'MarkerSpecificDataset', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
+    'LocatedSamples', 'LocationList', 'LocationResource'
 ]

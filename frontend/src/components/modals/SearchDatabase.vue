@@ -25,6 +25,7 @@
                     v-model="name"
                     class="text-center"
                     placeholder="Enter experiment name"
+                    type="text"
                   ></b-form-input>
                 </div>
               </b-col>
@@ -36,15 +37,16 @@
                     v-model="date"
                     class="text-center"
                     placeholder="Format: YYYY-MM-DD"
+                    type="date"
                   ></b-form-input>
                 </div>
               </b-col>
               <b-col>
                 <div class="text-center">
-                  <label for="input-method">Methodology</label>
+                  <label for="input-method">Observations</label>
                   <b-form-input
                     id="input-method"
-                    v-model="methodology"
+                    v-model="observations"
                     class="text-center"
                     locale="en"
                     placeholder="Enter method used"
@@ -205,7 +207,7 @@ export default {
           sortable: true
         },
         {
-          key: "methodology",
+          key: "observations",
           sortable: true
         },
         {
@@ -233,7 +235,7 @@ export default {
       date: null,
       name: null,
       analyzed: null,
-      methodology: null,
+      observations: null,
       sample: null
     };
   },
@@ -244,7 +246,7 @@ export default {
         name: this.name,
         date: this.date,
         analyzed: this.analyzed,
-        methodology: this.methodology
+        observations: this.observations
       };
       this.loadingResults = true;
       await this.$store
