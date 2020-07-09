@@ -61,28 +61,12 @@ const actions = {
     },
 
     updateSamplingSites({ commit }) {
-
-        // Dummy data
-        const latlngData = [
-            {
-                loc: [18.4358, -69.9853],
-                name: "Sede Central",
-                totalSamples: 19800
-            },
-            {
-                loc: [19.4548, -70.6929],
-                name: "Santiago",
-                totalSamples: 12800
-            },
-            {
-                loc: [19.22064, -70.5632],
-                name: "La Vega",
-                totalSamples: 11000
+        axios.get('api/v1/dashboard/locatedsamples').then(
+            res => {
+                commit('SET_SAMPLING_SITE_COORDINATES', res.data)
             }
-        ];
+        )
 
-        // Commit data
-        commit('SET_SAMPLING_SITE_COORDINATES', latlngData)
     }
 }
 
