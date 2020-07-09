@@ -801,11 +801,12 @@ def get_located_samples():
         {
             'loc': [x['latitude'], x['longitude']],
             'name': x['location'],
-            'totalSamples': x['count'],
+            'count': x['count'],
             'bgColor': x['color']
         }
         for i, x in location_df.iterrows()
+        if x['count'] > 0
     ]
 
-    # Return dataset
-    return rv
+    # Sort by largest count
+    return sorted(rv, key=lambda x: x['count'], reverse=True)
