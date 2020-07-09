@@ -34,6 +34,10 @@ api.add_resource(SamplesQuery, "/samples/query")
 api.add_resource(ImportExperiment, '/experiments/import')
 api.add_resource(ExportExperiment, '/experiments/export/<int:experiment_id>')
 
+# Simple and multiple records queries for Sample Location
+api.add_resource(LocationList, '/dashboard/samplelocation')
+api.add_resource(LocationResource, '/dashboard/samplelocation/<int:location_id>')
+
 # Amplification time series and other dashboard data
 # api.add_resource(AmplificationTimeSeriesResource, "/timeseries")
 # api.add_resource(MarkerSpecificDataset, "/dataset")
@@ -41,7 +45,7 @@ api.add_resource(ExportExperiment, '/experiments/export/<int:experiment_id>')
 api.add_resource(ProjectBrief, '/dashboard/briefing')
 api.add_resource(AmpStatData, '/dashboard/ampstatdata')
 api.add_resource(TagDistribution, '/dashboard/tagdistrib')
-api.add_resource(LocationList, '/dashboard/samplelocation')
+api.add_resource(LocatedSamples, '/dashboard/locatedsamples')
 
 
 @blueprint.before_app_first_request
