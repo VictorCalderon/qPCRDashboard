@@ -13,8 +13,8 @@
         <l-circle
           :lat-lng="s.loc"
           :radius="s.totalSamples"
-          :color="siteColor[i]"
-          :fillColor="siteColor[i]"
+          :color="s.bgColor"
+          :fillColor="s.bgColor"
           :opacity="0.8"
         >
           <l-tooltip :options="{ permanent: false, interactive: true }">
@@ -46,11 +46,9 @@ export default {
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       currentZoom: 11.5,
       currentCenter: latLng(19.007237, -70.41502),
-      showParagraph: false,
       mapOptions: {
         zoomSnap: 0.5
-      },
-      siteColor: ["#DD614A", "#F48668", "#5AB1BB", "#A5C882", "#F7DD72"]
+      }
     };
   },
   computed: {
