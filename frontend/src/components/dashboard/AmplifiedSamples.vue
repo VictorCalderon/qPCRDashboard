@@ -2,7 +2,7 @@
   <LineChart
     :chartData="ampPercDatasets"
     :options="chartConfig"
-    :height="150"
+    :height="190"
     v-if="ampPercDatasets"
   ></LineChart>
 </template>
