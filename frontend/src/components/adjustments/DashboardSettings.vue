@@ -12,7 +12,7 @@
         <h4>Sampling Map</h4>
       </b-form-row>
       <b-form-row class="justify-content-center">
-        <b-col cols="4">
+        <b-col cols="5">
           <label for="center-langitude">Latitude</label>
           <b-form-input
             class="text-center"
@@ -21,7 +21,7 @@
             v-model="newMapCenter[0]"
           ></b-form-input>
         </b-col>
-        <b-col cols="4">
+        <b-col cols="5">
           <label for="center-langitude">Longitude</label>
           <b-form-input
             class="text-center"
