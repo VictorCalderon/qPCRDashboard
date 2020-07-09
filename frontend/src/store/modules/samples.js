@@ -89,9 +89,15 @@ const actions = {
         })
     },
 
-    updateSampleLocationSchemas({ commit }, schemas) {
-        axios.post('api/v1/dashboard/samplelocation', { locations: schemas }).then(() => {
-            commit('UPDATE_SAMPLE_LOCATION_SCHEMAS', schemas)
+    updateSampleLocationSchemas({ commit }, schema) {
+        axios.post('api/v1/dashboard/samplelocation', schema).then(() => {
+            commit('SAMPLE_MODIFIED');
+        })
+    },
+
+    deleteSampleLocationSchema({ commit }, schema_id) {
+        axios.delete(`api/v1/dashboard/samplelocation/${schema_id}`).then(() => {
+            commit('SAMPLE_MODIFIED');
         })
     },
 
