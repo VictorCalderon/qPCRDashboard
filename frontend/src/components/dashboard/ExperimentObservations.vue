@@ -1,13 +1,15 @@
 <template>
   <div v-if="tagDistribution">
-    <BarChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-if="smallDataset"></BarChart>
-    <HBarChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-else></HBarChart>
+    <!-- <BarChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-if="smallDataset"></BarChart> -->
+    <PieChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-if="smallDataset"></PieChart>
+    <!-- <HBarChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-else></HBarChart> -->
   </div>
 </template>
 
 <script>
-import BarChart from "@/components/charts/BarChart.js";
-import HBarChart from "@/components/charts/HBarChart.js";
+import PieChart from "@/components/charts/PieChart.js";
+// import BarChart from "@/components/charts/BarChart.js";
+// import HBarChart from "@/components/charts/HBarChart.js";
 
 export default {
   mounted() {
@@ -15,8 +17,9 @@ export default {
   },
 
   components: {
-    BarChart,
-    HBarChart
+    // BarChart,
+    // HBarChart,
+    PieChart
   },
 
   computed: {
@@ -69,7 +72,7 @@ export default {
         },
 
         legend: {
-          display: false,
+          display: true,
           position: "bottom",
           maxWidth: 100,
           labels: {
@@ -77,26 +80,26 @@ export default {
             boxWidth: 20,
             fontSize: 12
           }
-        },
-        scales: {
-          xAxes: [
-            {
-              display: true,
-              ticks: {
-                fontSize: 12,
-                suggestedMin: 0
-              }
-            }
-          ],
-          yAxes: [
-            {
-              ticks: {
-                fontSize: 12,
-                suggestedMin: 0
-              }
-            }
-          ]
         }
+        // scales: {
+        //   xAxes: [
+        //     {
+        //       display: true,
+        //       ticks: {
+        //         fontSize: 12,
+        //         suggestedMin: 0
+        //       }
+        //     }
+        //   ],
+        //   yAxes: [
+        //     {
+        //       ticks: {
+        //         fontSize: 12,
+        //         suggestedMin: 0
+        //       }
+        //     }
+        //   ]
+        // }
 
         // layout: {
         //   padding: {
