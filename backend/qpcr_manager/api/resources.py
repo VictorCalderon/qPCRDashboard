@@ -482,9 +482,9 @@ class TagDistribution(Resource):
 class LocationSchema(ma.SQLAlchemyAutoSchema):
 
     id = ma.Int(dump_only=True)
-    name = ma.String(required=True)
-    latitude = ma.String(required=True)
-    longitude = ma.String(required=True)
+    location = ma.String(required=True)
+    latitude = ma.Float(required=True)
+    longitude = ma.Float(required=True)
     color = ma.String(required=True)
 
     class Meta:
@@ -505,17 +505,70 @@ class LocationList(Resource):
 
     def post(self):
 
-        # Grab locations from request
-        locations = request.args.get('locations')
+        # Load schema
+        schema = LocationSchema()
 
-        # Make necessary changes and what not
-        rv = location_moficiations(locations)
+        # Check if already in database
+        old_id = request.json.get('id', None)
 
-        if (rv):
-            return {'msg': 'Modification successful'}, 201
+        if old_id:
+
+            # Get location
+            location = Location.query.get_or_404(old_id)
+
+            # Run modifications
+            for k, v in request.json.items():
+                setattr(location, k, v)
+
+            # Commit modification
+            db.session.add(location)
+            db.session.commit()
+
+            return {"msg": "location modified", "location": schema.dump(location)}, 201
 
         else:
-            return {'msg': 'Modification unsucessful'}, 400
+
+            # Location schema
+            location = Location(**request.json)
+
+            # Add user
+            location.user_id = current_user.id
+
+            db.session.add(location)
+            db.session.commit()
+
+            return {"msg": "location created", "location": schema.dump(location)}, 201
+
+
+class LocationResource(Resource):
+    """ Single resource for locations
+    """
+
+    method_decorators = [jwt_required]
+
+    def delete(self, location_id):
+        location = Location.query.get_or_404(location_id)
+        db.session.delete(location)
+        db.session.commit()
+
+        return {"msg": "location deleted"}, 201
+
+
+class LocatedSamples(Resource):
+    """ Locate samples within the map thought locations and sample name
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Count samples per sampling site
+        """
+
+        # Run location function
+        located_samples = get_located_samples()
+
+        # Return data
+        return located_samples
 
 
 # Wilcard export overwrite
@@ -526,5 +579,5 @@ __all__ = [
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
     'MarkerList', 'MarkerSpecificDataset', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
-    'LocationList'
+    'LocatedSamples', 'LocationList', 'LocationResource'
 ]
