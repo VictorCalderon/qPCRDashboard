@@ -57,8 +57,8 @@
         <b-col>
           <b-form-group
             id="fieldset-1"
-            description="Brief methodology description of your experiment."
-            label="Enter your experiment's methodology"
+            description="Experiment observations that can be serve as variables."
+            label="Enter your experiment's observations"
             label-for="input-experientmethod"
             class="text-center"
           >
@@ -66,7 +66,7 @@
               id="input-experientmethod"
               v-model="methodology"
               trim
-              placeholder="extraction-primerprobe-cycling"
+              placeholder="Type observations"
               class="text-center"
             ></b-form-input>
             <b-tooltip
@@ -202,7 +202,6 @@ export default {
           this.showMessage = true;
           this.$store.dispatch("loadExperiments");
           this.$store.dispatch("getMarkers");
-
         })
         .catch(err => {
           this.message = err.response.data.msg;
@@ -248,8 +247,8 @@ export default {
         "e.g. extraction method, primers and probes used and thermocycler configuration.",
       options: [
         { value: null, text: "Choose a format" },
-        { value: "7500", text: "Applied Biosystems (7500)" },
-        { value: "DA2", text: "Applied Biosystems (DS2)" },
+        { value: "7500", text: "ABI 7500" },
+        { value: "DA2", text: "Design and Analysis 2" },
         { value: "default", text: "qPCR Dashboard" }
       ]
     };
