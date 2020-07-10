@@ -18,8 +18,8 @@
       </b-col>
     </b-form-row>
 
-    <b-form-row>
-      <b-col v-if="!currentExperiment" cols="12">
+    <b-form-row class="mt-5 justify-content-center">
+      <b-col v-if="!currentExperiment" cols="8">
         <b-card class="text-center mt-3 rounded">
           <div
             class="rounded py-2"
