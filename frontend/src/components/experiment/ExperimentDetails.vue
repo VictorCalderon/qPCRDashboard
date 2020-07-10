@@ -10,9 +10,8 @@
     <template v-slot:header>
       <h5 class="mb-0 thin-font">
         {{ currentExperiment.name }}&nbsp;
-        <span
-          class="my-0 smaller-font"
-        >|&nbsp;{{ currentExperiment.date }}</span>
+        <br />
+        <span class="my-0 smaller-font">&nbsp;{{ currentExperiment.date }}</span>
       </h5>
     </template>
 

@@ -706,7 +706,16 @@ def tag_distrib():
     dataset = pd.read_sql(query, db.session.bind)
 
     # Get split list of lists
-    tags = [t.split(';') for t in dataset['tags']]
+    tags = []
+
+    # Iterate over dataset
+    for t in dataset['tags']:
+
+        # If t exists
+        if(t):
+
+            # Get its tags
+            tags.append(t.split(';'))
 
     # Flatten tags
     tags = [item for sublist in tags for item in sublist]
