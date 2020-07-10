@@ -1,71 +1,85 @@
 <template>
-  <b-form-row class="m-3 mt-3">
-    <b-col lg="8" md="6" sm="10">
-      <b-form-row>
-        <b-col>
-          <b-card
-            bg-variant="light"
-            align="center"
-            header="Amplification Percetange by Marker"
-            header-bg-variant="dark"
-            header-text-variant="white"
-            class="m-2"
-          >
-            <AmplifiedSamples></AmplifiedSamples>
-          </b-card>
-        </b-col>
-      </b-form-row>
-      <b-form-row>
-        <b-col>
-          <b-card
-            bg-variant="light"
-            align="center"
-            header="Mapped Collected Samples"
-            header-bg-variant="dark"
-            header-text-variant="white"
-            class="m-2"
-          >
-            <SampleLocationMap></SampleLocationMap>
-          </b-card>
-        </b-col>
-      </b-form-row>
-    </b-col>
-    <b-col lg="4" md="6" sm="10">
-      <b-form-row>
-        <b-col class="m-2">
-          <ProjectBriefing></ProjectBriefing>
-        </b-col>
-      </b-form-row>
-      <b-form-row>
-        <b-col>
-          <b-card
-            bg-variant="light"
-            align="center"
-            header="Experiment Tag Distribution"
-            header-bg-variant="dark"
-            header-text-variant="white"
-            class="m-2"
-          >
-            <ExperimentObservations></ExperimentObservations>
-          </b-card>
-        </b-col>
-      </b-form-row>
-      <b-form-row>
-        <b-col>
-          <b-card
-            bg-variant="light"
-            align="center"
-            header="Processed Experiments by Region"
-            header-bg-variant="dark"
-            header-text-variant="white"
-            class="m-2"
-          >
-            <LocatedSamplesCount></LocatedSamplesCount>
-          </b-card>
-        </b-col>
-      </b-form-row>
-    </b-col>
-  </b-form-row>
+  <div>
+    <b-form-row class="m-3 mt-3" v-if="allExperiments">
+      <b-col lg="8" md="6" sm="10">
+        <b-form-row>
+          <b-col>
+            <b-card
+              bg-variant="light"
+              align="center"
+              header="Amplification Percetange by Marker"
+              header-bg-variant="dark"
+              header-text-variant="white"
+              class="m-2"
+            >
+              <AmplifiedSamples></AmplifiedSamples>
+            </b-card>
+          </b-col>
+        </b-form-row>
+        <b-form-row>
+          <b-col>
+            <b-card
+              bg-variant="light"
+              align="center"
+              header="Mapped Collected Samples"
+              header-bg-variant="dark"
+              header-text-variant="white"
+              class="m-2"
+            >
+              <SampleLocationMap></SampleLocationMap>
+            </b-card>
+          </b-col>
+        </b-form-row>
+      </b-col>
+      <b-col lg="4" md="6" sm="10">
+        <b-form-row>
+          <b-col class="m-2">
+            <ProjectBriefing></ProjectBriefing>
+          </b-col>
+        </b-form-row>
+        <b-form-row>
+          <b-col>
+            <b-card
+              bg-variant="light"
+              align="center"
+              header="Experiment Tag Distribution"
+              header-bg-variant="dark"
+              header-text-variant="white"
+              class="m-2"
+            >
+              <ExperimentObservations></ExperimentObservations>
+            </b-card>
+          </b-col>
+        </b-form-row>
+        <b-form-row>
+          <b-col>
+            <b-card
+              bg-variant="light"
+              align="center"
+              header="Processed Experiments by Region"
+              header-bg-variant="dark"
+              header-text-variant="white"
+              class="m-2"
+            >
+              <LocatedSamplesCount></LocatedSamplesCount>
+            </b-card>
+          </b-col>
+        </b-form-row>
+      </b-col>
+    </b-form-row>
+    <b-form-row class="justify-content-center mt-5" v-else>
+      <b-col cols="8">
+        <b-card class="text-center mt-3 rounded">
+          <div
+            class="rounded py-2"
+          >You don't seem to have any experiments on the platform, add an experiment to start your project.</div>
+          <b-row align-h="center" class="mt-3">
+            <b-button variant="info" v-b-modal.add-experiments-modal>Add Experiment</b-button>
+          </b-row>
+        </b-card>
+      </b-col>
+    </b-form-row>
+  </div>
 </template>
 
 <script>
@@ -83,6 +97,27 @@ export default {
     ProjectBriefing,
     LocatedSamplesCount,
     SampleLocationMap
+  },
+
+  computed: {
+    allExperiments() {
+      return this.$store.getters.allExperiments;
+    },
+
+    currentRoute() {
+      return this.$route.name;
+    }
+  },
+
+  watch: {
+    currentRoute() {
+      if (this.currentRoute == "Dashboard") {
+        this.$store.dispatch("updateTagDistribution");
+        this.$store.dispatch("updateBriefingData");
+        this.$store.dispatch("ampStatusTimeline");
+        this.$store.dispatch("updateSamplingSites");
+      }
+    }
   }
 };
 </script>
