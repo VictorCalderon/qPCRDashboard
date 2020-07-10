@@ -10,8 +10,8 @@ def gen_wells(rep=2):
     return np.array([[f'{w[0]}{w[1]}'] * rep for w in product(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'], [*range(1, 13)])]).flatten()
 
 
-def gen_samples(rep=2):
-    return np.array([[f'Sample {n}'] * rep for n in range(1, 97)]).flatten()
+def gen_samples(rep=2, loc='001'):
+    return np.array([[f'S-{loc} Sample {n}'] * rep for n in range(1, 97)]).flatten()
 
 
 def random_amp(p=0.35):
@@ -96,9 +96,12 @@ for i, x in enumerate(xs):
     results = pd.DataFrame()
     amp = pd.DataFrame()
 
+    # Make randint
+    loc = np.random.choice([0, 1, 2, 3, 4], p=[0.1, 0.4, 0.2, 0.1, 0.2])
+
     # Populate dataframes
     results['Well Position'] = gen_wells()
-    results['Sample'] = gen_samples()
+    results['Sample'] = gen_samples(loc=f"{loc}".zfill(3))
     results['Target'] = flat(
         [[f'Internal Control', f'SARS-CoV-2 Gene'] for n in range(1, 97)])
     results['Amp Status'] = flat(
@@ -110,7 +113,7 @@ for i, x in enumerate(xs):
 
     # Populate dataframess
     amp['Well Position'] = gen_wells(rep=80)
-    amp['Sample'] = gen_samples(rep=80)
+    amp['Sample'] = gen_samples(rep=80, loc=f"{loc}".zfill(3))
     amp['Cycle Number'] = flat([*range(1, 41)] * 96*2)
     amp['Target'] = flat([[f'Internal Control'] * 40 +
                           [f'SARS-CoV-2 Gene'] * 40 for _ in range(1, 97)])
