@@ -16,7 +16,7 @@
 
     <b-form-row v-if="currentExperiment">
       <b-col>
-        <line-chart :chart-data="datacollection" :options="options" :height="250"></line-chart>
+        <line-chart :chart-data="datacollection" :options="options" :height="300"></line-chart>
       </b-col>
     </b-form-row>
   </b-card>
