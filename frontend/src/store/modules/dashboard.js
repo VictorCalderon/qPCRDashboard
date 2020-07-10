@@ -4,7 +4,7 @@ import Vue from 'vue'
 const state = {
     mapCenter: [19.007237, -70.41502],
     samplingSites: [],
-    briefingData: { 'samples': 56812, 'experiments': 1232 },
+    briefingData: {},
     ampPercData: null,
     tagDistribution: null
 }
