@@ -112,7 +112,7 @@ export default {
 $GreyDarker: #505050;
 
 .sample-list {
-  height: 250px;
+  height: 295px;
   width: 100%;
   overflow-y: scroll;
   -ms-overflow-style: none;
