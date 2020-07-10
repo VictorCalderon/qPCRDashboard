@@ -16,7 +16,7 @@
     </template>
 
     <div class="text-center">
-      <div class="overflow-results p-1" style="max-height: 250px">
+      <div class="overflow-results p-1" style="height: 275px">
         <div v-for="(marker, i) in markers" :key="i" class="bg-light mb-2 rounded py-1">
           <b-card>
             <h6 class="my-0 rounded thin-font small-font">{{ marker }}</h6>
