@@ -1,5 +1,5 @@
 # Build base image
-FROM python:3.8
+FROM python:3.8.2
 
 # Create app directory
 RUN mkdir /code
