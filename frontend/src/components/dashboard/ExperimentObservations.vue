@@ -1,15 +1,11 @@
 <template>
   <div v-if="tagDistribution">
-    <!-- <BarChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-if="smallDataset"></BarChart> -->
     <PieChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-if="smallDataset"></PieChart>
-    <!-- <HBarChart :chartData="tagDistribution" :options="chartConfig" :height="250" v-else></HBarChart> -->
   </div>
 </template>
 
 <script>
 import PieChart from "@/components/charts/PieChart.js";
-// import BarChart from "@/components/charts/BarChart.js";
-// import HBarChart from "@/components/charts/HBarChart.js";
 
 export default {
   mounted() {
@@ -23,6 +19,18 @@ export default {
   },
 
   computed: {
+    tagColors() {
+      if (this.$store.getters.tagDistribution) {
+        // Get total labels
+        let colorLen = this.$store.getters.tagDistribution.labels.length;
+
+        // Return color array
+        return Array(Math.floor(colorLen / 5) + 1)
+          .fill(["#BD632F", "#D8C99B", "#D8973C", "#5C9EAD", "#273E47"])
+          .flat(colorLen);
+      } else return ["#BD632F", "#D8C99B", "#D8973C", "#5C9EAD", "#273E47"];
+    },
+
     tagDistribution() {
       // Check chart data exists
       if (this.$store.getters.tagDistribution) {
@@ -33,13 +41,7 @@ export default {
             {
               label: "Tag Distribution",
               data: this.$store.getters.tagDistribution.dataset,
-              backgroundColor: [
-                "#69A2B0",
-                "#FF9D70",
-                "#659157",
-                "#30323D",
-                "#E05263"
-              ],
+              backgroundColor: this.tagColors,
               hoverWidth: 2,
               hoverColor: "#000"
             }
@@ -50,6 +52,7 @@ export default {
         return chartData;
       } else return {};
     },
+
     smallDataset() {
       if (this.$store.getters.tagDistribution) {
         if (this.$store.getters.tagDistribution.labels.length > 5) {

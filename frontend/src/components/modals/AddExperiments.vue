@@ -1,148 +1,181 @@
 <template>
-  <div>
-    <b-modal
-      id="add-experiments-modal"
-      ref="add-experiments-modal"
-      size="md"
-      hide-footer
-      button-size="md"
-      title="Add a new experiment"
-    >
-      <b-row>
-        <b-col>
-          <b-alert
-            v-model="showMessage"
+  <b-modal
+    id="add-experiments-modal"
+    ref="add-experiments-modal"
+    size="md"
+    hide-footer
+    button-size="md"
+    title="Add a new experiment"
+  >
+    <b-form-row>
+      <b-col>
+        <b-alert
+          v-model="showMessage"
+          variant="info"
+          class="text-center"
+          dismissible
+          fade
+          @dismissed="hideModal"
+        >{{ message }}</b-alert>
+        <b-alert
+          v-model="showError"
+          variant="danger"
+          class="text-center"
+          dismissible
+          fade
+        >{{ message }}</b-alert>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <b-form-group
+          id="fieldset-1"
+          :description="invalidExperimentName"
+          label="Enter your experiment's name"
+          label-for="input-experimentname"
+          class="text-center"
+        >
+          <b-form-input
+            id="input-experimentname"
+            v-model="name"
+            :state="state"
+            trim
+            placeholder="SARS-CoV-2 Run 1"
+            class="text-center"
+          ></b-form-input>
+          <b-tooltip
+            target="input-experimentname"
+            triggers="hover"
+            placement="right"
             variant="info"
+          >"The title should contain enough information to be distinguishable from other experiments"</b-tooltip>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <!-- <b-form-row>
+      <b-col>
+        <b-form-group
+          id="fieldset-1"
+          description="Experiment observations such as collection metadata."
+          label="Enter your experiment's observations"
+          label-for="input-experientmethod"
+          class="text-center"
+        >
+          <b-form-input
+            id="input-experientmethod"
+            v-model="methodology"
+            trim
+            placeholder="Type observations"
             class="text-center"
-            dismissible
-            fade
-            @dismissed="hideModal"
-          >{{ message }}</b-alert>
-          <b-alert
-            v-model="showError"
-            variant="danger"
+          ></b-form-input>
+          <b-tooltip
+            target="input-experientmethod"
+            triggers="hover"
+            placement="right"
+            variant="info"
+          >{{ methodDescription }}</b-tooltip>
+        </b-form-group>
+      </b-col>
+    </b-form-row>-->
+    <b-form-row>
+      <b-col>
+        <b-form-group
+          id="fieldset-1"
+          description="Experiment tags that serve as variables."
+          label="Enter your experiment's tags"
+          label-for="input-experimenttags"
+          class="text-center"
+        >
+          <b-form-tags
+            id="tags"
+            v-model="tags"
             class="text-center"
-            dismissible
-            fade
-          >{{ message }}</b-alert>
+            tag-pills
+            tag-variant="info"
+            size="md"
+            separator=" ,;"
+            :input-attrs="{ 'aria-describedby': 'tags-remove-on-delete-help' }"
+            remove-on-delete
+          ></b-form-tags>
+          <b-tooltip
+            target="input-experimenttags"
+            triggers="hover"
+            placement="right"
+            variant="info"
+          >{{ tagsDescription }}</b-tooltip>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col>
+        <b-form-group
+          description="If unsure of what to upload read the manual."
+          label="Upload experiment"
+          label-for="select-1"
+          class="text-center"
+        >
+          <b-form-file
+            v-model="file"
+            placeholder="Choose a file"
+            drop-placeholder="Drop a file"
+            id="file-1"
+          ></b-form-file>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <hr />
+    <b-form-row class="mx-1">
+      <b-col cols="6">
+        <b-form-group
+          description="This is the export format of your equipment."
+          label="Experiment Format"
+          label-for="select-1"
+          class="text-center"
+        >
+          <b-form-select
+            id="select-1"
+            v-model="format"
+            :options="options"
+            size="md"
+            class="text-center"
+          ></b-form-select>
+        </b-form-group>
+      </b-col>
+      <b-col cols="6">
+        <b-form-group
+          description="This will help us organize and analyze your data."
+          label="Experiment date"
+          label-for="experiment-date"
+          class="text-center"
+        >
+          <b-form-datepicker
+            id="experiment-date"
+            v-model="date"
+            class="mb-2"
+            placeholder="YYYY-MM-DD"
+            :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+            locale="en"
+          ></b-form-datepicker>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <hr />
+    <b-container>
+      <b-form-row>
+        <b-col v-if="!uploading">
+          <b-button @click="sendExperiment" variant="outline-success" block>Upload Experiment</b-button>
         </b-col>
-      </b-row>
-      <b-row>
+        <b-col v-if="uploading">
+          <b-button variant="info" disabled block>
+            <b-spinner small type="grow"></b-spinner>
+          </b-button>
+        </b-col>
         <b-col>
-          <b-form-group
-            id="fieldset-1"
-            :description="invalidExperimentName"
-            label="Enter your experiment's name"
-            label-for="input-experimentname"
-            class="text-center"
-          >
-            <b-form-input
-              id="input-experimentname"
-              v-model="name"
-              :state="state"
-              trim
-              placeholder="SARS-CoV-2 Run 1"
-              class="text-center"
-            ></b-form-input>
-            <b-tooltip
-              target="input-experimentname"
-              triggers="hover"
-              placement="right"
-              variant="info"
-            >"The title should contain enough information to be distinguishable from other experiments"</b-tooltip>
-          </b-form-group>
+          <b-button variant="outline-secondary" @click="hideModal" block>Close</b-button>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
-          <b-form-group
-            id="fieldset-1"
-            description="Experiment observations that can be serve as variables."
-            label="Enter your experiment's observations"
-            label-for="input-experientmethod"
-            class="text-center"
-          >
-            <b-form-input
-              id="input-experientmethod"
-              v-model="methodology"
-              trim
-              placeholder="Type observations"
-              class="text-center"
-            ></b-form-input>
-            <b-tooltip
-              target="input-experientmethod"
-              triggers="hover"
-              placement="right"
-              variant="info"
-            >{{ methodDescription }}</b-tooltip>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col>
-          <b-form-group
-            description="If unsure of what to upload read the manual."
-            label="Upload experiment"
-            label-for="select-1"
-            class="text-center"
-          >
-            <b-form-file
-              v-model="file"
-              placeholder="Choose a file"
-              drop-placeholder="Drop a file"
-              id="file-1"
-            ></b-form-file>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <hr />
-      <b-row class="mx-1">
-        <b-col cols="7">
-          <b-form-group
-            description="This is the export format of your equipment."
-            label="Experiment Format"
-            label-for="select-1"
-            class="text-center"
-          >
-            <b-form-select id="select-1" v-model="format" :options="options" size="md"></b-form-select>
-          </b-form-group>
-        </b-col>
-        <b-col cols="5">
-          <b-form-group
-            description="This will help us organize and analyze your data."
-            label="Experiment date"
-            label-for="experiment-date"
-            class="text-center"
-          >
-            <b-form-datepicker
-              id="experiment-date"
-              v-model="date"
-              class="mb-2"
-              placeholder="YYYY-MM-DD"
-              :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
-              locale="en"
-            ></b-form-datepicker>
-          </b-form-group>
-        </b-col>
-      </b-row>
-      <hr />
-      <b-container>
-        <b-row>
-          <b-col v-if="!uploading">
-            <b-button @click="sendExperiment" variant="outline-success" block>Upload Experiment</b-button>
-          </b-col>
-          <b-col v-if="uploading">
-            <b-button variant="info" disabled block>
-              <b-spinner small type="grow"></b-spinner>
-            </b-button>
-          </b-col>
-          <b-col>
-            <b-button variant="outline-secondary" @click="hideModal" block>Close</b-button>
-          </b-col>
-        </b-row>
-      </b-container>
-    </b-modal>
-  </div>
+      </b-form-row>
+    </b-container>
+  </b-modal>
 </template>
 
 <script>
@@ -187,6 +220,7 @@ export default {
       formData.append("name", this.name);
       formData.append("date", this.date);
       formData.append("methodology", this.methodology);
+      formData.append("tags", this.tags);
       formData.append("format", this.format);
 
       // Dispatch uploadExperiment with formData
@@ -237,19 +271,19 @@ export default {
       name: "",
       file: null,
       date: null,
-      format: "DA2",
+      format: "zip",
       methodology: null,
+      tags: [],
       message: false,
       showMessage: false,
       showError: false,
       uploading: false,
-      methodDescription:
-        "e.g. extraction method, primers and probes used and thermocycler configuration.",
+      methodDescription: "e.g. Experimental conditions or a brief description",
+      tagsDescription: "e.g. Independent experiments variables",
       options: [
         { value: null, text: "Choose a format" },
-        { value: "7500", text: "ABI 7500" },
-        { value: "DA2", text: "Design and Analysis 2" },
-        { value: "default", text: "qPCR Dashboard" }
+        { value: "txt", text: "Single file" },
+        { value: "zip", text: "Zipped files" }
       ]
     };
   },
