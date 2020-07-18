@@ -3,16 +3,15 @@
     <b-form-row class="m-3 mt-3" v-if="currentExperiment">
       <b-col lg="8" md="12" sm="12" xs="12">
         <b-card no-body class="m-2" header-bg-variant="dark" header-text-variant="white">
-          <b-tabs card fill pills>
+          <b-tabs card pills justified>
             <b-tab title="Amplification Plot">
               <AmpPlot></AmpPlot>
             </b-tab>
             <b-tab title="Latent Space Clusters">
-              <AEPlot></AEPlot>
-              <h5>Latent Space Clusterization</h5>
+              <LatentSpaceClusters></LatentSpaceClusters>
             </b-tab>
             <b-tab title="Cycle Kernel Density">
-              <CqDistribution></CqDistribution>
+              <ThresholdKDE></ThresholdKDE>
             </b-tab>
             <b-tab title="Observation Cloud">
               <ObservationCloud></ObservationCloud>
@@ -27,7 +26,7 @@
         <SamplePlate></SamplePlate>
       </b-col>
       <b-col lg="6" md="6" sm="12" xs="12">
-        <AEPlot></AEPlot>
+        <LatentSpaceClusters></LatentSpaceClusters>
       </b-col>
       <b-col lg="6" md="6" sm="12" xs="12">
         <CqBoxPlot></CqBoxPlot>
@@ -54,20 +53,18 @@ import AmpPlot from "@/components/experiment2/AmpPlot";
 // import SamplePlate from "@/components/experiment2/SamplePlate";
 import SampleTable from "@/components/experiment2/SampleTable";
 import ObservationCloud from "@/components/experiment2/ObservationCloud";
-import CqDistribution from "@/components/experiment2/CqDistribution";
-
-// import AEPlot from "@/components/experiment2/AEPlot";
-// import CqBoxPlot from "@/components/experiment2/CqBoxPlot";
+import ThresholdKDE from "@/components/experiment2/ThresholdKDE";
+import LatentSpaceClusters from "@/components/experiment2/LatentSpaceClusters";
 
 export default {
   components: {
     AmpPlot,
-    // AEPlot,
+    LatentSpaceClusters,
     // SamplePlate,
     // CqBoxPlot,
     SampleTable,
     ObservationCloud,
-    CqDistribution
+    ThresholdKDE
   },
 
   methods: {

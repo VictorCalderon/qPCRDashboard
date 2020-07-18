@@ -12,10 +12,10 @@
       <div v-for="(s, i) in samplingSites" :key="i">
         <l-circle
           :lat-lng="s.loc"
-          :radius="s.count + 2000"
+          :radius="s.count * markerSize"
           :color="s.bgColor"
           :fillColor="s.bgColor"
-          :opacity="0.8"
+          :opacity="markerOpacity"
         >
           <l-tooltip :options="{ permanent: false, interactive: true }">
             <div @click="innerClick(s.description)">{{s.name}}</div>
@@ -58,6 +58,14 @@ export default {
 
     samplingSites() {
       return this.$store.getters.samplingSites;
+    },
+
+    markerSize() {
+      return this.$store.getters.markerSize;
+    },
+
+    markerOpacity() {
+      return this.$store.getters.markerOpacity;
     }
   },
 
@@ -81,6 +89,10 @@ export default {
 
   watch: {
     mapCenter() {
+      this.centerUpdate();
+    },
+
+    markerSize() {
       this.centerUpdate();
     }
   }

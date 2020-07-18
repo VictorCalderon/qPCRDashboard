@@ -39,9 +39,9 @@
         <b-nav-item v-b-modal.edit-experiments-modal class="mx-2" v-if="currentExperiment">
           <i class="far fa-edit"></i>&nbsp;Edit
         </b-nav-item>
-        <b-nav-item @click="exportCurrentExperiment" class="mx-2" v-if="currentExperiment">
+        <!-- <b-nav-item @click="exportCurrentExperiment" class="mx-2" v-if="currentExperiment">
           <i class="fas fa-file-export" v-if="!exportingExperiment"></i>&nbsp;Export
-        </b-nav-item>
+        </b-nav-item>-->
         <b-nav-item class="mx-2" v-if="exportingExperiment">
           <b-spinner small type="grow" v-if="exportingExperiment"></b-spinner>Exporting...
         </b-nav-item>

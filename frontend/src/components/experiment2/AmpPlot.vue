@@ -1,13 +1,13 @@
 <template>
   <div>
-    <b-form-row class="justify-content-center mb-2">
+    <!-- <b-form-row class="justify-content-center mb-2">
       <b-col cols="4" class="my-0 py-0">
         <b-form-select v-model="marker" :options="availableMarkers" size="sm"></b-form-select>
       </b-col>
-    </b-form-row>
+    </b-form-row>-->
     <b-form-row>
       <b-col>
-        <line-chart :chart-data="qPCRData" :options="options" :height="255"></line-chart>
+        <line-chart :chart-data="qPCRData" :options="options" :height="260"></line-chart>
       </b-col>
     </b-form-row>
   </div>
@@ -27,13 +27,14 @@ export default {
       availableMarkers: ["ORF1ab", "RNase P"],
       options: {
         legend: {
+          display: false,
           position: "bottom",
           align: "center",
           labels: {
             boxWidth: 12,
             boxHeight: 10,
             padding: 10,
-            fontSize: 12,
+            fontSize: 10,
             usePointStyle: false
           }
         }
@@ -101,7 +102,37 @@ export default {
             label: "20012981212M1",
             data: this.generateNegativeDataset(),
             fill: false,
-            borderColor: "#FF70A6"
+            borderColor: "#07020D"
+          },
+          {
+            label: "20012981212M1",
+            data: this.generateAmpedDataset(),
+            fill: false,
+            borderColor: "#5DB7DE"
+          },
+          {
+            label: "20012981212M1",
+            data: this.generateAmpedDataset(),
+            fill: false,
+            borderColor: "#F1E9DB"
+          },
+          {
+            label: "20012981212M1",
+            data: this.generateAmpedDataset(),
+            fill: false,
+            borderColor: "#A39B8B"
+          },
+          {
+            label: "20012981212M1",
+            data: this.generateAmpedDataset(),
+            fill: false,
+            borderColor: "#716A5C"
+          },
+          {
+            label: "20012981212M1",
+            data: this.generateNegativeDataset(),
+            fill: false,
+            borderColor: "#2BA84A"
           }
         ]
       };

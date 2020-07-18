@@ -1,6 +1,6 @@
 <template>
-  <BarChart :chartData="chartData" :options="chartConfig" :height="250" v-if="smallDataset"></BarChart>
-  <HBarChart :chartData="chartData" :options="chartConfig" :height="250" v-else></HBarChart>
+  <BarChart :chartData="chartData" :options="chartConfig" :height="310" v-if="smallDataset"></BarChart>
+  <HBarChart :chartData="chartData" :options="chartConfig" :height="310" v-else></HBarChart>
 </template>
 
 <script>
@@ -16,7 +16,7 @@ export default {
   computed: {
     smallDataset() {
       if (this.$store.getters.samplingSites) {
-        if (this.$store.getters.samplingSites.length > 1) {
+        if (this.$store.getters.samplingSites.length > 5) {
           return false;
         } else return true;
       } else return null;
@@ -73,8 +73,8 @@ export default {
           maxWidth: 100,
           labels: {
             fontColor: "#1E152A",
-            boxWidth: 20,
-            fontSize: 12
+            boxWidth: 0,
+            fontSize: 0
           }
         },
 

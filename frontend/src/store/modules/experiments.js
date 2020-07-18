@@ -1,7 +1,188 @@
 import axios from 'axios'
 import Vue from 'vue'
 
-const state = {}
+const state = {
+    sampleList: [
+        {
+            id: 0,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 28
+        },
+        {
+            id: 1,
+            well: "B1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: false,
+            cq: 0
+        },
+        {
+            id: 2,
+            well: "C1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 30
+        },
+        {
+            id: 3,
+            well: "D1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 27
+        },
+        {
+            id: 4,
+            well: "E1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 29
+        },
+        {
+            id: 5,
+            well: "F1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 24
+        },
+        {
+            id: 6,
+            well: "G1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: false,
+            cq: 0
+        },
+        {
+            id: 7,
+            well: "H1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 26
+        },
+        {
+            id: 8,
+            well: "A2",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 22
+        },
+        {
+            id: 9,
+            well: "B2",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 26
+        },
+        {
+            id: 10,
+            well: "C2",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 30
+        },
+        {
+            id: 11,
+            well: "D2",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: true,
+            cq: 21
+        },
+        {
+            id: 12,
+            well: "E2",
+            sample: "2001238732M1",
+            marker: "ORF1ab",
+            amp: false,
+            cq: 0
+        }
+    ],
+
+    LSCData: [
+        {
+            label: "2001232123M1",
+            x: 0.2, y: 0.7,
+            cluster: 0
+        },
+        {
+            label: "2001232123M1",
+            x: 0.4, y: 0.6,
+            cluster: 0
+        },
+        {
+            label: "2001232123M1",
+            x: 0.3, y: 0.7,
+            cluster: 0
+        },
+        {
+            label: "2001232123M1",
+            x: 0.4, y: 0.8,
+            cluster: 0
+        },
+        {
+            label: "2001232123M1",
+            x: 4, y: 2,
+            cluster: 1
+        },
+        {
+            label: "2001232123M1",
+            x: 4.2, y: 2.5,
+            cluster: 1
+        },
+        {
+            label: "2001232123M1",
+            x: 4.7, y: 2.2,
+            cluster: 1
+        },
+        {
+            label: "2001232123M1",
+            x: 3.8, y: 2.7,
+            cluster: 1
+        },
+        {
+            label: "2001232123M1",
+            x: 4.1, y: 2.6,
+            cluster: 1
+        },
+        {
+            label: "2001232121M1",
+            x: 1.1, y: 2.1,
+            cluster: 2
+        },
+        {
+            label: "2001232121M1",
+            x: 1.3, y: 2.2,
+            cluster: 2
+        },
+        {
+            label: "2001232121M1",
+            x: 1.2, y: 2.3,
+            cluster: 2
+        },
+        {
+            label: "2001232121M1",
+            x: 1.1, y: 1.9,
+            cluster: 2
+        },
+        {
+            label: "2001232121M1",
+            x: 1, y: 2.4,
+            cluster: 2
+        }
+    ]
+
+}
 
 const mutations = {
     'INIT_EXPERIMENTS'(state) {
@@ -182,7 +363,15 @@ const getters = {
     availableMarkers(state) {
         return state.availableMarkers ? state.availableMarkers.map(m => {
             return { value: m[0], text: m[1] };
-          }) : null
+        }) : null
+    },
+
+    sampleList(state) {
+        return state.sampleList
+    },
+
+    LSCData(state) {
+        return state.LSCData
     }
 }
 

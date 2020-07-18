@@ -6,8 +6,8 @@
       font-family="Roboto"
       style="height: 615px;width: 1200px;"
       :animation-duration="500"
-      font-size-ratio="4"
-      spacing="0.2"
+      :font-size-ratio="4"
+      :spacing="0.2"
     />
   </b-form-row>
 </template>

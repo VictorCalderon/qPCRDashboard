@@ -715,7 +715,7 @@ def tag_distrib():
         if(t):
 
             # Get its tags
-            tags.append(t.split(';'))
+            tags.append(t.split(','))
 
     # Flatten tags
     tags = [item for sublist in tags for item in sublist]

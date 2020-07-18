@@ -249,7 +249,7 @@ export default {
       this.experiment = this.currentExperiment;
 
       if (this.currentExperiment.tags) {
-        this.experiment.tags = this.currentExperiment.tags.split(";");
+        this.experiment.tags = this.currentExperiment.tags.split(",");
       }
     }
   }

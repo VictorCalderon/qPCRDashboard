@@ -111,7 +111,7 @@ class ExperimentResource(Resource):
 
         # Changes or add tags
         if request.json.get('tags'):
-            experiment.tags = ';'.join(request.json.get('tags'))
+            experiment.tags = ','.join(request.json.get('tags'))
 
         # Add experiment to session and commit change
         db.session.add(experiment)
@@ -179,20 +179,22 @@ class ImportExperiment(Resource):
         name = request.form.get('name', None)
         date = request.form.get('date', None)
         observations = request.form.get('observations', None)
+        tags = ';'.join(request.form.get('tags', None))
         fmt = request.form.get('format', None)
 
+        # Check if required data is not present
         if (name is None) or (date is None) or (file is None) or (fmt is None):
             return {'msg': 'Experiment is missing information'}, 400
 
         # Experiment instantiation
-        current_experiment = Experiment(name=name, date=date, user=current_user, observations=observations)
+        current_experiment = Experiment(name=name, date=date, user=current_user, observations=observations, tags=tags)
 
         try:
-            if fmt == 'DA2':
+            if fmt == 'zip':
                 feed_DA2(file, current_experiment, current_user)
                 return {'msg': 'Experiment added successfully'}
 
-            if fmt == '7500':
+            if fmt == 'txt':
                 feed_7500(file, current_experiment, current_user)
                 return {'msg': 'Experiment Successfully Added'}
 
