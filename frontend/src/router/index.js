@@ -2,7 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 // Import views
-import Experiment from '../views/Experiment.vue'
+// import Experiment from '../views/Experiment.vue'
+import Experiment from '../views/Experiments2.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Adjustments from '../views/Adjustments.vue'
 // import Login from '../components/navigation/Login.vue'

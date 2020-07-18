@@ -4,3 +4,5 @@ backend/migrations/*
 backend/postgres-data
 data/env*
 data/demo/*
+.DS_Store
+backend/.DS_Store
