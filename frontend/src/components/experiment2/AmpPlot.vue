@@ -1,13 +1,9 @@
 <template>
-  <div>
-    <!-- <b-form-row class="justify-content-center mb-2">
-      <b-col cols="4" class="my-0 py-0">
-        <b-form-select v-model="marker" :options="availableMarkers" size="sm"></b-form-select>
-      </b-col>
-    </b-form-row>-->
+  <div style="height: 790px" class="mt-3">
     <b-form-row>
-      <b-col>
-        <line-chart :chart-data="qPCRData" :options="options" :height="260"></line-chart>
+      <b-col cols="12">{{currentSample ? currentSample.name : 'All'}}</b-col>
+      <b-col sm="12">
+        <line-chart :chart-data="qPCRData" :options="qPCROptions" style="height: 70vh"></line-chart>
       </b-col>
     </b-form-row>
   </div>
@@ -23,9 +19,29 @@ export default {
 
   data() {
     return {
-      marker: "ORF1ab",
-      availableMarkers: ["ORF1ab", "RNase P"],
-      options: {
+      qPCROptions: {
+        normalized: true,
+        spanGaps: true,
+        elements: {
+          point: { radius: 0 },
+          line: {
+            tension: 0, 
+            fill: false,
+            stepped: false,
+            borderDash: []
+          }
+        },
+        animation: false,
+        tooltips: {
+        enabled: true,
+        callbacks: {
+            label: function(tooltipItem, data) {
+              let datapoint = data.datasets[tooltipItem.index];
+              return datapoint.label;
+            }
+          }
+        },
+        maintainAspectRatio: false,
         legend: {
           display: false,
           position: "bottom",
@@ -37,103 +53,86 @@ export default {
             fontSize: 10,
             usePointStyle: false
           }
+        },
+        scales: {
+          yAxes: [{ ticks: { suggestedMax: 5, min: 0 } }],
+          gridLines: {
+            display: false
+          },
         }
       }
     };
   },
 
   methods: {
-    sigmoid(t, ct) {
-      return 1 / (1 + Math.exp(-(t - ct)));
+    getColor() {
+      // Background colors
+      return ['#004E8970', '#AA998F70', '#368F8B70', '#1C373870', '#4D484770'];
     },
-
-    generateAmpedDataset() {
-      const ct = Math.random() * (30 - 18) + 18;
-      return [...Array(40).keys()].map(i => this.sigmoid(i, ct) * 2.5);
-    },
-
-    generateNegativeDataset() {
-      return [...Array(40).keys()].map(i => (i / i) * Math.random() * 0.15);
-    }
   },
 
   computed: {
+    currentSample() {
+      return this.$store.getters.currentSample;
+    },
+
+    currentExperimentFluorescences() {
+      if (this.$store.getters.currentExperimentFluorescences) {
+        return this.$store.getters.currentExperimentFluorescences 
+      }
+
+      return []
+    },
+
+    uniqueMarkers() {
+      // Unique markers
+      if (this.currentExperimentFluorescences) {
+        return [...new Set(this.currentExperimentFluorescences.map(item => item.marker))]
+      }
+      else return []
+    },
+
+    colorMap() {
+      // Marker color combination
+      if (this.uniqueMarkers) {
+
+        // Empty color map
+        let colorMap = {};
+
+        // Iterate over markers
+        for (let idx = 0; idx < this.uniqueMarkers.length; idx++) {
+          let marker = this.uniqueMarkers[idx];
+          colorMap[marker] = this.getColor()[idx]
+        }
+
+        // Return filled colormap
+        return colorMap
+      }
+
+      // Null
+      else return null
+    },
+
     qPCRData() {
       return {
-        labels: [...Array(40).keys()].map(i => i + 1),
-        datasets: [
-          {
-            label: "2001231232M1",
-            data: this.generateAmpedDataset(),
+        labels: [...Array(40).keys()].map(cycle => cycle + 1),
+        datasets: [...this.currentExperimentFluorescences.map((fluorescence, i) => {
+
+          // Custom Border Color
+          let sampleCompare = fluorescence.result_id == this.currentSample.result_id;
+          let customBorderColor = sampleCompare ? '#D64045' : this.colorMap[fluorescence.marker];
+          let customOrder = sampleCompare ? 0 : 1;
+
+          return {
+            index: i,
+            label: fluorescence.sample,
+            data: fluorescence.data,
             fill: false,
-            borderColor: "#067BC2"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#ECC30B"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#F37748"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateNegativeDataset(),
-            fill: false,
-            borderColor: "#D56062"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#2FBF71"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#70D6FF"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateNegativeDataset(),
-            fill: false,
-            borderColor: "#07020D"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#5DB7DE"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#F1E9DB"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#A39B8B"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateAmpedDataset(),
-            fill: false,
-            borderColor: "#716A5C"
-          },
-          {
-            label: "20012981212M1",
-            data: this.generateNegativeDataset(),
-            fill: false,
-            borderColor: "#2BA84A"
+            marker: fluorescence.marker,
+            borderColor: customBorderColor,
+            order: customOrder
           }
+        })
         ]
       };
     }
