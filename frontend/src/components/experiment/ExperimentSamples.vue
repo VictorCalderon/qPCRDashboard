@@ -60,7 +60,7 @@ export default {
 
   methods: {
     selectSample(id) {
-      this.$store.dispatch("selectSample", id).then();
+      this.$store.dispatch("selectSample", id);
     }
   },
 
