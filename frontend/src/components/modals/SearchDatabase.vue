@@ -287,7 +287,10 @@ export default {
           this.selectedExperiment[0]
         );
         await this.$store.dispatch("loadCurrentSamples");
+        await this.$store.dispatch("loadCurrentTable");
         await this.$store.dispatch("loadCurrentExperimentResults");
+        await this.$store.dispatch("loadCurrentExperimentFluorescences");
+        
         this.selectedExperiment = null;
         this.hideModal();
       }
