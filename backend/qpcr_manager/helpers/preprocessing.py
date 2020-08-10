@@ -88,13 +88,13 @@ def import_DA2(buffered_zip):
             results = results.replace('Undetermined', 0)
 
             # Column order
-            amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
+            amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'dRn']
             results_columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
 
             # Make them the correct datatype
             amp_data = amp_data.astype({
                 'Well Position': str, 'Sample': str,
-                'Cycle Number': int, 'Target': str, 'Rn': float
+                'Cycle Number': int, 'Target': str, 'dRn': float
             })
 
             results = results.astype({
@@ -819,3 +819,77 @@ def get_located_samples():
 
     # Sort by largest count
     return sorted(rv, key=lambda x: x['count'], reverse=True)
+
+
+def sample_table(experiment_id):
+    """Get current experiment data"""
+
+    # Build query
+    query = f"""
+    SELECT samples.id, sample, marker, amp_status AS amp, amp_cq AS cq, score, results.id AS result_id FROM experiments
+    JOIN samples on samples.experiment_id = experiments.id
+    JOIN results on results.sample_id = samples.id
+    JOIN markers on results.marker_id = markers.id
+    WHERE experiments.user_id = {current_user.id} and experiments.id = {experiment_id};
+    """
+
+    # Run query
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Add random score
+    dataset['score'] = np.abs(np.random.rand(dataset.shape[0]) - 0.5)
+    dataset['score'] = np.around(dataset['score'] * 2, decimals=2)
+
+    # Return dataset as a list
+    return dataset.to_dict('records')
+
+
+def experiment_fluorescences(experiment_id):
+    """Get current experiment fluorescence data"""
+
+    # Build query
+    query = f"""
+    SELECT results.id as result_id, well, sample, marker, cycle, rn FROM samples
+    JOIN fluorescences on fluorescences.sample_id = samples.id
+    JOIN markers on markers.id = fluorescences.marker_id
+    JOIN experiments on experiments.id = samples.experiment_id
+    JOIN results on (results.sample_id = samples.id and results.marker_id = markers.id)
+    WHERE experiments.id = {experiment_id}
+    """
+
+    # Run query
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Create single column index
+    dataset['indexer'] = dataset['result_id'].astype(str) + '-' + dataset['well'] + \
+        '-' + dataset['sample'] + '-' + dataset['marker']
+
+    # Sort dataset
+    dataset = dataset.pivot(index='indexer', columns='cycle', values='rn').reset_index()
+
+    # Separate data
+    split_indexer = dataset['indexer'].str.split('-', expand=True).values
+
+    # Add split data to DataFrame
+    for idx, col in enumerate(['result_id', 'well', 'sample', 'marker']):
+
+        # Add column
+        dataset[col] = split_indexer[:, idx]
+
+    # Remove redundant indexer
+    dataset.drop('indexer', axis=1, inplace=True)
+
+    # Build Data Structure
+    dataset = [
+        {
+            'result_id': d['result_id'],
+            'well': d['well'],
+            'sample': d['sample'],
+            'marker': d['marker'],
+            'data': list(d.filter(regex="\d+"))
+        }
+        for i, d in dataset.iterrows()
+    ]
+
+    # Return dataset
+    return dataset
