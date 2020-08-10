@@ -5,7 +5,7 @@ class Fluorescence(db.Model):
     """Base Fluorescence Model
     """
 
-    __tablename__ = 'fluorescence'
+    __tablename__ = 'fluorescences'
 
     id = db.Column(db.Integer, primary_key=True)
     well = db.Column(db.String, nullable=False)
