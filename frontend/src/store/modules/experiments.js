@@ -7,106 +7,219 @@ const state = {
             id: 0,
             well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "RNase P",
             amp: true,
-            cq: 28
+            cq: 28,
+            score: 0.8
         },
         {
             id: 1,
-            well: "B1",
+            well: "A1",
             sample: "2001231232M1",
             marker: "ORF1ab",
             amp: false,
-            cq: 0
+            cq: 0,
+            score: 0.1
         },
         {
             id: 2,
-            well: "C1",
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "N Gene",
             amp: true,
-            cq: 30
+            cq: 30,
+            score: 0.7
         },
         {
             id: 3,
-            well: "D1",
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "S Gene",
             amp: true,
-            cq: 27
+            cq: 27,
+            score: 0.7
         },
         {
-            id: 4,
-            well: "E1",
+            id: 0,
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "RNase P",
             amp: true,
-            cq: 29
+            cq: 28,
+            score: 0.8
         },
         {
-            id: 5,
-            well: "F1",
-            sample: "2001231232M1",
-            marker: "ORF1ab",
-            amp: true,
-            cq: 24
-        },
-        {
-            id: 6,
-            well: "G1",
+            id: 1,
+            well: "A1",
             sample: "2001231232M1",
             marker: "ORF1ab",
             amp: false,
-            cq: 0
+            cq: 0,
+            score: 0.1
         },
         {
-            id: 7,
-            well: "H1",
+            id: 2,
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "N Gene",
             amp: true,
-            cq: 26
+            cq: 30,
+            score: 0.7
         },
         {
-            id: 8,
-            well: "A2",
+            id: 3,
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "S Gene",
             amp: true,
-            cq: 22
+            cq: 27,
+            score: 0.7
         },
         {
-            id: 9,
-            well: "B2",
+            id: 0,
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
+            marker: "RNase P",
             amp: true,
-            cq: 26
+            cq: 28,
+            score: 0.8
         },
         {
-            id: 10,
-            well: "C2",
+            id: 1,
+            well: "A1",
             sample: "2001231232M1",
-            marker: "ORF1ab",
-            amp: true,
-            cq: 30
-        },
-        {
-            id: 11,
-            well: "D2",
-            sample: "2001231232M1",
-            marker: "ORF1ab",
-            amp: true,
-            cq: 21
-        },
-        {
-            id: 12,
-            well: "E2",
-            sample: "2001238732M1",
             marker: "ORF1ab",
             amp: false,
-            cq: 0
-        }
+            cq: 0,
+            score: 0.1
+        },
+        {
+            id: 2,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "N Gene",
+            amp: true,
+            cq: 30,
+            score: 0.7
+        },
+        {
+            id: 3,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "S Gene",
+            amp: true,
+            cq: 27,
+            score: 0.7
+        },
+        {
+            id: 0,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "RNase P",
+            amp: true,
+            cq: 28,
+            score: 0.8
+        },
+        {
+            id: 1,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: false,
+            cq: 0,
+            score: 0.1
+        },
+        {
+            id: 2,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "N Gene",
+            amp: true,
+            cq: 30,
+            score: 0.7
+        },
+        {
+            id: 3,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "S Gene",
+            amp: true,
+            cq: 27,
+            score: 0.7
+        },
+        {
+            id: 0,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "RNase P",
+            amp: true,
+            cq: 28,
+            score: 0.8
+        },
+        {
+            id: 1,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: false,
+            cq: 0,
+            score: 0.1
+        },
+        {
+            id: 2,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "N Gene",
+            amp: true,
+            cq: 30,
+            score: 0.7
+        },
+        {
+            id: 3,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "S Gene",
+            amp: true,
+            cq: 27,
+            score: 0.7
+        },
+        {
+            id: 0,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "RNase P",
+            amp: true,
+            cq: 28,
+            score: 0.8
+        },
+        {
+            id: 1,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "ORF1ab",
+            amp: false,
+            cq: 0,
+            score: 0.1
+        },
+        {
+            id: 2,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "N Gene",
+            amp: true,
+            cq: 30,
+            score: 0.7
+        },
+        {
+            id: 3,
+            well: "A1",
+            sample: "2001231232M1",
+            marker: "S Gene",
+            amp: true,
+            cq: 27,
+            score: 0.7
+        },
+
     ],
 
     LSCData: [
@@ -180,7 +293,8 @@ const state = {
             x: 1, y: 2.4,
             cluster: 2
         }
-    ]
+    ],
+
 
 }
 
@@ -233,6 +347,10 @@ const mutations = {
         Vue.set(state, 'currentExperimentResults', results)
     },
 
+    'SET_EXPERIMENT_FLUORESCENCES'(state, results) {
+        Vue.set(state, 'currentExperimentFluorescences', results)
+    },
+
     'AVAILABLE_MARKERS'(state, markers) {
         Vue.set(state, 'availableMarkers', markers)
     }
@@ -263,6 +381,12 @@ const actions = {
     loadCurrentExperimentResults({ commit, getters }) {
         axios.get(`api/v1/experiments/${getters.currentExperiment.id}/results`).then(res => {
             commit('SET_EXPERIMENT_RESULTS', res.data)
+        })
+    },
+
+    loadCurrentExperimentFluorescences({ commit, getters }) {
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/fluorescences`).then(res => {
+            commit('SET_EXPERIMENT_FLUORESCENCES', res.data.fluorescence_data)
         })
     },
 
@@ -360,19 +484,20 @@ const getters = {
         return state.currentExperimentResults ? state.currentExperimentResults : null
     },
 
+    currentExperimentFluorescences(state) {
+        return state.currentExperimentFluorescences
+    },
+
     availableMarkers(state) {
         return state.availableMarkers ? state.availableMarkers.map(m => {
             return { value: m[0], text: m[1] };
         }) : null
     },
 
-    sampleList(state) {
-        return state.sampleList
-    },
-
     LSCData(state) {
         return state.LSCData
-    }
+    },
+
 }
 
 export default {

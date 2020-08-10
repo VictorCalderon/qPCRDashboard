@@ -6,32 +6,6 @@ const state = {
     currentSample: [],
     queriedSamples: [],
     sampleLocationSchemas: null,
-    // sampleLocationSchemas: [
-    //     {
-    //         id: 0,
-    //         key: "001",
-    //         location: "Sede Central",
-    //         latitude: "18.4358",
-    //         longitude: "-69.9853",
-    //         color: '#DD614A'
-    //     },
-    //     {
-    //         id: 1,
-    //         key: "002",
-    //         location: "Piantini",
-    //         latitude: "18.4772",
-    //         longitude: "-69.9263",
-    //         color: '#F48668'
-    //     },
-    //     {
-    //         id: 2,
-    //         key: "003",
-    //         location: "Santiago",
-    //         latitude: "19.4548",
-    //         longitude: "-70.6929",
-    //         color: '#5AB1BB'
-    //     }
-    // ],
 }
 
 const mutations = {
@@ -56,6 +30,10 @@ const mutations = {
         Vue.set(state, 'currentSamples', currentSamples);
     },
 
+    'LOAD_CURRENT_TABLE'(state, currentTable) {
+        Vue.set(state, 'currentTable', currentTable);
+    },
+
     'SELECT_SAMPLE'(state, sample) {
         Vue.set(state, 'currentSample', sample)
     },
@@ -69,6 +47,10 @@ const mutations = {
     },
 
     'SAMPLES_FILTER'(state, filter) {
+        Vue.set(state, 'filter', filter)
+    },
+
+    'TABLE_FILTER'(state, filter) {
         Vue.set(state, 'filter', filter)
     },
 
@@ -110,14 +92,8 @@ const actions = {
         })
     },
 
-    selectSample({ state, commit }, sample_id) {
-        const sample = state.currentSamples.find(s => s.id == sample_id);
+    selectSample({ commit }, sample) {
         commit('SELECT_SAMPLE', sample);
-
-        axios.get(`api/v1/samples/${sample_id}/fluorescences`, {
-        }).then(
-            res => { commit('LOAD_SAMPLE_Fluorescences', res.data.fluorescence_data) }
-        )
     },
 
     loadCurrentSamples({ getters, commit }) {
@@ -126,6 +102,16 @@ const actions = {
         }).then(
             res => {
                 commit('LOAD_CURRENT_SAMPLES', res.data.samples)
+            }
+        );
+    },
+
+    loadCurrentTable({ getters, commit }) {
+        if (!getters.currentExperiment) return void 0;
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/table`, {
+        }).then(
+            res => {
+                commit('LOAD_CURRENT_TABLE', res.data.samples)
             }
         );
     },
@@ -142,6 +128,9 @@ const actions = {
         commit('SAMPLES_FILTER', filter)
     },
 
+    filterTable({ commit }, filter) {
+        commit('TABLE_FILTER', filter)
+    },
 
     querySamples({ commit }, params) {
         axios.post('api/v1/samples/query', null, { params })
@@ -185,8 +174,18 @@ const getters = {
             : state.currentSamples;
     },
 
+    filteredTable(state) {
+        return state.filter
+            ? state.currentTable.filter(result => result.sample.includes(state.filter))
+            : state.currentTable;
+    },
+
     queriedSamples(state) {
         return state.queriedSamples
+    },
+
+    currentTable(state) {
+        return state.currentTable ? state.currentTable : null
     }
 }
 
