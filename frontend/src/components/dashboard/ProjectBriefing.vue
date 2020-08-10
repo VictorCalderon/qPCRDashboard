@@ -8,9 +8,9 @@
     class
   >
     <b-form-row>
-      <b-col>
-        <b-card>
-          <h6 class="card-subtitle mb-2 text-muted">Samples</h6>
+      <b-col lg="6" md="12">
+        <b-card class="my-1">
+          <h6 class="card-subtitle mt-1 text-muted">Samples</h6>
           <span>
             <h4>
               {{ briefingData.samples }}
@@ -19,9 +19,9 @@
           </span>
         </b-card>
       </b-col>
-      <b-col>
-        <b-card>
-          <h6 class="card-subtitle mb-2 text-muted">Experiments</h6>
+      <b-col lg="6" md="12">
+        <b-card class="my-1">
+          <h6 class="card-subtitle mt-1 text-muted">Experiments</h6>
           <span>
             <h4>
               {{ briefingData.experiments }}
