@@ -2,7 +2,7 @@
   <div>
     <b-form-row>
       <b-col>
-        <scatter-chart :chart-data="chartData" :options="chartOptions" :height="255"></scatter-chart>
+        <scatter-chart :chart-data="chartData" :options="chartOptions" :height="260"></scatter-chart>
       </b-col>
     </b-form-row>
   </div>
