@@ -4,7 +4,7 @@
       :words="words"
       :color="([, weight]) => weight > 10 ? '#F37748' : '#067BC2'"
       font-family="Roboto"
-      style="height: 615px;width: 1200px;"
+      style="height: 80vh;width: 1200px;"
       :animation-duration="500"
       :font-size-ratio="4"
       :spacing="0.2"
