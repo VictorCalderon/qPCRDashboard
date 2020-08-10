@@ -2,19 +2,22 @@
   <div>
     <b-form-row class="m-3 mt-3" v-if="currentExperiment">
       <b-col lg="8" md="12" sm="12" xs="12">
-        <b-card no-body class="m-2" header-bg-variant="dark" header-text-variant="white">
+        <b-card
+          no-body
+          class="m-2"
+          header-bg-variant="dark"
+          header-text-variant="white"
+          style="height: 85vh"
+        >
           <b-tabs card pills justified>
             <b-tab title="Amplification Plot">
               <AmpPlot></AmpPlot>
             </b-tab>
-            <b-tab title="Latent Space Clusters">
+            <b-tab title="AE Latent Clusters">
               <LatentSpaceClusters></LatentSpaceClusters>
             </b-tab>
-            <b-tab title="Cycle Kernel Density">
+            <b-tab title="Threshold Cycle KDE">
               <ThresholdKDE></ThresholdKDE>
-            </b-tab>
-            <b-tab title="Observation Cloud">
-              <ObservationCloud></ObservationCloud>
             </b-tab>
           </b-tabs>
         </b-card>
@@ -22,15 +25,6 @@
       <b-col lg="4" md="12" sm="12" xs="12">
         <SampleTable></SampleTable>
       </b-col>
-      <!-- <b-col lg="3" md="6" sm="12" xs="12">
-        <SamplePlate></SamplePlate>
-      </b-col>
-      <b-col lg="6" md="6" sm="12" xs="12">
-        <LatentSpaceClusters></LatentSpaceClusters>
-      </b-col>
-      <b-col lg="6" md="6" sm="12" xs="12">
-        <CqBoxPlot></CqBoxPlot>
-      </b-col>-->
     </b-form-row>
 
     <b-form-row class="mt-5 justify-content-center">
@@ -50,9 +44,7 @@
 
 <script>
 import AmpPlot from "@/components/experiment2/AmpPlot";
-// import SamplePlate from "@/components/experiment2/SamplePlate";
 import SampleTable from "@/components/experiment2/SampleTable";
-import ObservationCloud from "@/components/experiment2/ObservationCloud";
 import ThresholdKDE from "@/components/experiment2/ThresholdKDE";
 import LatentSpaceClusters from "@/components/experiment2/LatentSpaceClusters";
 
@@ -60,10 +52,7 @@ export default {
   components: {
     AmpPlot,
     LatentSpaceClusters,
-    // SamplePlate,
-    // CqBoxPlot,
     SampleTable,
-    ObservationCloud,
     ThresholdKDE
   },
 
