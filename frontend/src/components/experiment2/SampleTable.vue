@@ -141,10 +141,9 @@ export default {
 
   methods: {
     downloadSampleTable() {
-
       // Generate csv
-      let file = [...this.currentTable.map(sample => { return Object.values(sample).slice(1, ).join(',')})];
-      const header = [...Object.keys(this.currentTable[0]).slice(1, )];
+      let file = [...this.currentTable.map(sample => { return Object.values(sample).slice(1, -1).join(',')})];
+      const header = [...Object.keys(this.currentTable[0]).slice(1, -1)];
 
       // Add header
       file.unshift(header.join(','));
@@ -156,7 +155,7 @@ export default {
       file = new Blob([file], { type: "text/plain" });
 
       // Download file
-      FileDownload(file, this.currentExperiment.name);
+      FileDownload(file, this.currentExperiment.name + '.txt');
     },
 
     onRowSelected(items) {
