@@ -121,6 +121,8 @@
 </template>
 
 <script>
+import FileDownload from "js-file-download";
+
 export default {
   data() {
     return {
@@ -138,14 +140,33 @@ export default {
   },
 
   methods: {
+    downloadSampleTable() {
+
+      // Generate csv
+      let file = [...this.currentTable.map(sample => { return Object.values(sample).slice(1, ).join(',')})];
+      const header = [...Object.keys(this.currentTable[0]).slice(1, )];
+
+      // Add header
+      file.unshift(header.join(','));
+
+      // Join lines with \n
+      file = file.join('\r\n');
+
+      // Generate data blob
+      file = new Blob([file], { type: "text/plain" });
+
+      // Download file
+      FileDownload(file, this.currentExperiment.name);
+    },
+
     onRowSelected(items) {
       this.selectedRow = items[0];
       this.$store.dispatch('selectSample', this.selectedRow)
     },
 
-    downloadSampleTable() {
-      alert("Not Implemented");
-    },
+    // downloadSampleTable() {
+    //   alert("Not Implemented");
+    // },
 
     editSelectedSample() {
       alert("Not Implemented");
@@ -191,7 +212,11 @@ export default {
     },
 
     currentSample() {
-      return this.$store.getters.currentSample
+      return this.$store.getters.currentSample;
+    },
+
+    currentExperiment() {
+      return this.$store.getters.currentExperiment;
     }
   },
 
