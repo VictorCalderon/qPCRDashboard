@@ -119,7 +119,7 @@ export default {
         datasets: [...this.currentExperimentFluorescences.map((fluorescence, i) => {
 
           // Custom Border Color
-          let sampleCompare = fluorescence.result_id == this.currentSample.result_id;
+          let sampleCompare = this.currentSample ? fluorescence.result_id == this.currentSample.result_id : false;
           let customBorderColor = sampleCompare ? '#D64045' : this.colorMap[fluorescence.marker];
           let customOrder = sampleCompare ? 0 : 1;
 
