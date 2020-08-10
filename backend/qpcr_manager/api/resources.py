@@ -434,6 +434,31 @@ class ExperimentSamplesList(Resource):
         return {'samples': schema.dump(samples)}
 
 
+class ExperimentFluorescenceList(Resource):
+    """Get patients fluorescence data
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        """Get a single patient's raw Fluorescence data
+        """
+        fluorescence_data = experiment_fluorescences(experiment_id)
+        return {'fluorescence_data': fluorescence_data}
+
+
+class ExperimentSampleTable(Resource):
+    """Get all samples from an experiment with their results
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        """Get samples from experiment"""
+
+        return {'samples': sample_table(experiment_id)}
+
+
 class SampleFluorescenceResource(Resource):
     """Get patients Fluorescence data
     """
@@ -581,5 +606,5 @@ __all__ = [
     'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
     'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
     'MarkerList', 'MarkerSpecificDataset', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
-    'LocatedSamples', 'LocationList', 'LocationResource'
+    'LocatedSamples', 'LocationList', 'LocationResource', 'ExperimentSampleTable', 'ExperimentFluorescenceList'
 ]
