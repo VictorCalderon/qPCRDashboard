@@ -2,7 +2,7 @@
   <LineChart
     :chartData="ampPercDatasets"
     :options="chartConfig"
-    :height="190"
+    style="height:475px"
     v-if="ampPercDatasets"
   ></LineChart>
 </template>
@@ -52,7 +52,7 @@ export default {
     return {
       colors: ["#2E5266", "#6E8898", "#D3D0CB", "#E2C044"],
       chartConfig: {
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         reponsive: true,
         tooltips: {
           callbacks: {
