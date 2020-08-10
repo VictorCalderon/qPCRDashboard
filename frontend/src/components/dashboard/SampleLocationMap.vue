@@ -4,7 +4,7 @@
       :zoom="zoom"
       :center="mapCenter"
       :options="mapOptions"
-      style="height: 390px"
+      style="height: 450px"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate"
     >
