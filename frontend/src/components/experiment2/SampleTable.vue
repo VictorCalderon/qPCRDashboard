@@ -1,9 +1,15 @@
 <template>
-  <b-card class="m-2" bg-variant="light" header-bg-variant="light" header-text-variant="black">
+  <b-card
+    class="m-2"
+    bg-variant="light"
+    header-bg-variant="light"
+    header-text-variant="black"
+    style="height: 85vh;"
+  >
     <template v-slot:header>
       <b-form-row>
-        <b-col cols="5">
-          <h5 class="my-2 thin-font">Sample Table</h5>
+        <b-col lg="5" md="6">
+          <h5 class="my-2 thin-font text-center">Sample Table</h5>
         </b-col>
         <b-col class="my-0 py-0">
           <b-button
@@ -11,7 +17,7 @@
             variant="light"
             id="previous-samples"
             size="md"
-            v-b-tooltip.hover.bottom
+            v-b-tooltip.hover.top
             title="Previous page"
             @click="prevPage"
             :disabled="currentPage == 1"
@@ -25,7 +31,7 @@
             variant="light"
             id="next-samples"
             size="md"
-            v-b-tooltip.hover.bottom
+            v-b-tooltip.hover.top
             title="Next page"
             @click="nextPage"
             :disabled="currentPage == lastPage"
@@ -37,13 +43,20 @@
           <b-button
             class="text-dark border"
             variant="light"
-            id="filter-samples"
+            id="filter-popover"
             size="md"
-            v-b-tooltip.hover.bottom
+            v-b-tooltip.hover.top
             title="Filter samples"
           >
             <i class="fas fa-filter"></i>
           </b-button>
+          <b-popover target="filter-popover" placement="bottom">
+            <b-form-input
+              v-model="filter"
+              placeholder="Enter sample name"
+              class="placeholder-light text-center bg-light borderless border-bottom my-1"
+            ></b-form-input>
+          </b-popover>
         </b-col>
         <b-col class="my-0 py-0">
           <b-button
@@ -52,7 +65,7 @@
             @click="modifySample"
             id="modify-sample"
             size="md"
-            v-b-tooltip.hover.bottom
+            v-b-tooltip.hover.top
             title="Edit selected sample"
             :disabled="!sampleSelected"
           >
@@ -66,7 +79,7 @@
             @click="downloadSampleTable"
             id="download-dataset"
             size="md"
-            v-b-tooltip.hover.bottom
+            v-b-tooltip.hover.top
             title="Download this table"
           >
             <i class="fas fa-download"></i>
@@ -76,25 +89,30 @@
     </template>
 
     <b-form-row class="justify-content-center">
-      <b-col style="height: 600px">
+      <b-col>
         <b-table
           borderless
           selectable
           scrollable
           responsive
           hover
+          sticky-header="71vh"
+          head-variant="white"
           :fields="fields"
-          :items="sampleList"
+          :items="filteredTable"
           select-mode="single"
           :per-page="perPage"
           :current-page="currentPage"
           @row-selected="onRowSelected"
           class="text-center"
         >
-          <template v-slot:cell(amp)="data">
+          <template v-slot:head(sample)="data">
+            <span>{{ data.label + ' Name' }}</span>
+          </template>
+          <template v-slot:cell(score)="data">
             <b
-              :style="{color: data.item.amp ? '#6C8EAD' : '#FF3C38' }"
-            >{{ data.item.amp ? 'Yes' : 'No' }}</b>
+              :style="{color: data.item.score < 0.75 ? data.item.score < 0.25 ? '#CC2936' : '#F2BB05' : '#124E78' }"
+            >{{ data.item.score }}</b>
           </template>
         </b-table>
       </b-col>
@@ -106,21 +124,23 @@
 export default {
   data() {
     return {
-      perPage: 12,
+      filter: null,
+      perPage: 13,
       currentPage: 1,
       selectedRow: null,
       fields: [
-        { key: "well", sortable: true },
         { key: "sample", sortable: true },
         { key: "marker", sortable: true },
-        { key: "amp", sortable: true },
-        { key: "cq", sortable: true }
+        { key: "cq", sortable: true },
+        { key: "score", sortable: true }
       ]
     };
   },
+
   methods: {
     onRowSelected(items) {
       this.selectedRow = items[0];
+      this.$store.dispatch('selectSample', this.selectedRow)
     },
 
     downloadSampleTable() {
@@ -147,18 +167,44 @@ export default {
   },
 
   computed: {
-    sampleList() {
-      return this.$store.getters.sampleList;
+    filteredTable() {
+      return this.$store.getters.filteredTable;
+    },
+
+    searchFilter() {
+      if (this.filter == "") return null;
+      else return this.filter;
+    },
+
+    currentTable() {
+      return this.$store.getters.currentTable;
     },
 
     lastPage() {
-      if (this.sampleList) {
-        return Math.ceil(this.sampleList.length / this.perPage);
+      if (this.currentTable) {
+        return Math.ceil(this.currentTable.length / this.perPage);
       } else return 99;
     },
 
     sampleSelected() {
       return this.selectedRow ? true : false;
+    },
+
+    currentSample() {
+      return this.$store.getters.currentSample
+    }
+  },
+
+  watch: {
+    filteredTable() {
+      if (this.filteredTable == null) return {};
+
+      const firstSample = this.filteredTable.slice(0, 1);
+      this.$store.dispatch('selectSample', firstSample[0]);
+    },
+
+    searchFilter() {
+      this.$store.dispatch("filterSamples", this.filter);
     }
   }
 };
