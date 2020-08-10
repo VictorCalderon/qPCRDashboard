@@ -23,6 +23,9 @@ api.add_resource(LastExperimentResource, "/experiments/lastexperiment")
 api.add_resource(ExperimentsQuery, "/experiments/query")
 api.add_resource(ExperimentResults, "/experiments/<int:experiment_id>/results")
 api.add_resource(ExperimentSamplesList, "/experiments/<int:experiment_id>/samples")
+api.add_resource(ExperimentSampleTable, "/experiments/<int:experiment_id>/table")
+api.add_resource(ExperimentFluorescenceList, "/experiments/<int:experiment_id>/fluorescences")
+
 
 # Single and multiple records queries for qpcrs
 api.add_resource(SampleList, "/samples")
