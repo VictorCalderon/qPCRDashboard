@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <b-form-row class="m-3 mt-3" v-if="allExperiments">
+  <b-container fluid>
+    <b-form-row class="mt-3" v-if="allExperiments">
       <b-col lg="8" md="6" sm="10">
         <b-form-row>
           <b-col>
@@ -79,7 +79,7 @@
         </b-card>
       </b-col>
     </b-form-row>
-  </div>
+  </b-container>
 </template>
 
 <script>
