@@ -286,9 +286,7 @@ export default {
           "selectExperiment",
           this.selectedExperiment[0]
         );
-        await this.$store.dispatch("loadCurrentSamples");
         await this.$store.dispatch("loadCurrentTable");
-        await this.$store.dispatch("loadCurrentExperimentResults");
         await this.$store.dispatch("loadCurrentExperimentFluorescences");
         
         this.selectedExperiment = null;
@@ -301,10 +299,6 @@ export default {
         await this.$store.dispatch("selectExperiment", this.selectedSample[0]);
         await this.$store.dispatch("loadCurrentSamples");
         await this.$store.dispatch("loadCurrentExperimentResults");
-        // await this.$store.dispatch(
-        //   "filterSamples",
-        //   this.selectedSample[0].sample
-        // );
         this.selectedSample = null;
         this.hideModal();
       }
