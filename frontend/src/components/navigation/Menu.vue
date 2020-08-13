@@ -1,11 +1,17 @@
 <template>
-  <div fixed="top">
-    <b-navbar type="dark" variant="dark">
+  <b-navbar toggleable="lg" type="dark" variant="dark">
+    <b-navbar-brand href="#">
+      <span>qPCR Dashboard</span>
+    </b-navbar-brand>
+
+    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+    <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-link class="navbar nav text-light" exact-active-class to="/Dashboard">
           <span
             :class="this.$route.name == 'Dashboard' ? 'custom-active-link' : 'custom-inactive-link'"
-          >Dashboard</span>
+          >Overview</span>
         </b-link>
         <b-link
           class="navbar nav text-light"
@@ -29,53 +35,39 @@
         </b-link>
       </b-navbar-nav>
 
-      <b-navbar-nav v-if="this.$route.name == 'Experiments' && allExperiments" class="ml-auto">
-        <b-nav-item v-b-modal.add-experiments-modal class="mx-2">
-          <i class="fas fa-plus"></i>&nbsp;Add
-        </b-nav-item>
-        <b-nav-item v-b-modal.search-experiments-modal class="mx-2">
-          <i class="fas fa-search"></i>&nbsp;Search
-        </b-nav-item>
-        <b-nav-item v-b-modal.edit-experiments-modal class="mx-2" v-if="currentExperiment">
-          <i class="far fa-edit"></i>&nbsp;Edit
-        </b-nav-item>
-        <!-- <b-nav-item @click="exportCurrentExperiment" class="mx-2" v-if="currentExperiment">
-          <i class="fas fa-file-export" v-if="!exportingExperiment"></i>&nbsp;Export
-        </b-nav-item>-->
-        <b-nav-item class="mx-2" v-if="exportingExperiment">
-          <b-spinner small type="grow" v-if="exportingExperiment"></b-spinner>Exporting...
-        </b-nav-item>
-        <b-nav-item disabled class="mx-2">
-          <i class="fas fa-grip-lines-vertical"></i>
-        </b-nav-item>
-        <b-nav-item-dropdown right class="mx-2">
-          <template v-slot:button-content>
-            <span>
-              <i class="fas fa-user"></i>&nbsp;User
-            </span>
-          </template>
-          <b-dropdown-item href="#" @click="logOut">
-            <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
+      <b-navbar-nav class="ml-auto">
+        <b-nav-item-dropdown
+          class="navbar nav text-light"
+          text="Options"
+          right
+          v-if="this.$route.name == 'Experiments' && allExperiments"
+        >
+          <b-dropdown-item v-b-modal.add-experiments-modal class="mx-2">
+            <i class="fas fa-plus text-dark"></i>&nbsp;
+            <span class="text-dark">Add</span>
+          </b-dropdown-item>
+          <b-dropdown-item v-b-modal.search-experiments-modal class="mx-2">
+            <i class="fas fa-search text-dark"></i>&nbsp;
+            <span class="text-dark">Search</span>
+          </b-dropdown-item>
+          <b-dropdown-item v-b-modal.edit-experiments-modal class="mx-2" v-if="currentExperiment">
+            <i class="far fa-edit text-dark"></i>&nbsp;
+            <span class="text-dark">Edit</span>
           </b-dropdown-item>
         </b-nav-item-dropdown>
-      </b-navbar-nav>
 
-      <b-navbar-nav v-if="this.$route.name == 'Dashboard'" class="ml-auto">
-        <b-nav-item-dropdown right>
-          <template v-slot:button-content>
-            <span>
-              <i class="fas fa-user"></i>
-            </span>
-          </template>
-          <b-dropdown-item href="#">Logged as: {{ currentUser }}</b-dropdown-item>
-          <b-dropdown-divider></b-dropdown-divider>
+        <b-nav-item-dropdown right class="navbar nav text-light" text="User">
+          <b-dropdown-item href="#">
+            <i class="fas fa-user"></i>
+            &nbsp;{{ currentUser }}
+          </b-dropdown-item>
           <b-dropdown-item href="#" @click="logOut">
             <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
-    </b-navbar>
-  </div>
+    </b-collapse>
+  </b-navbar>
 </template>
 
 
