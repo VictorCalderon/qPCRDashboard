@@ -1,24 +1,23 @@
 <template>
   <div>
-    <b-form-row class="m-3 mt-3" v-if="currentExperiment">
+    <b-form-row class="mt-2" v-if="currentExperiment">
       <b-col lg="8" md="12" sm="12" xs="12">
         <b-card
           no-body
-          class="m-2"
+          class="card-height mb-2"
           header-bg-variant="dark"
           header-text-variant="white"
-          style="height: 85vh"
         >
           <b-tabs card pills justified>
             <b-tab title="Amplification Plot">
               <AmpPlot></AmpPlot>
             </b-tab>
-            <b-tab title="AE Latent Clusters">
+            <b-tab title="Sample Clusters">
               <LatentSpaceClusters></LatentSpaceClusters>
             </b-tab>
-            <b-tab title="Threshold Cycle KDE">
+            <!-- <b-tab title="Threshold Cycle KDE">
               <ThresholdKDE></ThresholdKDE>
-            </b-tab>
+            </b-tab>-->
           </b-tabs>
         </b-card>
       </b-col>
@@ -27,9 +26,9 @@
       </b-col>
     </b-form-row>
 
-    <b-form-row class="mt-5 justify-content-center">
-      <b-col v-if="!currentExperiment" cols="8">
-        <b-card class="text-center mt-3 rounded">
+    <b-form-row class="mt-5 justify-content-center" v-show="!currentExperiment">
+      <b-col cols="8">
+        <b-card class="text-center rounded">
           <div
             class="rounded py-2"
           >You don't seem to be working on any experiments right now. Use the engine to search for experiments.</div>
@@ -45,7 +44,6 @@
 <script>
 import AmpPlot from "@/components/experiment2/AmpPlot";
 import SampleTable from "@/components/experiment2/SampleTable";
-import ThresholdKDE from "@/components/experiment2/ThresholdKDE";
 import LatentSpaceClusters from "@/components/experiment2/LatentSpaceClusters";
 
 export default {
@@ -53,7 +51,6 @@ export default {
     AmpPlot,
     LatentSpaceClusters,
     SampleTable,
-    ThresholdKDE
   },
 
   methods: {
@@ -82,3 +79,15 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.card-height {
+  height: 85vh;
+}
+
+@media (max-width: 480px) {
+  .card-height {
+    height: 65vh;
+  }
+}
+</style>
