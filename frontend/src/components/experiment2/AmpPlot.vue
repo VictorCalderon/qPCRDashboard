@@ -1,9 +1,9 @@
 <template>
-  <div style="height: 790px" class="mt-3">
+  <div class="card-height">
     <b-form-row>
-      <b-col cols="12">{{currentSample ? currentSample.name : 'All'}}</b-col>
+      <b-col cols="12">{{currentSample ? currentSample.name : ''}}</b-col>
       <b-col sm="12">
-        <line-chart :chart-data="qPCRData" :options="qPCROptions" style="height: 70vh"></line-chart>
+        <line-chart :chart-data="qPCRData" :options="qPCROptions" class="ampplot-height"></line-chart>
       </b-col>
     </b-form-row>
   </div>
@@ -19,61 +19,32 @@ export default {
 
   data() {
     return {
-      qPCROptions: {
-        normalized: true,
-        spanGaps: true,
-        elements: {
-          point: { radius: 0 },
-          line: {
-            tension: 0, 
-            fill: false,
-            stepped: false,
-            borderDash: []
-          }
-        },
-        animation: false,
-        tooltips: {
-        enabled: true,
-        callbacks: {
-            label: function(tooltipItem, data) {
-              let datapoint = data.datasets[tooltipItem.index];
-              return datapoint.label;
-            }
-          }
-        },
-        maintainAspectRatio: false,
-        legend: {
-          display: false,
-          position: "bottom",
-          align: "center",
-          labels: {
-            boxWidth: 12,
-            boxHeight: 10,
-            padding: 10,
-            fontSize: 10,
-            usePointStyle: false
-          }
-        },
-        scales: {
-          yAxes: [{ ticks: { suggestedMax: 5, min: 0 } }],
-          gridLines: {
-            display: false
-          },
-        }
-      }
+     
     };
   },
 
   methods: {
     getColor() {
       // Background colors
-      return ['#004E8970', '#AA998F70', '#368F8B70', '#1C373870', '#4D484770'];
+      return ['#004E98', '#9C3848', '#FF6700', '#0A8754', '#1A281F'];
     },
   },
 
   computed: {
     currentSample() {
       return this.$store.getters.currentSample;
+    },
+
+    currentExperiment() {
+      return this.$store.getters.currentExperiment
+    },
+
+    lineOpacity() {
+      if (this.currentSample) {
+        return '10'
+      }
+
+      else return '80'
     },
 
     currentExperimentFluorescences() {
@@ -113,14 +84,66 @@ export default {
       else return null
     },
 
+    qPCROptions() {
+
+      return {
+        title: {
+          display: true,
+          text: this.currentExperiment.name,
+          fontSize: 18,
+          fontStyle: 'normal'
+        },
+        normalized: true,
+        spanGaps: true,
+        elements: {
+          point: { radius: 0 },
+          line: {
+            tension: 0, 
+            fill: false,
+            stepped: false,
+            borderDash: []
+          }
+        },
+        animation: true,
+        tooltips: {
+        enabled: true,
+        callbacks: {
+            label: function(tooltipItem, data) {
+              let datapoint = data.datasets[tooltipItem.index];
+              return datapoint.label;
+            }
+          }
+        },
+        maintainAspectRatio: false,
+        legend: {
+          display: false,
+          position: "bottom",
+          align: "center",
+          labels: {
+            boxWidth: 12,
+            boxHeight: 10,
+            padding: 10,
+            fontSize: 10,
+            usePointStyle: false
+          }
+        },
+        scales: {
+          yAxes: [{ ticks: { suggestedMax: 5, min: 0 } }],
+          gridLines: {
+            display: false
+          },
+        }
+      }
+    },
+
     qPCRData() {
       return {
         labels: [...Array(40).keys()].map(cycle => cycle + 1),
         datasets: [...this.currentExperimentFluorescences.map((fluorescence, i) => {
 
           // Custom Border Color
-          let sampleCompare = this.currentSample ? fluorescence.result_id == this.currentSample.result_id : false;
-          let customBorderColor = sampleCompare ? '#D64045' : this.colorMap[fluorescence.marker];
+          let sampleCompare = this.currentSample ? fluorescence.sample == this.currentSample.sample : false;
+          let customBorderColor = sampleCompare ? this.colorMap[fluorescence.marker] : this.colorMap[fluorescence.marker] + this.lineOpacity;
           let customOrder = sampleCompare ? 0 : 1;
 
           return {
@@ -140,5 +163,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang='scss' scoped>
+.ampplot-height {
+  height: 75vh;
+}
+
+@media (max-width: 480px) {
+  .ampplot-height {
+    height: 50vh;
+  }
+}
 </style>
