@@ -1,15 +1,14 @@
 <template>
   <b-card
-    class="m-2"
+    class="sample-table"
     bg-variant="light"
     header-bg-variant="light"
     header-text-variant="black"
-    style="height: 85vh;"
   >
     <template v-slot:header>
       <b-form-row>
         <b-col lg="5" md="6">
-          <h5 class="my-2 thin-font text-center">Sample Table</h5>
+          <h5 class="my-2 thin-font text-center">Results Table</h5>
         </b-col>
         <b-col class="my-0 py-0">
           <b-button
@@ -88,7 +87,7 @@
       </b-form-row>
     </template>
 
-    <b-form-row class="justify-content-center">
+    <b-form-row>
       <b-col>
         <b-table
           borderless
@@ -96,8 +95,8 @@
           scrollable
           responsive
           hover
-          sticky-header="71vh"
-          head-variant="white"
+          sticky-header="73vh"
+          head-variant="light"
           :fields="fields"
           :items="filteredTable"
           select-mode="single"
@@ -107,7 +106,7 @@
           class="text-center"
         >
           <template v-slot:head(sample)="data">
-            <span>{{ data.label + ' Name' }}</span>
+            <span>{{ data.label + ' Name'}}</span>
           </template>
           <template v-slot:cell(score)="data">
             <b
@@ -127,45 +126,50 @@ export default {
   data() {
     return {
       filter: null,
-      perPage: 13,
+      perPage: 14,
       currentPage: 1,
       selectedRow: null,
       fields: [
         { key: "sample", sortable: true },
         { key: "marker", sortable: true },
+        { key: "score", sortable: true },
         { key: "cq", sortable: true },
-        { key: "score", sortable: true }
       ]
     };
   },
 
   methods: {
     downloadSampleTable() {
-      // Generate csv
-      let file = [...this.currentTable.map(sample => { return Object.values(sample).slice(1, -1).join(',')})];
-      const header = [...Object.keys(this.currentTable[0]).slice(1, -1)];
 
-      // Add header
-      file.unshift(header.join(','));
+      // Make sure the table has content
+      if (this.currentTable.length > 1) {
+        // Generate csv
+        let file = [...this.currentTable.map(sample => { return Object.values(sample).slice(1, -1).join(',')})];
+        const header = [...Object.keys(this.currentTable[0]).slice(1, -1)];
 
-      // Join lines with \n
-      file = file.join('\r\n');
+        // Add header
+        file.unshift(header.join(','));
 
-      // Generate data blob
-      file = new Blob([file], { type: "text/plain" });
+        // Join lines with \n
+        file = file.join('\r\n');
 
-      // Download file
-      FileDownload(file, this.currentExperiment.name + '.txt');
+        // Generate data blob
+        file = new Blob([file], { type: "text/plain" });
+
+        // Download file
+        FileDownload(file, this.currentExperiment.name + '.txt');
+      }
+
+      else {
+        alert('The table is empty.')
+      }
+
     },
 
     onRowSelected(items) {
       this.selectedRow = items[0];
       this.$store.dispatch('selectSample', this.selectedRow)
     },
-
-    // downloadSampleTable() {
-    //   alert("Not Implemented");
-    // },
 
     editSelectedSample() {
       alert("Not Implemented");
@@ -234,5 +238,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.sample-table {
+  height: 85vh;
+}
+
+@media (max-width: 480px) {
+  .sample-table {
+    height: 90vh;
+  }
+}
 </style>
