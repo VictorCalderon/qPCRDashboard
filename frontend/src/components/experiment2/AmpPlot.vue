@@ -85,7 +85,6 @@ export default {
     },
 
     qPCROptions() {
-
       return {
         title: {
           display: true,
