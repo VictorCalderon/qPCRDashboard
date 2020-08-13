@@ -19,25 +19,25 @@
             <b-row class="pb-2 mx-1">
               <b-col>
                 <div class="text-center">
-                  <label for="input-experimentname">Type name</label>
+                  <label for="input-experimentname">Name</label>
                   <b-form-input
                     id="input-experimentname"
                     v-model="name"
                     class="text-center"
-                    placeholder="Enter experiment name"
                     type="text"
+                    placeholder="Experiment"
                   ></b-form-input>
                 </div>
               </b-col>
               <b-col>
                 <div class="text-center">
-                  <label for="input-datepicker">Choose a date</label>
+                  <label for="input-datepicker">Date</label>
                   <b-form-input
                     id="input-datepicker"
                     v-model="date"
                     class="text-center"
-                    placeholder="Format: YYYY-MM-DD"
                     type="date"
+                    placeholder="Date YYYY-MM-DD"
                   ></b-form-input>
                 </div>
               </b-col>
@@ -49,7 +49,7 @@
                     v-model="observations"
                     class="text-center"
                     locale="en"
-                    placeholder="Enter method used"
+                    placeholder="Observations"
                   ></b-form-input>
                 </div>
               </b-col>
@@ -61,6 +61,8 @@
                   :fields="experimentFields"
                   :tbody-tr-class="rowClass"
                   :busy="loadingResults"
+                  responsive
+                  scrollable
                   hover
                   borderless
                   small
@@ -69,7 +71,13 @@
                   @row-selected="onExperimentSelected"
                   :per-page="perPage"
                   :current-page="currentPageExperiments"
-                ></b-table>
+                >
+                  <template v-slot:cell(analyzed)="data">
+                    <span
+                      :style="{color: data.item.analyzed ? '#004E98' : '#F2BB05'}"
+                    >{{ data.item.analyzed ? 'Yes' : 'No' }}</span>
+                  </template>
+                </b-table>
               </b-col>
             </b-row>
             <b-row v-else align-h="center" class="border my-2 mx-1 rounded">
@@ -82,9 +90,10 @@
           </b-container>
           <hr />
           <b-container>
-            <b-row align-h="start">
-              <b-col>
+            <b-row align="center">
+              <b-col md="12" lg="6">
                 <b-pagination
+                  align="center"
                   v-model="currentPageExperiments"
                   :total-rows="experimentRows"
                   :per-page="perPage"
@@ -93,8 +102,7 @@
                   class="text-center"
                 ></b-pagination>
               </b-col>
-              <b-col cols="3"></b-col>
-              <b-col>
+              <b-col md="12" lg="6">
                 <b-button size="md" variant="info" @click="queryExperiments" class="mx-1">Search</b-button>
                 <b-button
                   size="md"
@@ -110,21 +118,21 @@
         </b-tab>
         <b-tab title="Samples" lazy>
           <b-container>
-            <b-row class="pb-2 mx-1" align-h="center">
-              <b-col cols="6">
+            <b-row class="pb-2" align-h="center">
+              <b-col cols="12">
                 <div class="text-center">
                   <label for="input-samplename">Type name</label>
                   <b-form-input
                     id="input-samplename"
                     v-model="sample"
                     class="text-center"
-                    placeholder="Enter sample name"
+                    placeholder="Sample ID"
                   ></b-form-input>
                 </div>
               </b-col>
             </b-row>
 
-            <b-row v-if="queriedSamples.length > 0" class="border my-2 mx-1 rounded">
+            <b-row v-if="queriedSamples.length > 0" class="border my-2 rounded">
               <b-col>
                 <b-table
                   :items="queriedSamples"
@@ -134,18 +142,29 @@
                   borderless
                   small
                   selectable
+                  responsive
+                  scrollable
                   select-mode="single"
                   @row-selected="onSampleSelected"
                   :per-page="perPage"
                   :current-page="currentPageSamples"
-                ></b-table>
+                  head-variant="dark"
+                  fixed
+                  class="mt-1"
+                >
+                  <template v-slot:head(sample)="data">
+                    <span>{{ data.label }}</span>
+                  </template>
+                  <template v-slot:head(amp_cq)>
+                    <span>{{ 'Cq' }}</span>
+                  </template>
+                  <template v-slot:head(name)>
+                    <span>{{ 'Run' }}</span>
+                  </template>
+                </b-table>
               </b-col>
             </b-row>
-            <b-row
-              v-if="searched && queriedSamples.length == 0"
-              align-h="center"
-              class="border my-2 mx-1 rounded"
-            >
+            <b-row v-if="searched && queriedSamples.length == 0" class="border my-2 mx-1 rounded">
               <b-col>
                 <div align-h="center">
                   <h5 class="my-5 text-center">Your search had no matches</h5>
@@ -154,9 +173,10 @@
             </b-row>
           </b-container>
           <hr />
-          <b-row align-h="start">
-            <b-col>
+          <b-row align="center">
+            <b-col lg="6" md="12">
               <b-pagination
+                align="center"
                 v-model="currentPageSamples"
                 :total-rows="sampleRows"
                 :per-page="perPage"
@@ -165,8 +185,7 @@
                 class="text-center"
               ></b-pagination>
             </b-col>
-            <b-col cols="3"></b-col>
-            <b-col>
+            <b-col lg="6" md="12">
               <b-button size="md" variant="info" @click="querySamples" class="mx-1">Search</b-button>
               <b-button
                 size="md"
@@ -221,15 +240,12 @@ export default {
         },
         {
           key: "name",
-          sortable: true
         },
         {
           key: "marker",
-          sortable: true
         },
         {
           key: "amp_cq",
-          sortable: true
         }
       ],
       date: null,
@@ -299,6 +315,7 @@ export default {
         await this.$store.dispatch("selectExperiment", this.selectedSample[0]);
         await this.$store.dispatch("loadCurrentSamples");
         await this.$store.dispatch("loadCurrentExperimentResults");
+        // await this.$store.dispatch("selectSample", this.selectedSample[0])
         this.selectedSample = null;
         this.hideModal();
       }
