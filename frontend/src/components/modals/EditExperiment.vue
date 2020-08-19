@@ -245,13 +245,13 @@ export default {
   },
 
   watch: {
-    currentExperiment() {
-      this.experiment = this.currentExperiment;
+    // currentExperiment() {
+    //   this.experiment = this.currentExperiment;
 
-      if (this.currentExperiment.tags) {
-        this.experiment.tags = this.currentExperiment.tags.split(",");
-      }
-    }
+    //   if (this.currentExperiment.tags) {
+    //     this.experiment.tags = this.currentExperiment.tags.split(",");
+    //   }
+    // }
   }
 };
 </script>

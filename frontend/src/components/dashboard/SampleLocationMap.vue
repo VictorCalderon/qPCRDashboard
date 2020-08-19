@@ -4,7 +4,7 @@
       :zoom="zoom"
       :center="mapCenter"
       :options="mapOptions"
-      style="height: 450px"
+      class="locationmap-height"
       @update:center="centerUpdate"
       @update:zoom="zoomUpdate"
     >
@@ -98,3 +98,15 @@ export default {
   }
 };
 </script>
+
+<style lang='scss' scoped>
+.locationmap-height {
+  height: 400px;
+}
+
+@media (max-width: 480px) {
+  .locationmap-height {
+    height: 300px;
+  }
+}
+</style>

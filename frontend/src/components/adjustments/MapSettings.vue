@@ -10,15 +10,27 @@
     <div>
       <b-form-row class="justify-content-center">
         <b-col cols="12">
-          <h5 class="font-weight-light">Center [Lat, Long]</h5>
+          <h5 class="font-weight-light">Map center coordinates</h5>
         </b-col>
-        <b-col cols="4">
-          <b-form-input id="center-langitude" type="number" v-model="newMapCenter[0]"></b-form-input>
+        <b-col cols="5">
+          <b-form-input
+            id="center-langitude"
+            type="number"
+            v-model="newMapCenter[0]"
+            class="text-center"
+          ></b-form-input>
         </b-col>
-        <b-col cols="4">
-          <b-form-input id="center-longitude" type="number" v-model="newMapCenter[1]"></b-form-input>
+        <b-col cols="5">
+          <b-form-input
+            id="center-longitude"
+            type="number"
+            v-model="newMapCenter[1]"
+            class="text-center"
+          ></b-form-input>
         </b-col>
-        <b-col cols="2">
+      </b-form-row>
+      <b-form-row class="justify-content-center mt-2">
+        <b-col cols="3">
           <b-button
             block
             class="px-1"
@@ -37,6 +49,21 @@
             <i class="fas fa-check-square"></i>
           </b-button>
         </b-col>
+        <b-col cols="3">
+          <b-button
+            id="secret-text"
+            block
+            class="px-1"
+            size="md"
+            variant="warning"
+            v-b-tooltip.hover
+            title="Reset to default"
+            @click="resetMarkerSize"
+            :disabled="newMarkerSize==10000"
+          >
+            <i class="fas fa-redo-alt"></i>
+          </b-button>
+        </b-col>
       </b-form-row>
     </div>
 
@@ -44,7 +71,75 @@
 
     <div>
       <b-form-row class="justify-content-center">
-        <b-col md="12" lg="6">
+        <b-col cols="5">
+          <h5 class="font-weight-light">Marker size</h5>
+          <b-form-input
+            class="text-center"
+            id="marker-size-offset"
+            type="number"
+            v-model="newMarkerSize"
+          ></b-form-input>
+        </b-col>
+        <b-col cols="5">
+          <h5 class="font-weight-light">Marker opacity</h5>
+          <b-form-input
+            class="text-center"
+            id="marker-opacity-offset"
+            type="number"
+            v-model="newMarkerOpacity"
+          ></b-form-input>
+        </b-col>
+      </b-form-row>
+      <b-form-row class="justify-content-center mt-2">
+        <b-col cols="3" v-if="!updatingMarkerSize">
+          <b-button
+            block
+            class="px-1"
+            size="md"
+            variant="info"
+            id="save-marker-size"
+            v-b-tooltip.hover
+            title="Save changes"
+            @click="updateMarkerSize"
+            :disabled="newMarkerSize==markerSize"
+            v-if="!updatingMarkerSize"
+          >
+            <i class="fas fa-save"></i>
+          </b-button>
+        </b-col>
+
+        <b-col cols="3" v-if="updatingMarkerSize">
+          <b-button
+            block
+            class="px-1"
+            size="md"
+            variant="success"
+            id="save-marker-size"
+            v-b-tooltip.hover
+            title="Changes saved"
+          >
+            <i class="fas fa-check-square"></i>
+          </b-button>
+        </b-col>
+
+        <b-col cols="3">
+          <b-button
+            id="secret-text"
+            block
+            class="px-1"
+            size="md"
+            variant="warning"
+            v-b-tooltip.hover
+            title="Reset to default"
+            @click="resetMarkerSize"
+            :disabled="newMarkerSize==10000"
+          >
+            <i class="fas fa-redo-alt"></i>
+          </b-button>
+        </b-col>
+      </b-form-row>
+      <!-- <b-form-row class="justify-content-center">
+        <b-col md="12" lg="12">
           <b-form-row>
             <b-col>
               <h5 class="font-weight-light">Marker size scaler</h5>
@@ -52,7 +147,7 @@
           </b-form-row>
 
           <b-form-row>
-            <b-col cols="5">
+            <b-col cols="6">
               <b-form-input
                 class="text-center"
                 id="marker-size-offset"
@@ -79,7 +174,15 @@
             </b-col>
 
             <b-col cols="3" v-if="updatingMarkerSize">
-              <b-button class variant="success" v-if="updatingMarkerSize">
+              <b-button
+                block
+                class="px-1"
+                size="md"
+                variant="success"
+                id="save-marker-size"
+                v-b-tooltip.hover
+                title="Changes saved"
+              >
                 <i class="fas fa-check-square"></i>
               </b-button>
             </b-col>
@@ -101,15 +204,20 @@
             </b-col>
           </b-form-row>
         </b-col>
-        <b-col md="12" lg="6">
+      </b-form-row>
+    </div>
+    <hr class="my-4" />
+    <div>
+      <b-form-row>
+        <b-col md="12" lg="12">
           <b-form-row>
             <b-col>
               <h5 class="font-weight-light">Marker opacity</h5>
             </b-col>
           </b-form-row>
 
-          <b-form-row>
-            <b-col cols="5">
+          <b-form-row class="mb-3">
+            <b-col cols="6">
               <b-form-input
                 class="text-center"
                 id="marker-opacity-offset"
@@ -158,7 +266,7 @@
             </b-col>
           </b-form-row>
         </b-col>
-      </b-form-row>
+      </b-form-row>-->
     </div>
   </b-card>
 </template>
@@ -170,7 +278,7 @@ export default {
       updatingMapCenter: false,
       updatingMarkerSize: false,
       updatingMarkerOpacity: false,
-      newMapCenter: null,
+      newMapCenter: [],
       newMarkerSize: null,
       newMarkerOpacity: null
     };
@@ -178,10 +286,14 @@ export default {
 
   computed: {
     noCenterChange() {
-      return (
-        this.newMapCenter[0] == this.mapCenter[0] &&
-        this.newMapCenter[1] == this.mapCenter[1]
-      );
+      if (this.mapCenter) {
+        return (
+          this.newMapCenter[0] == this.mapCenter[0] &&
+          this.newMapCenter[1] == this.mapCenter[1]
+        );
+      }
+      else return false
+
     },
 
     mapCenter() {

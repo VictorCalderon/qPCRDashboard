@@ -52,31 +52,6 @@
         </b-form-group>
       </b-col>
     </b-form-row>
-    <!-- <b-form-row>
-      <b-col>
-        <b-form-group
-          id="fieldset-1"
-          description="Experiment observations such as collection metadata."
-          label="Enter your experiment's observations"
-          label-for="input-experientmethod"
-          class="text-center"
-        >
-          <b-form-input
-            id="input-experientmethod"
-            v-model="methodology"
-            trim
-            placeholder="Type observations"
-            class="text-center"
-          ></b-form-input>
-          <b-tooltip
-            target="input-experientmethod"
-            triggers="hover"
-            placement="right"
-            variant="info"
-          >{{ methodDescription }}</b-tooltip>
-        </b-form-group>
-      </b-col>
-    </b-form-row>-->
     <b-form-row>
       <b-col>
         <b-form-group
@@ -282,8 +257,8 @@ export default {
       tagsDescription: "e.g. Independent experiments variables",
       options: [
         { value: null, text: "Choose a format" },
-        { value: "txt", text: "Single file" },
-        { value: "zip", text: "Zipped files" }
+        { value: "txt", text: "ABI 7500" },
+        { value: "zip", text: "Design and Analysis 2" }
       ]
     };
   },

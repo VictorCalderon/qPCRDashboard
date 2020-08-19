@@ -148,7 +148,7 @@
                   @row-selected="onSampleSelected"
                   :per-page="perPage"
                   :current-page="currentPageSamples"
-                  head-variant="dark"
+                  head-variant="light"
                   fixed
                   class="mt-1"
                 >
@@ -298,12 +298,11 @@ export default {
 
     async selectExperiment() {
       if (this.selectExperiment) {
-        await this.$store.dispatch(
-          "selectExperiment",
-          this.selectedExperiment[0]
-        );
+        await this.$store.dispatch("selectExperiment", this.selectedExperiment[0]);
         await this.$store.dispatch("loadCurrentTable");
         await this.$store.dispatch("loadCurrentExperimentFluorescences");
+        await this.$store.dispatch('loadCurrentExperimentPCA');
+        await this.$store.dispatch('loadCurrentExperimentMaxGrad');
         
         this.selectedExperiment = null;
         this.hideModal();
@@ -311,11 +310,20 @@ export default {
     },
 
     async selectSample() {
-      if (this.selectSample) {
-        await this.$store.dispatch("selectExperiment", this.selectedSample[0]);
-        await this.$store.dispatch("loadCurrentSamples");
-        await this.$store.dispatch("loadCurrentExperimentResults");
-        // await this.$store.dispatch("selectSample", this.selectedSample[0])
+      if (this.selectedSample) {
+
+        // Query experiment to database
+        await this.$store.dispatch('getExperiment', { experimentID: this.selectedSample[0].experiment_id });
+
+        // Load relevant experiment data
+        await this.$store.dispatch("loadCurrentTable");
+        await this.$store.dispatch("loadCurrentExperimentFluorescences");
+        await this.$store.dispatch('loadCurrentExperimentPCA')
+
+        // Select sample
+        await this.$store.dispatch('selectSample', this.selectedSample)
+
+        // Clear search and hide modal
         this.selectedSample = null;
         this.hideModal();
       }

@@ -17,7 +17,20 @@
         <b-col cols="8" offset="2">
           <h6 class="mb-0 mt-2">Sample Location Schema</h6>
         </b-col>
-        <b-col cols="1" class="ml-auto">
+        <b-col cols="1" class="ml-auto" v-if="!visible">
+          <b-button
+            id="add-schema"
+            block
+            variant="secondary"
+            :disabled="disableAddSchema"
+            @click="toggleAddSchema"
+            size="sm"
+            class="px-1"
+          >
+            <i class="fas fa-plus-square"></i>
+          </b-button>
+        </b-col>
+        <b-col cols="1" class="ml-auto" v-if="visible">
           <b-button
             id="add-schema"
             block
@@ -29,19 +42,6 @@
             v-if="visible"
           >
             <i class="fas fa-minus-square"></i>
-          </b-button>
-        </b-col>
-        <b-col cols="1" class="ml-auto">
-          <b-button
-            id="add-schema"
-            block
-            variant="secondary"
-            :disabled="disableAddSchema"
-            @click="toggleAddSchema"
-            size="sm"
-            class="px-1"
-          >
-            <i class="fas fa-plus-square"></i>
           </b-button>
         </b-col>
       </b-form-row>
@@ -135,11 +135,13 @@
             <i class="fas fa-window-close"></i>
           </b-button>
         </b-col>
+        <b-col cols="12">
+          <hr />
+        </b-col>
       </b-form-row>
-      <hr />
     </b-collapse>
 
-    <b-row v-if="schemas.length > 0" class="justify-content-center">
+    <b-form-row v-if="schemas.length > 0" class="justify-content-center">
       <b-col>
         <b-table
           borderless
@@ -156,8 +158,15 @@
           </template>
         </b-table>
       </b-col>
-    </b-row>
-    <template v-slot:footer>
+    </b-form-row>
+
+    <b-form-row v-if="noSchemasMessage">
+      <b-col cols="12">
+        <p class="no-map-schemas">Click on the plus button to add sampling sites</p>
+      </b-col>
+    </b-form-row>
+
+    <template v-slot:footer v-if="schemas.length > 0">
       <b-form-row class="justify-content-end">
         <b-col cols="2">
           <b-button
@@ -204,7 +213,7 @@ export default {
         location: null,
         latitude: null,
         longitude: null,
-        color: null
+        color: "#FFFFFF"
       },
       schemas: []
     };
@@ -234,10 +243,10 @@ export default {
       else this.schemas.push({ ...this.newSchema });
 
       // Clear schema
-      this.cleanSchema();
+      this.cleanSchemaForm();
     },
 
-    cleanSchema() {
+    cleanSchemaForm() {
       // Clear key
       this.newSchema.key = null;
 
@@ -275,7 +284,7 @@ export default {
 
     toggleAddSchema() {
       // Clean schemas
-      this.cleanSchema();
+      this.cleanSchemaForm();
 
       // Toggle add schemas
       this.modification = false;
@@ -287,7 +296,7 @@ export default {
       this.$store
         .dispatch("updateSampleLocationSchemas", newSchema)
         .then(() => {
-          this.cleanSchema();
+          this.toggleAddSchema();
         })
         .then(() => {
           this.loadSchemas();
@@ -296,12 +305,16 @@ export default {
 
     async loadSchemas() {
       await this.$store.dispatch("getSampleLocationSchemas").then(() => {
-        this.schemas = [...this.sampleLocationSchemas];
+        // this.schemas = [...this.sampleLocationSchemas];
       });
     }
   },
 
   computed: {
+    noSchemasMessage() {
+      return this.schemas.length == 0 & !this.visible & !this.modification
+    },
+
     sampleLocationSchemas() {
       return this.$store.getters.sampleLocationSchemas;
     },
@@ -328,10 +341,6 @@ export default {
   async mounted() {
     // Get schemas
     this.loadSchemas();
-    // // Initialize schemas
-    // () => {
-    //   this.schemas = [...this.sampleLocationSchemas];
-    // }
   },
 
   watch: {
@@ -346,5 +355,10 @@ export default {
 };
 </script>
 
-<style>
+<style lang='scss' scoped>
+.no-map-schemas {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-top: 15px;
+}
 </style>

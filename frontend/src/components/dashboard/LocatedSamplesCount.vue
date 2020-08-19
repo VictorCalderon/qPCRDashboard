@@ -1,6 +1,11 @@
 <template>
-  <BarChart :chartData="chartData" :options="chartConfig" :height="310" v-if="smallDataset"></BarChart>
-  <HBarChart :chartData="chartData" :options="chartConfig" :height="310" v-else></HBarChart>
+  <BarChart
+    :chartData="chartData"
+    :options="chartConfig"
+    class="locationcount-height"
+    v-if="smallDataset"
+  ></BarChart>
+  <HBarChart :chartData="chartData" :options="chartConfig" class="locationcount-height" v-else></HBarChart>
 </template>
 
 <script>
@@ -51,7 +56,7 @@ export default {
           datasets: [
             {
               label: "Sampling Site Counts",
-              data: this.samplingDatasets,
+              data: this.samplingDatasets.map(c => {return Math.log(c)}),
               backgroundColor: this.samplingColors,
               hoverWidth: 2,
               hoverColor: "#000"
@@ -65,7 +70,7 @@ export default {
   data() {
     return {
       chartConfig: {
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         reponsive: true,
         legend: {
           display: true,
@@ -89,5 +94,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang='scss' scoped>
+.locationcount-height {
+  height: 40vh;
+}
+
+@media (max-width: 480px) {
+  .locationcount-height {
+    height: 30vh;
+  }
+}
 </style>

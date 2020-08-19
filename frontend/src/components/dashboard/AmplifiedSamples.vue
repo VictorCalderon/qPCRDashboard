@@ -2,7 +2,7 @@
   <LineChart
     :chartData="ampPercDatasets"
     :options="chartConfig"
-    style="height:475px"
+    class="timeseries-height"
     v-if="ampPercDatasets"
   ></LineChart>
 </template>
@@ -32,7 +32,7 @@ export default {
         // Add chart options to dataset
         let chartData = chartRawData.map((d, i) => {
           return {
-            label: d.marker,
+            label: d.target,
             data: d.data,
             backgroundColor: this.colors[i],
             fill: true,
@@ -52,6 +52,15 @@ export default {
     return {
       colors: ["#2E5266", "#6E8898", "#D3D0CB", "#E2C044"],
       chartConfig: {
+        // elements: {
+        //   point: { radius: 0 },
+        //   line: {
+        //     tension: 0, 
+        //     fill: false,
+        //     stepped: false,
+        //     borderDash: []
+        //   }
+        // },
         maintainAspectRatio: false,
         reponsive: true,
         tooltips: {
@@ -111,7 +120,7 @@ export default {
 
         elements: {
           point: {
-            radius: 5
+            radius: 0
           }
         }
       }
@@ -120,5 +129,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang='scss' scoped>
+.timeseries-height {
+  height: 50vh;
+}
+
+@media (max-width: 480px) {
+  .timeseries-height {
+    height: 30vh;
+  }
+}
 </style>
