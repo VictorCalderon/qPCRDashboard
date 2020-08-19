@@ -9,11 +9,13 @@ class Target(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String)
-    name = db.Column(db.String, unique=True, nullable=False)
+    target = db.Column(db.String)
     description = db.Column(db.Text)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref='targets', lazy=True)
 
+    __table_args__ = (db.UniqueConstraint('target', 'user_id', name='target_user_unique'),)
+
     def __repr__(self):
-        return '<Target: {}>'.format(self.marker)
+        return '<Target: {}>'.format(self.target)
