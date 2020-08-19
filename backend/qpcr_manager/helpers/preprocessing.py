@@ -23,9 +23,12 @@ from collections import defaultdict, deque, Counter
 import pandas as pd
 import numpy as np
 
-# Data processing pipeline
+# Data preprocessing and clusterization
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KernelDensity
 from sklearn.pipeline import Pipeline
 
 
@@ -35,7 +38,7 @@ def query_samples(current_user, sample):
 
     # Build query
     query = f"""
-    SELECT experiments.id, sample, name, marker, amp_status, amp_cq FROM experiments
+    SELECT experiments.id as experiment_id, sample, name, marker, amp_status, amp_cq FROM experiments
     JOIN samples on samples.experiment_id = experiments.id
     JOIN results on results.sample_id = samples.id
     JOIN markers on results.marker_id = markers.id
@@ -88,13 +91,13 @@ def import_DA2(buffered_zip):
             results = results.replace('Undetermined', 0)
 
             # Column order
-            amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'dRn']
+            amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
             results_columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
 
             # Make them the correct datatype
             amp_data = amp_data.astype({
                 'Well Position': str, 'Sample': str,
-                'Cycle Number': int, 'Target': str, 'dRn': float
+                'Cycle Number': int, 'Target': str, 'Rn': float
             })
 
             results = results.astype({
@@ -258,6 +261,7 @@ def add_markers(markers):
         else:
             # Add marker to database
             new_marker = Marker(marker=marker)
+            new_marker.user_id = current_user.id
             db.session.add(new_marker)
             db.session.commit()
 
@@ -389,75 +393,24 @@ def feed_7500(filebuffer, current_experiment, current_user):
 
 
 @lru_cache(maxsize=100)
-def query_fluorescence(sample_id):
-    """ Query and return a parse qPCR for frontend display
+def get_experiment_results(experiment_id):
+    """Query and parse a DataFrame with Experiment(experiment_id) results
     """
 
-    # Query sample
-    sample = Sample.query.get_or_404(sample_id)
-
-    # Get qPCRs
-    fluorescence = [(q.marker_id, q.cycle, q.rn) for q in sample.fluorescence]
-
-    # Max cycles
-    max_cycle = max([q[1] for q in fluorescence])
-
-    # Container
-    fluorescence_data = defaultdict(list)
-
-    # Iterate over fluorescence tuples
-    for q in fluorescence:
-
-        # Check if key not in data
-        if q[0] not in fluorescence_data.keys():
-            fluorescence_data[q[0]] = [*range(max_cycle)]
-
-        # Add data to container
-        fluorescence_data[q[0]][q[1] - 1] = q[2]
-
-    # Array of data
-    fluorescence_array = []
-
-    # Change dict key name
-    for k in fluorescence_data:
-
-        # Query db for key
-        fluorescence_array.append({
-            'marker': query_marker(k),
-            'amp': fluorescence_data[k],
-            'well': sample.fluorescence[0].well
-        })
-
-    return sorted(fluorescence_array, key=lambda x: x['marker'])
-
-
-def export_results(experiment_id, current_user, params={'sep': ','}):
-    """Export experiment
+    # Build query
+    query = f"""
+    SELECT sample, marker, amp_status, amp_cq FROM samples
+    JOIN experiments ON samples.experiment_id = experiments.id
+    JOIN results ON results.sample_id = samples.id
+    JOIN markers ON results.marker_id = markers.id
+    WHERE experiments.user_id = {current_user.id} and experiments.id = {experiment_id}
     """
 
-    try:
-        query = f"""
-        SELECT name, date, sample, marker, amp_status, amp_cq FROM experiments
-        JOIN samples on samples.experiment_id = experiments.id
-        JOIN results on results.sample_id = samples.id
-        JOIN markers on results.marker_id = markers.id
-        WHERE experiments.user_id = {current_user.id} and experiments.id = {experiment_id};
-        """
+    # Run query
+    results_df = pd.read_sql(query, db.session.bind)
 
-        # Get results
-        query = pd.read_sql(query, db.session.bind)
-
-        if query is None:
-            raise ValueError('This experiment could not be exported')
-
-    except:
-        raise ValueError('You can only export your own experiments')
-
-    # Set Amplification Name
-    query['amp_status'] = query['amp_status'].apply(lambda x: 'Amp' if x else 'No Amp')
-
-    # Apply to queried df
-    return query.to_csv(index=False, sep=params['sep'])
+    # Return results
+    return results_df
 
 
 def experiment_statistics(experiment_id, current_user):
@@ -501,7 +454,6 @@ def experiment_statistics(experiment_id, current_user):
     results_df['PCA 2'] = np.round(pca[:, 1], 4)
 
     # [SUGGESTION] preprocessing.py Find a better way of dealing with this
-    # Data
     cq_raw = results_df.to_dict('list')
 
     # Count amplifications
@@ -513,59 +465,25 @@ def experiment_statistics(experiment_id, current_user):
     return {'samples': samples, 'cq_raw': cq_raw, 'amp_status': amp_status, 'amped_cq': amped_cq, 'amp_raw': amped_df}
 
 
-def available_markers(current_user):
+def available_markers():
     """Return a list of all available markers
     """
 
+    # Generate query
     query = f"""
-    SELECT DISTINCT(m.id)
-    FROM samples AS s
-    JOIN experiments AS p on s.experiment_id = p.id
-    JOIN results AS r on r.sample_id = s.id
-    JOIN markers as m on r.marker_id = m.id
-    WHERE p.user_id = {current_user.id}
+    SELECT id, marker, target_id FROM markers
+    WHERE markers.user_id = {current_user.id}
     """
 
     # Run query
-    markers = db.session.execute(query)
+    markers = pd.read_sql(query, db.session.bind)
 
-    # Clean markers
-    markers = [[m.id, query_marker(m.id)] for m in markers]
-
-    # Return marker list
-    return markers
-
-
-def amped_timeseries(marker_id, current_user):
-    """Query dashboard data (date, perc_cases, total_samples, total_experiments)
-    """
-
-    # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
-    query = f"""
-    SELECT date, CAST(COUNT(CASE WHEN amp_status THEN 1 END) as decimal) / COUNT(amp_status), COUNT(DISTINCT(sample)), COUNT(DISTINCT(name))
-    FROM samples AS s
-    JOIN experiments as p on s.experiment_id = p.id
-    JOIN results as r on r.sample_id = s.id
-    JOIN markers as m on r.marker_id = m.id
-    WHERE m.id = {marker_id} AND p.user_id = {current_user.id}
-    GROUP BY date
-    """
-
-    # Run query
-    data = db.session.execute(query)
-
-    # Parse data
-    data = [(str(d[0]), round(float(d[1]), 2), d[2], d[3]) for d in data]
-
-    # Insert into dataframe
-    data = pd.DataFrame(data=data, columns=['Date', 'Amp Fraction', 'Total Samples', 'Total Experiments'])
-
-    # Return data
-    return data.to_dict('list')
+    # Return markers
+    return markers.to_json(orient='records')
 
 
 def marker_dataset(marker_id, current_user):
-    """Query dashboard data (date, perc_cases, total_samples, total_experiments)
+    """Query dashboard data(date, perc_cases, total_samples, total_experiments)
     """
 
     # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
@@ -609,6 +527,64 @@ def get_brief():
 
 
 def amp_stat_data():
+    """Build a target based timeseries for each added type
+    """
+
+    # Build query
+    query = f"""
+    SELECT experiments.name, date, sample, target_id, targets.name as target, amp_cq FROM samples
+    JOIN experiments on experiments.id = samples.experiment_id
+    JOIN results on results.sample_id = samples.id
+    JOIN markers on results.marker_id = markers.id
+    JOIN targets on markers.target_id = targets.id
+    WHERE experiments.user_id = {current_user.id}
+    """
+
+    # Run query in pandas
+    dataset = pd.read_sql(query, db.session.bind)
+
+    # Compute all amplified samples
+    dataset['amp_status'] = dataset['amp_cq'] != 0
+
+    # Parse date as datetime
+    dataset['date'] = pd.to_datetime(dataset['date'])
+
+    # Group by date and target_id and calculate amplification (binary mean) percentages
+    dataset = dataset.groupby(['date', 'target_id', 'target'])['amp_status'].mean().reset_index()
+
+    # Parse dates
+    dataset['day'] = dataset['date'].dt.day
+    dataset['month'] = dataset['date'].dt.month_name()
+
+    # Make then pretty
+    dataset['day-month'] = dataset['day'].astype(str) + '-' + dataset['month'].astype(str)
+
+    # Instantiate data struct [{'target': 'example 1, 'data': [1, 2, 3]}]
+    datasets = []
+
+    # Generate parsed dataset
+    for target in dataset['target'].unique():
+
+        # Mask dataset to keep target specific
+        df = dataset[dataset['target'] == target]
+
+        # Get dataset
+        percs = df['amp_status'] * 100
+
+        # Add data to struct
+        datasets.append({'target': target, 'data': percs.to_list()})
+
+    # Sort list of dictionaries
+    datasets = sorted(datasets, key=lambda i: np.mean(i['data']))
+
+    # Use last iteration day-month column
+    return {'dates': df['day-month'].to_list(), 'datasets': datasets}
+
+    # # Send data
+    # return dataset.to_json('records')
+
+
+def amp_stat_data_2():
     """ Return the following data structure:
         {
             labels: ["26 Jun", "27 Jun", "28 Jun", "29 Jun"],
@@ -646,12 +622,6 @@ def amp_stat_data():
 
     # Parse date as datetime
     dataset['date'] = pd.to_datetime(dataset['date'])
-
-    # # Resample if length is >100 days
-    # if len(dataset) > 2:
-
-    #     # Run resample
-    #     dataset = dataset.resample('W', on='date')['amp_status'].mean().reset_index()
 
     # Group by date and marker and calculate amplification (binary mean) percentages
     dataset = dataset.groupby(['date', 'marker'])['amp_status'].mean().reset_index()
@@ -780,8 +750,8 @@ def get_located_samples():
     # Get sample data
     sample_query = f"""
     SELECT sample FROM samples
-    JOIN experiments ON samples.experiment_id = experiments.id
-    WHERE experiments.user_id = {current_user.id}
+    JOIN experiments ON samples.experiment_id= experiments.id
+    WHERE experiments.user_id= {current_user.id}
     """
 
     # Run sample query
@@ -790,7 +760,7 @@ def get_located_samples():
     # Get location data
     location_query = f"""
     SELECT key, location, latitude, longitude, color FROM locations
-    WHERE locations.user_id = {current_user.id}
+    WHERE locations.user_id= {current_user.id}
     """
 
     # Run location query
@@ -827,10 +797,10 @@ def sample_table(experiment_id):
     # Build query
     query = f"""
     SELECT samples.id, sample, marker, amp_status AS amp, amp_cq AS cq, score, results.id AS result_id FROM experiments
-    JOIN samples on samples.experiment_id = experiments.id
-    JOIN results on results.sample_id = samples.id
-    JOIN markers on results.marker_id = markers.id
-    WHERE experiments.user_id = {current_user.id} and experiments.id = {experiment_id};
+    JOIN samples on samples.experiment_id= experiments.id
+    JOIN results on results.sample_id= samples.id
+    JOIN markers on results.marker_id= markers.id
+    WHERE experiments.user_id= {current_user.id} and experiments.id = {experiment_id};
     """
 
     # Run query
@@ -844,16 +814,100 @@ def sample_table(experiment_id):
     return dataset.to_dict('records')
 
 
-def experiment_fluorescences(experiment_id):
+def compute_kmeans_labels(dataset):
+    """Compute KMeans labels based on PCA transformed dataset
+    """
+
+    # Model distortion
+    models = [
+        KMeans(n_clusters=i, n_init=20, max_iter=500, random_state=42).fit(dataset) for i in range(2, 10)
+    ]
+
+    # Get distortions
+    sil_scores = [silhouette_score(dataset, m.labels_, metric='euclidean') for m in models]
+
+    # Compute best K
+    best_k = np.argmax(sil_scores)
+
+    # Return best model labels
+    return models[best_k].labels_
+
+
+def experiment_pca_kmeans(experiment_id, k=None):
+    """Build a PCA from experiment results
+    """
+
+    # Get results
+    results_df = get_experiment_results(experiment_id)
+
+    # Count unique markers
+    n_components = len(results_df['marker'].unique())
+
+    # Pivot Table
+    results_df = results_df.pivot(index='sample', columns='marker', values='amp_cq')
+
+    # Drop NaN columns
+    results_df = results_df.dropna(axis=1)
+
+    # Scaled dataset
+    scaled_data = StandardScaler().fit_transform(results_df)
+
+    # PCA from scaled data
+    pca = PCA(n_components=n_components, random_state=42).fit_transform(scaled_data)
+
+    # Add random noise for plotting (jitter)
+    pca += np.random.randn(pca.shape[0], pca.shape[1]) * 0.01
+
+    # Add components to results DataFrame with jitter
+    results_df['PCA 1'] = np.around(pca[:, 0], 2)
+    results_df['PCA 2'] = np.around(pca[:, 1], 2)
+
+    # Add cluster labels
+    if k:
+        results_df['Cluster'] = KMeans(n_clusters=k).fit(pca).labels_
+
+    else:
+        results_df['Cluster'] = compute_kmeans_labels(pca)
+
+    # PCA dataset
+    pca_df = results_df.reset_index()[['sample', 'PCA 1', 'PCA 2', 'Cluster']]
+
+    # Return dataset
+    return pca_df.to_dict('records')
+
+
+# Sliding window noise detector
+def sliding_denoiser(raw_data, window=5):
+    """Compute Log(raw_data) - Min(Std(SlidingWindow(Log(raw_data))))
+    """
+
+    # Compute means
+    stds_ = [np.std(raw_data[i: i: window]) for i in range(len(raw_data - window + 1))]
+
+    # Compute argmin
+    std_argmin = np.argmin(stds_)
+
+    # Log transform data
+    raw_data = np.log(raw_data)
+
+    # Compute denoised data
+    denoised_data = raw_data - np.mean(raw_data[std_argmin: std_argmin + window])
+
+    # Clip data to 0 for plotting
+    return np.clip(denoised_data, 0, 10)
+
+
+@lru_cache(maxsize=10)
+def compute_fluorescences(experiment_id):
     """Get current experiment fluorescence data"""
 
     # Build query
     query = f"""
     SELECT results.id as result_id, well, sample, marker, cycle, rn FROM samples
-    JOIN fluorescences on fluorescences.sample_id = samples.id
-    JOIN markers on markers.id = fluorescences.marker_id
-    JOIN experiments on experiments.id = samples.experiment_id
-    JOIN results on (results.sample_id = samples.id and results.marker_id = markers.id)
+    JOIN fluorescences on fluorescences.sample_id= samples.id
+    JOIN markers on markers.id= fluorescences.marker_id
+    JOIN experiments on experiments.id= samples.experiment_id
+    JOIN results on(results.sample_id = samples.id and results.marker_id = markers.id)
     WHERE experiments.id = {experiment_id}
     """
 
@@ -861,35 +915,105 @@ def experiment_fluorescences(experiment_id):
     dataset = pd.read_sql(query, db.session.bind)
 
     # Create single column index
-    dataset['indexer'] = dataset['result_id'].astype(str) + '-' + dataset['well'] + \
-        '-' + dataset['sample'] + '-' + dataset['marker']
+    dataset['indexer'] = dataset['result_id'].astype(str) + '&-&' + dataset['well'] + \
+        '&-&' + dataset['sample'] + '&-&' + dataset['marker']
 
-    # Sort dataset
-    dataset = dataset.pivot(index='indexer', columns='cycle', values='rn').reset_index()
+    # Pivot and sort dataset
+    dataset = dataset.pivot(index='indexer', columns='cycle', values='rn')
+
+    # Log transform and remove noise
+    dataset.iloc[:, :] = dataset.apply(lambda row: sliding_denoiser(row), axis=1).values
+
+    # Reset index
+    dataset.reset_index(inplace=True)
 
     # Separate data
-    split_indexer = dataset['indexer'].str.split('-', expand=True).values
+    split_indexer = dataset['indexer'].str.split('&-&', expand=True).values
 
     # Add split data to DataFrame
     for idx, col in enumerate(['result_id', 'well', 'sample', 'marker']):
 
         # Add column
-        dataset[col] = split_indexer[:, idx]
+        dataset.insert(idx, col, split_indexer[:, idx])
 
     # Remove redundant indexer
     dataset.drop('indexer', axis=1, inplace=True)
 
-    # Build Data Structure
-    dataset = [
-        {
-            'result_id': d['result_id'],
-            'well': d['well'],
-            'sample': d['sample'],
-            'marker': d['marker'],
-            'data': list(d.filter(regex="\d+"))
-        }
-        for i, d in dataset.iterrows()
-    ]
-
     # Return dataset
     return dataset
+
+
+def experiment_fluorescences(experiment_id):
+    """Send experiment to frontend
+    """
+
+    # Get data
+    dataset = compute_fluorescences(experiment_id)
+
+    # Build json like dataset
+    return [{'result_id': d[1], 'well': d[2], 'sample': d[3], 'marker': d[4], 'data': list(d[5:])} for d in dataset.itertuples()]
+
+
+def maximum_gradient(experiment_id):
+    """Second order gradient maximum distribution
+    """
+
+    # Get fluorescences and initialize grad_
+    fluo_data = experiment_fluorescences(experiment_id)
+    max_grad = []
+
+    # Iterate over fluorescences and compute grad and cycle
+    for f in fluo_data:
+
+        # Compute second order gradient
+        grad_ = np.gradient(f['data'])
+
+        # Extract argmax
+        cycle = np.argmax(grad_)
+
+        # Add to dataset
+        max_grad.append({
+            'result_id': f['result_id'],
+            'sample': f['sample'],
+            'marker': f['marker'],
+            'cycle': int(cycle),
+            'maxgrad': float(grad_[cycle])
+        })
+
+    # Return max gradient
+    return max_grad
+
+
+def maximum_gradient_kde(experiment_id):
+    """Compute a Max Gradient KDE
+    """
+
+    # Get fluorescences
+    fluo_data = compute_fluorescences(experiment_id)
+
+    # Compute max gradients
+    fluo_data['max_grad'] = fluo_data.iloc[:, 5:].apply(lambda r: np.max(np.gradient(r)), axis=1)
+
+    # Initialize empty kde array
+    kdes = []
+
+    # Iterate over marker
+    for marker in fluo_data['marker'].unique():
+
+        # Filter dataset by marker
+        d_ = fluo_data[fluo_data['marker'] == marker]
+
+        # Transform data
+        d_ = np.array(d_['max_grad']).reshape(-1, 1)
+
+        # Compute KDE of d_
+        kde = KernelDensity(kernel='gaussian').fit(d_)
+
+        # Compute log densities
+        kde_estimates = np.exp(kde.score_samples(np.linspace(-5, 10, 100).reshape(-1, 1)))
+
+        # Save exp(log_densities) to kdes
+        kdes.append({'marker': marker, 'kde': list(kde_estimates)})
+
+    # Return dataset
+    return kdes
