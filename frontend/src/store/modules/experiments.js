@@ -2,80 +2,12 @@ import axios from 'axios'
 import Vue from 'vue'
 
 const state = {
-    LSCData: [
-        {
-            label: "2001232123M1",
-            x: 0.2, y: 0.7,
-            cluster: 0
-        },
-        {
-            label: "2001232123M1",
-            x: 0.4, y: 0.6,
-            cluster: 0
-        },
-        {
-            label: "2001232123M1",
-            x: 0.3, y: 0.7,
-            cluster: 0
-        },
-        {
-            label: "2001232123M1",
-            x: 0.4, y: 0.8,
-            cluster: 0
-        },
-        {
-            label: "2001232123M1",
-            x: 4, y: 2,
-            cluster: 1
-        },
-        {
-            label: "2001232123M1",
-            x: 4.2, y: 2.5,
-            cluster: 1
-        },
-        {
-            label: "2001232123M1",
-            x: 4.7, y: 2.2,
-            cluster: 1
-        },
-        {
-            label: "2001232123M1",
-            x: 3.8, y: 2.7,
-            cluster: 1
-        },
-        {
-            label: "2001232123M1",
-            x: 4.1, y: 2.6,
-            cluster: 1
-        },
-        {
-            label: "2001232121M1",
-            x: 1.1, y: 2.1,
-            cluster: 2
-        },
-        {
-            label: "2001232121M1",
-            x: 1.3, y: 2.2,
-            cluster: 2
-        },
-        {
-            label: "2001232121M1",
-            x: 1.2, y: 2.3,
-            cluster: 2
-        },
-        {
-            label: "2001232121M1",
-            x: 1.1, y: 1.9,
-            cluster: 2
-        },
-        {
-            label: "2001232121M1",
-            x: 1, y: 2.4,
-            cluster: 2
-        }
-    ],
-
-
+    currentViz: 0,
+    loadingPCA: false,
+    loadingMaxGrad: false,
+    loadingAmpPlot: false,
+    colorPalette: ["#009DDC", "#F26430", "#934B00", '#A997DF'],
+    errorLoadingExperiment: false
 }
 
 const mutations = {
@@ -131,8 +63,28 @@ const mutations = {
         Vue.set(state, 'currentExperimentFluorescences', results)
     },
 
-    'AVAILABLE_MARKERS'(state, markers) {
-        Vue.set(state, 'availableMarkers', markers)
+    'SET_EXPERIMENT_PCA'(state, pca) {
+        Vue.set(state, 'experimentPCA', pca)
+    },
+
+    'SET_EXPERIMENT_MAXGRAD'(state, maxGrad) {
+        Vue.set(state, 'experimentMaxGrad', maxGrad)
+    },
+
+    TOGGLE_LOADING_FLUORESCENCES(state) {
+        Vue.set(state, 'loadingAmpPlot', !state.loadingAmpPlot)
+    },
+
+    TOGGLE_LOADING_MAXGRAD(state) {
+        Vue.set(state, 'loadingMaxGrad', !state.loadingMaxGrad)
+    },
+
+    TOGGLE_LOADING_PCA(state) {
+        Vue.set(state, 'loadingPCA', !state.loadingPCA)
+    },
+
+    ERROR_LOADING_PCAKMeans(state, error) {
+        Vue.set(state, 'errorLoadingExperiment', error)
     }
 }
 
@@ -152,23 +104,43 @@ const actions = {
         })
     },
 
-    async getMarkers({ commit }) {
-        await axios.get("api/v1/markers").then(res => {
-            commit('AVAILABLE_MARKERS', res.data.markers);
-        });
+    loadCurrentExperimentPCA({ commit, getters }) {
+        commit('TOGGLE_LOADING_PCA');
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/pca`)
+            .then(res => {
+                commit('SET_EXPERIMENT_PCA', res.data);
+                commit('TOGGLE_LOADING_PCA')
+            })
+            .catch(() => {
+                commit('ERROR_LOADING_PCAKMeans', true)
+                commit('TOGGLE_LOADING_PCA')
+            })
     },
 
-    loadCurrentExperimentResults({ commit, getters }) {
-        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/results`).then(res => {
-            commit('SET_EXPERIMENT_RESULTS', res.data)
+    loadCurrentExperimentMaxGrad({ commit, getters }) {
+        commit('TOGGLE_LOADING_MAXGRAD');
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/maxgrad`).then(res => {
+            commit('SET_EXPERIMENT_MAXGRAD', res.data);
+            commit('TOGGLE_LOADING_MAXGRAD');
         })
     },
 
     loadCurrentExperimentFluorescences({ commit, getters }) {
+        commit('TOGGLE_LOADING_FLUORESCENCES');
         axios.get(`api/v1/experiments/${getters.currentExperiment.id}/fluorescences`).then(res => {
             commit('SET_EXPERIMENT_FLUORESCENCES', res.data.fluorescence_data)
+            commit('TOGGLE_LOADING_FLUORESCENCES');
+
         })
     },
+
+    loadCurrentExperimentResults({ commit, getters }) {
+        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/results`).then(res => {
+            commit('SET_EXPERIMENT_RESULTS', res.data);
+
+        })
+    },
+
 
     selectExperiment({ commit }, experiment) {
         commit('SELECT_EXPERIMENT', experiment);
@@ -212,6 +184,12 @@ const actions = {
             .then(res => {
                 commit('EXPERIMENTS_QUERY', res.data.results)
             })
+    },
+
+    async getExperiment({ commit }, param) {
+        await axios.get(`api/v1/experiments/${param.experimentID}`).then(res => {
+            commit('SELECT_EXPERIMENT', res.data.experiment)
+        })
     },
 
     deleteCurrentExperiment({ commit, getters }) {
@@ -268,15 +246,48 @@ const getters = {
         return state.currentExperimentFluorescences
     },
 
-    availableMarkers(state) {
-        return state.availableMarkers ? state.availableMarkers.map(m => {
-            return { value: m[0], text: m[1] };
-        }) : null
+    experimentPCA(state) {
+        return state.experimentPCA ? state.experimentPCA : null
     },
 
-    LSCData(state) {
-        return state.LSCData
+    errorLoadingExperiment(state) {
+        return state.errorLoadingExperiment
     },
+
+    experimentMaxGrad(state) {
+        return state.experimentMaxGrad ? state.experimentMaxGrad : null
+    },
+
+    loadingPCA(state) {
+        return state.loadingPCA
+    },
+
+    loadingAmpPlot(state) {
+        return state.loadingAmpPlot
+    },
+
+    loadingMaxGrad(state) {
+        return state.loadingMaxGrad
+    },
+
+    markerColor(state, getters) {
+
+        if (getters.experimentMaxGrad) {
+
+            // Unique markers and colors
+            const uniqueExperimentMarkers = [...new Set(getters.experimentMaxGrad.map(el => { return el.marker }))]
+
+            // Generate Map with colors
+            let cArray = {}
+
+            // Iterate over markers
+            uniqueExperimentMarkers.forEach((key, i) => cArray[key] = state.colorPalette[i]);
+
+            // Return color array 
+            return cArray
+        }
+        else return []
+    }
 
 }
 

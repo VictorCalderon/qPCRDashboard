@@ -2,19 +2,13 @@ import axios from 'axios'
 import Vue from 'vue'
 
 const state = {
-    mapCenter: [19.007237, -70.41502],
-    markerSize: 50,
-    markerOpacity: 0.8,
     samplingSites: [],
     briefingData: {},
     ampPercData: null,
-    tagDistribution: null
+    tagDistribution: null,
 }
 
 const mutations = {
-    SET_MAP_CENTER(state, newCenter) {
-        Vue.set(state, 'mapCenter', newCenter);
-    },
 
     SET_SAMPLING_SITE_COORDINATES(state, samplingSites) {
         Vue.set(state, 'samplingSites', samplingSites)
@@ -30,14 +24,6 @@ const mutations = {
 
     SET_TAG_DISTRIBUTION(state, tagDistribution) {
         Vue.set(state, 'tagDistribution', tagDistribution)
-    },
-
-    SET_MAP_MARKER_SIZE(state, markerSize) {
-        Vue.set(state, 'markerSize', markerSize);
-    },
-
-    SET_MAP_MARKER_OPACITY(state, markerOpacity) {
-        Vue.set(state, 'markerOpacity', markerOpacity);
     },
 }
 
@@ -66,18 +52,6 @@ const actions = {
         )
     },
 
-    updateMapCenter({ commit }, newCenter) {
-        commit('SET_MAP_CENTER', newCenter)
-    },
-
-    updateMarkerSize({ commit }, markerSize) {
-        commit('SET_MAP_MARKER_SIZE', markerSize)
-    },
-
-    updateMarkerOpacity({ commit }, markerOpacity) {
-        commit('SET_MAP_MARKER_OPACITY', markerOpacity)
-    },
-
     updateSamplingSites({ commit }) {
         axios.get('api/v1/dashboard/locatedsamples').then(
             res => {
@@ -85,23 +59,11 @@ const actions = {
             }
         )
 
-    }
+    },
 }
 
 
 const getters = {
-    mapCenter(state) {
-        return state.mapCenter
-    },
-
-    markerSize(state) {
-        return state.markerSize
-    },
-
-    markerOpacity(state) {
-        return state.markerOpacity
-    },
-
     samplingSites(state) {
         return state.samplingSites
     },
@@ -116,7 +78,7 @@ const getters = {
 
     tagDistribution() {
         return state.tagDistribution
-    }
+    },
 }
 
 

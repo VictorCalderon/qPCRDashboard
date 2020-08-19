@@ -2,20 +2,15 @@ import axios from 'axios'
 import Vue from 'vue'
 
 const state = {
-    sampleModifiedSignal: false,
     currentSample: [],
     queriedSamples: [],
-    sampleLocationSchemas: null,
+    sampleModifiedSignal: false,
 }
 
 const mutations = {
 
     'LOAD_SAMPLES'(state, allSamples) {
         Vue.set(state, 'allSamples', allSamples)
-    },
-
-    'UPDATE_SAMPLE_LOCATION_SCHEMAS'(state, allSchemas) {
-        Vue.set(state, 'sampleLocationSchemas', allSchemas)
     },
 
     'LOAD_NEXT_SAMPLES'(state, nextUrl) {
@@ -38,20 +33,20 @@ const mutations = {
         Vue.set(state, 'currentSample', sample)
     },
 
-    'LOAD_SAMPLE_Fluorescences'(state, fluorescences) {
-        Vue.set(state, 'currentSampleFluorescences', fluorescences)
-    },
-
     'ADD_SAMPLE_RESULT'(state, result) {
         state.currentSample.result = result
     },
 
-    'SAMPLES_FILTER'(state, filter) {
-        Vue.set(state, 'filter', filter)
+    'SAMPLES_FILTER'(state, sampleFilter) {
+        Vue.set(state, 'filter', sampleFilter)
     },
 
-    'TABLE_FILTER'(state, filter) {
-        Vue.set(state, 'filter', filter)
+    'TABLE_SAMPLE_FILTER'(state, sampleFilter) {
+        Vue.set(state, 'sampleFilter', sampleFilter)
+    },
+
+    'TABLE_MARKER_FILTER'(state, markerFilter) {
+        Vue.set(state, 'markerFilter', markerFilter)
     },
 
     'SAMPLE_MODIFIED'(state) {
@@ -64,25 +59,6 @@ const mutations = {
 }
 
 const actions = {
-
-    getSampleLocationSchemas({ commit }) {
-        axios.get('api/v1/dashboard/samplelocation').then(res => {
-            commit('UPDATE_SAMPLE_LOCATION_SCHEMAS', res.data)
-        })
-    },
-
-    updateSampleLocationSchemas({ commit }, schema) {
-        axios.post('api/v1/dashboard/samplelocation', schema).then(() => {
-            commit('SAMPLE_MODIFIED');
-        })
-    },
-
-    deleteSampleLocationSchema({ commit }, schema_id) {
-        axios.delete(`api/v1/dashboard/samplelocation/${schema_id}`).then(() => {
-            commit('SAMPLE_MODIFIED');
-        })
-    },
-
     loadSamples({ commit }) {
         axios.get('api/v1/samples', {
         }).then(res => {
@@ -94,16 +70,6 @@ const actions = {
 
     selectSample({ commit }, sample) {
         commit('SELECT_SAMPLE', sample);
-    },
-
-    loadCurrentSamples({ getters, commit }) {
-        if (!getters.currentExperiment) return void 0;
-        axios.get(`api/v1/experiments/${getters.currentExperiment.id}/samples`, {
-        }).then(
-            res => {
-                commit('LOAD_CURRENT_SAMPLES', res.data.samples)
-            }
-        );
     },
 
     loadCurrentTable({ getters, commit }) {
@@ -124,12 +90,16 @@ const actions = {
         }).then(res => { return res.msg })
     },
 
-    filterSamples({ commit }, filter) {
-        commit('SAMPLES_FILTER', filter)
+    filterSamples({ commit }, sampleFilter) {
+        commit('SAMPLES_FILTER', sampleFilter)
     },
 
-    filterTable({ commit }, filter) {
-        commit('TABLE_FILTER', filter)
+    modifySampleFilter({ commit }, sampleFilter) {
+        commit('TABLE_SAMPLE_FILTER', sampleFilter);
+    },
+
+    modifyMarkerFilter({ commit }, markerFilter) {
+        commit('TABLE_MARKER_FILTER', markerFilter);
     },
 
     querySamples({ commit }, params) {
@@ -144,10 +114,6 @@ const actions = {
 const getters = {
     allSamples(state) {
         return state.allSamples
-    },
-
-    sampleLocationSchemas(state) {
-        return state.sampleLocationSchemas
     },
 
     currentSamples(state) {
@@ -168,16 +134,16 @@ const getters = {
         return state.sampleModifiedSignal
     },
 
-    filteredSamples(state) {
-        return state.filter
-            ? state.currentSamples.filter(sample => sample.sample.includes(state.filter))
-            : state.currentSamples;
-    },
-
     filteredTable(state) {
-        return state.filter
-            ? state.currentTable.filter(result => result.sample.includes(state.filter))
-            : state.currentTable;
+
+        // Filter samples
+        const sTable = state.sampleFilter ? state.currentTable.filter(result => result.sample.includes(state.sampleFilter)) : state.currentTable;
+
+        // Filter markers
+        const mTable = state.markerFilter ? sTable.filter(result => result.marker == state.markerFilter) : sTable
+
+        // Return table
+        return mTable
     },
 
     queriedSamples(state) {
@@ -185,8 +151,8 @@ const getters = {
     },
 
     currentTable(state) {
-        return state.currentTable ? state.currentTable : null
-    }
+        return state.currentTable ? state.currentTable : []
+    },
 }
 
 
