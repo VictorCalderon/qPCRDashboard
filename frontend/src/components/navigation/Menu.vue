@@ -18,35 +18,24 @@
         </b-navbar-nav>
 
         <b-navbar-nav class="ml-auto">
-          <b-nav-item-dropdown
-            text="Options"
-            right
+          <b-nav-item
+            v-b-modal.add-experiments-modal
             v-if="this.$route.name == 'Experiments' && allExperiments"
           >
-            <b-dropdown-item v-b-modal.add-experiments-modal>
-              <i class="fas fa-plus text-dark"></i>&nbsp;
-              <span class="text-dark">Add</span>
-            </b-dropdown-item>
-            <b-dropdown-item v-b-modal.search-experiments-modal>
-              <i class="fas fa-search text-dark"></i>&nbsp;
-              <span class="text-dark">Search</span>
-            </b-dropdown-item>
-            <b-dropdown-item v-b-modal.edit-experiments-modal v-if="currentExperiment">
-              <i class="far fa-edit text-dark"></i>&nbsp;
-              <span class="text-dark">Edit</span>
-            </b-dropdown-item>
-          </b-nav-item-dropdown>
-          <b-nav-item-dropdown right>
-            <!-- Using 'button-content' slot -->
-            <template v-slot:button-content>User</template>
-            <b-dropdown-item href="#">
-              <i class="fas fa-user"></i>
-              &nbsp;{{ currentUser }}
-            </b-dropdown-item>
-            <b-dropdown-item href="#" @click="logOut">
-              <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
-            </b-dropdown-item>
-          </b-nav-item-dropdown>
+            <span>
+              <i class="fas fa-plus"></i>&nbsp;Add
+            </span>
+          </b-nav-item>
+          <b-nav-item
+            v-b-modal.search-experiments-modal
+            v-if="this.$route.name == 'Experiments' && allExperiments"
+          >
+            <i class="fas fa-search"></i>&nbsp;
+            <span class>Search</span>
+          </b-nav-item>
+          <b-nav-item @click="logOut">
+            <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
+          </b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
