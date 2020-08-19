@@ -8,8 +8,8 @@
     class="m-2"
     v-if="targetGroups"
   >
-    <b-tooltip target="add-group" triggers="hover" placement="left" variant="info">
-      Group names can be alpha-numerical.
+    <b-tooltip target="add-group" triggers="hover" placement="top" variant="info">
+      Group targets can be alpha-numerical.
       Groups cluster your amplified genes into a single category.
       <br />e.g.: Marker ORF1ab will belong to SARS-CoV-2 surveillance group.
     </b-tooltip>
@@ -60,12 +60,12 @@
           ></b-form-input>
         </b-col>
         <b-col cols="3" class="my-1">
-          <label for="group-name">Group Name</label>
+          <label for="group-target">Group Name</label>
           <b-form-input
-            id="group-name"
+            id="group-target"
             aria-label="GroupName"
             placeholder="SARS-CoV-2"
-            v-model="newGroup.name"
+            v-model="newGroup.target"
             class="text-center"
             size="sm"
           ></b-form-input>
@@ -131,7 +131,7 @@
           <template v-slot:head(id)>
             <span>Group ID</span>
           </template>
-          <template v-slot:head(group_name)>
+          <template v-slot:head(group_target)>
             <span>Group Name</span>
           </template>
         </b-table>
@@ -183,11 +183,11 @@ export default {
       visible: false,
       modification: false,
       selectedGroup: null,
-      fields: ["key", "name", "description"],
+      fields: ["key", "target", "description"],
       newGroup: {
         id: null,
         key: null,
-        name: null,
+        target: null,
         description: null,
       },
       groups: []
@@ -205,10 +205,10 @@ export default {
     addGroup() {
       // Check if group is present
       const keys = this.groups.filter(s => s.key == this.newGroup.key);
-      const names = this.groups.filter(g => g.name == this.newGroup.name)
+      const targets = this.groups.filter(g => g.target == this.newGroup.target)
 
       // Add if condition is met
-      if (keys.length > 0 || names.length > 0) {
+      if (keys.length > 0 || targets.length > 0) {
         alert("ID or Group Name already in use!");
       }
 
@@ -223,8 +223,11 @@ export default {
       // Clear id
       this.newGroup.key = null;
 
-      // Clear location
-      this.newGroup.name = null;
+      // Clear target
+      this.newGroup.target = null;
+
+      // Clear description
+      this.newGroup.description = null;
     },
 
     toggleModifyGroup() {
@@ -250,6 +253,11 @@ export default {
       // Toggle add groups
       this.modification = false;
       this.visible = !this.visible;
+
+      // Hide tooltip
+      if (this.visible) {
+        this.$root.$emit("bv::hide::tooltip", "add-group");
+      }
     },
 
     saveGroup() {
@@ -287,7 +295,7 @@ export default {
     },
 
     formReady() {
-      if ( this.newGroup.key && this.newGroup.name ) {
+      if ( this.newGroup.key && this.newGroup.target ) {
         return true;
       } else return false;
     }
@@ -305,7 +313,9 @@ export default {
 
     selectedGroup() {
       this.newGroup = { ...this.selectedGroup };
-    }
+    },
+
+
   }
 };
 </script>

@@ -84,20 +84,20 @@
             </b-form-row>
           </b-popover>
         </b-col>
-        <!-- <b-col class="my-0 py-0">
+        <b-col class="my-0 py-0">
           <b-button
             class="text-dark border"
             variant="light"
-            @click="modifySample"
+            v-b-modal.edit-experiments-modal
             id="modify-sample"
             size="md"
             v-b-tooltip.hover.top
-            title="Edit selected sample"
+            title="Edit experiment"
             :disabled="!sampleSelected"
           >
             <i class="fas fa-pencil-alt"></i>
           </b-button>
-        </b-col>-->
+        </b-col>
         <b-col class="my-0 py-0">
           <b-button
             class="text-dark border"
@@ -143,6 +143,12 @@
               :style="{color: data.item.score < 0.75 ? data.item.score < 0.25 ? '#CC2936' : '#F2BB05' : '#124E78' }"
             >{{ data.item.score }}</b>
           </template>
+
+          <template v-slot:cell(amp_status)="data">
+            <b
+              :style="{color: data.item.cq != 0 ? '#124E78' : '#CC2936' }"
+            >{{ data.item.cq != 0 ? 'Yes' : 'No' }}</b>
+          </template>
         </b-table>
       </b-col>
     </b-form-row>
@@ -164,8 +170,9 @@ export default {
       fields: [
         { key: "sample", sortable: true, label: "Sample Name" },
         { key: "marker", sortable: true },
+        { key: "amp_status", sortable: false, label: 'Amplified'},
         { key: "cq", sortable: true },
-        { key: "score", sortable: true },
+        // { key: "score", sortable: true },
       ]
     };
   },
