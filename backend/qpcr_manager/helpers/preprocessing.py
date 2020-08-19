@@ -413,58 +413,6 @@ def get_experiment_results(experiment_id):
     return results_df
 
 
-def experiment_statistics(experiment_id, current_user):
-    """Analyze experiment
-    """
-
-    # Write query
-    query = f"""
-    SELECT sample, marker, amp_status, amp_cq FROM samples
-    JOIN experiments on samples.experiment_id = experiments.id
-    JOIN results on results.sample_id = samples.id
-    JOIN markers on results.marker_id = markers.id
-    WHERE experiments.user_id = {current_user.id} AND experiments.id = {experiment_id}
-    """
-
-    # Run query on pandas
-    results = pd.read_sql(query, db.session.bind)
-
-    # Build extended Cq dataframe
-    results_df = results.pivot_table(
-        index='sample', columns='marker', values='amp_cq').reset_index()
-
-    amped_df = results.pivot_table(
-        index='sample', columns='marker', values='amp_status').to_dict('list')
-
-    # Remove controls
-    results_df = results_df.dropna()
-
-    # Get samples
-    samples = list(results_df.pop('sample'))
-
-    # Build PCA pipeline
-    pipe = Pipeline([('scaler', StandardScaler()),
-                     ('reducer', PCA(n_components=2))])
-
-    # Process cq matrix
-    pca = pipe.fit_transform(results_df)
-
-    # Add PCA components to dataframe
-    results_df['PCA 1'] = np.round(pca[:, 0], 4)
-    results_df['PCA 2'] = np.round(pca[:, 1], 4)
-
-    # [SUGGESTION] preprocessing.py Find a better way of dealing with this
-    cq_raw = results_df.to_dict('list')
-
-    # Count amplifications
-    amp_status = results.groupby('marker')['amp_status'].agg([np.mean, np.sum]).reset_index().to_dict('records')
-    amped_cq = results[results['amp_status'] > 0]
-    amped_cq = amped_cq.groupby('marker')['amp_cq'].agg([np.mean, np.std]).reset_index().to_dict('records')
-
-    # Jsonify results
-    return {'samples': samples, 'cq_raw': cq_raw, 'amp_status': amp_status, 'amped_cq': amped_cq, 'amp_raw': amped_df}
-
-
 def available_markers():
     """Return a list of all available markers
     """
@@ -532,7 +480,7 @@ def amp_stat_data():
 
     # Build query
     query = f"""
-    SELECT experiments.name, date, sample, target_id, targets.name as target, amp_cq FROM samples
+    SELECT experiments.name, date, samples.id, target, amp_cq FROM samples
     JOIN experiments on experiments.id = samples.experiment_id
     JOIN results on results.sample_id = samples.id
     JOIN markers on results.marker_id = markers.id
@@ -549,8 +497,8 @@ def amp_stat_data():
     # Parse date as datetime
     dataset['date'] = pd.to_datetime(dataset['date'])
 
-    # Group by date and target_id and calculate amplification (binary mean) percentages
-    dataset = dataset.groupby(['date', 'target_id', 'target'])['amp_status'].mean().reset_index()
+    # Group by date and target and calculate amplification (binary mean) percentages
+    dataset = dataset.groupby(['date', 'target'])['amp_status'].mean().reset_index()
 
     # Parse dates
     dataset['day'] = dataset['date'].dt.day
@@ -579,9 +527,6 @@ def amp_stat_data():
 
     # Use last iteration day-month column
     return {'dates': df['day-month'].to_list(), 'datasets': datasets}
-
-    # # Send data
-    # return dataset.to_json('records')
 
 
 def amp_stat_data_2():
