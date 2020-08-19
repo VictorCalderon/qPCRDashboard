@@ -29,6 +29,7 @@ import axios from 'axios'
 
 // Set basic URL
 axios.defaults.baseURL = 'http://localhost:5000/'
+axios.defaults.headers['Content-Type'] = 'application/json'
 
 // Set token interceptor
 axios.interceptors.request.use(config => {
