@@ -12,9 +12,9 @@
 
       <b-form-row class="mx-0">
         <b-col>
-          <keep-alive>
-            <router-view />
-          </keep-alive>
+          <!-- <keep-alive> -->
+          <router-view />
+          <!-- </keep-alive> -->
         </b-col>
       </b-form-row>
     </div>
