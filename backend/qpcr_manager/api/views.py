@@ -19,36 +19,39 @@ api.add_resource(ExperimentList, "/experiments")
 api.add_resource(ExperimentResource, "/experiments/<int:experiment_id>")
 api.add_resource(LastExperimentResource, "/experiments/lastexperiment")
 
-# Single Experiment utilities
+# Single Experiment utilities and data preprocessing
+api.add_resource(ExperimentPCA, "/experiments/<int:experiment_id>/pca")
+api.add_resource(ExperimentMaxGradient, "/experiments/<int:experiment_id>/maxgrad")
 api.add_resource(ExperimentsQuery, "/experiments/query")
 api.add_resource(ExperimentResults, "/experiments/<int:experiment_id>/results")
 api.add_resource(ExperimentSamplesList, "/experiments/<int:experiment_id>/samples")
 api.add_resource(ExperimentSampleTable, "/experiments/<int:experiment_id>/table")
 api.add_resource(ExperimentFluorescenceList, "/experiments/<int:experiment_id>/fluorescences")
 
-
 # Single and multiple records queries for qpcrs
 api.add_resource(SampleList, "/samples")
 api.add_resource(SampleResource, "/samples/<int:sample_id>")
-api.add_resource(SampleFluorescenceResource, "/samples/<int:sample_id>/fluorescences")
 api.add_resource(SamplesQuery, "/samples/query")
 
 # Import/Export functionality for experiments
-api.add_resource(ImportExperiment, '/experiments/import')
-api.add_resource(ExportExperiment, '/experiments/export/<int:experiment_id>')
+api.add_resource(ImportExperiment, "/experiments/import")
 
 # Simple and multiple records queries for Sample Location
-api.add_resource(LocationList, '/dashboard/samplelocation')
-api.add_resource(LocationResource, '/dashboard/samplelocation/<int:location_id>')
+api.add_resource(LocationList, "/dashboard/samplelocation")
+api.add_resource(LocationResource, "/dashboard/samplelocation/<int:location_id>")
+
+# Simple and multiple record queries for Markers
+api.add_resource(MarkerList, "/adjustments/markers")
+
+# Simple and multiple records queries for Target Groups
+api.add_resource(TargetList, "/adjustments/targetgroups")
+api.add_resource(TargetResource, "/adjustments/targetgroups/<int:target_id>")
 
 # Amplification time series and other dashboard data
-# api.add_resource(AmplificationTimeSeriesResource, "/timeseries")
-# api.add_resource(MarkerSpecificDataset, "/dataset")
-# api.add_resource(MarkerList, '/markers')
-api.add_resource(ProjectBrief, '/dashboard/briefing')
-api.add_resource(AmpStatData, '/dashboard/ampstatdata')
-api.add_resource(TagDistribution, '/dashboard/tagdistrib')
-api.add_resource(LocatedSamples, '/dashboard/locatedsamples')
+api.add_resource(ProjectBrief, "/dashboard/briefing")
+api.add_resource(AmpStatData, "/dashboard/ampstatdata")
+api.add_resource(TagDistribution, "/dashboard/tagdistrib")
+api.add_resource(LocatedSamples, "/dashboard/locatedsamples")
 
 
 @blueprint.before_app_first_request
