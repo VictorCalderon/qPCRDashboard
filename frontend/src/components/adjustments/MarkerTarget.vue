@@ -134,7 +134,7 @@ export default {
 
     targetGroupOptions() {
       if (this.targetGroups) {
-        return [{'text': 'Select group', 'value': null }, ...this.targetGroups.map(t => { return { "text": t.name, "value": t.id }})]
+        return [{'text': 'Select group', 'value': null }, ...this.targetGroups.map(t => { return { "text": t.target, "value": t.id }})]
       }
       else return [ {'text': 'No Groups Available', 'value': null} ]
     }
