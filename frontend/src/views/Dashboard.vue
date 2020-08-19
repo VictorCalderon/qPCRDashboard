@@ -7,7 +7,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Amplification Percetange by Marker"
+              header="Detection Percetange by Target Group"
               header-bg-variant="dark"
               header-text-variant="white"
               class="m-2"
