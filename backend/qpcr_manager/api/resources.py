@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, current_user
 
@@ -273,29 +273,15 @@ class ExperimentsQuery(Resource):
         return paginate(query, schema)
 
 
-class ExportExperiment(Resource):
-    """Export experiment data and results as a csv file
-    """
+class MarkerSchema(ma.SQLAlchemyAutoSchema):
 
-    method_decorators = [jwt_required]
+    id = ma.Int(dump_only=True)
+    marker = ma.String(required=True)
+    target_id = ma.String(required=True)
 
-    def get(self, experiment_id):
-        """Get all sample from a sigle experiment
-        """
-
-        # Define parameters
-        sep = request.args.get('sep', ',')
-        columns = request.args.get('columns', None)
-
-        # Parse columns
-        if columns:
-            columns = columns.split(',')
-
-        # Result file
-        result_file = export_results(experiment_id, current_user, params={'sep': sep, 'columns': columns})
-
-        # Return response
-        return {'file': result_file}
+    class Meta:
+        model = Marker
+        sqla_session = db.session
 
 
 class MarkerList(Resource):
@@ -305,10 +291,42 @@ class MarkerList(Resource):
     method_decorators = [jwt_required]
 
     def get(self):
-        """All markers resource
-        """
+        """All markers resource"""
 
-        return {'markers': available_markers(current_user)}
+        # Get available markers
+        return available_markers()
+
+    def post(self):
+        """Modify markers"""
+
+        # Load schema
+        schema = MarkerSchema(many=True)
+
+        # Check if already in database
+        old_markers = request.json.get('markers', None)
+
+        if old_markers:
+
+            # Iterate over markers
+            for marker in old_markers:
+
+                # Search for old Marker
+                marker_ = Marker.query.get_or_404(marker.pop('id'))
+
+                # Run modifications
+                for k, v in marker.items():
+                    setattr(marker_, k, v)
+
+                # Commit modifications
+                db.session.add(marker_)
+                db.session.commit()
+
+            return {"msg": "markers modified", "markers": schema.dump(old_markers)}, 201
+
+        else:
+
+            # No markers sent
+            return {"msg": "No markers sent"}, 400
 
 
 class AmplificationTimeSeriesResource(Resource):
@@ -421,91 +439,6 @@ class SamplesQuery(Resource):
         return query_samples(current_user, sample)
 
 
-class ExperimentSamplesList(Resource):
-    """Get all samples from a certain experiment
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self, experiment_id):
-        schema = SampleSchema(many=True)
-        samples = Sample.query.filter_by(
-            experiment_id=experiment_id).order_by('id')
-        return {'samples': schema.dump(samples)}
-
-
-class ExperimentFluorescenceList(Resource):
-    """Get patients fluorescence data
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self, experiment_id):
-        """Get a single patient's raw Fluorescence data
-        """
-        fluorescence_data = experiment_fluorescences(experiment_id)
-        return {'fluorescence_data': fluorescence_data}
-
-
-class ExperimentSampleTable(Resource):
-    """Get all samples from an experiment with their results
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self, experiment_id):
-        """Get samples from experiment"""
-
-        return {'samples': sample_table(experiment_id)}
-
-
-class SampleFluorescenceResource(Resource):
-    """Get patients Fluorescence data
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self, sample_id):
-        """Get a single patient's raw Fluorescence data
-        """
-        fluorescence_data = query_fluorescence(sample_id)
-        return {'fluorescence_data': fluorescence_data}
-
-
-class ProjectBrief(Resource):
-    """Get Project Briefing of amount of experiments and samples performed
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self):
-        """Return a two element list with total experiments and samples processed by mode (daily: 1, all-time: 0)
-        """
-        return get_brief()
-
-
-class AmpStatData(Resource):
-    """Get amplification data from experiments
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self):
-        """Time-based amplification status from each sample"""
-
-        return amp_stat_data()
-
-
-class TagDistribution(Resource):
-    """Get tag distribution from experiments
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self):
-        return tag_distrib()
-
-
 class LocationSchema(ma.SQLAlchemyAutoSchema):
 
     id = ma.Int(dump_only=True)
@@ -567,6 +500,81 @@ class LocationList(Resource):
             return {"msg": "location created", "location": schema.dump(location)}, 201
 
 
+class TargetSchema(ma.SQLAlchemyAutoSchema):
+
+    id = ma.Int(dump_only=True)
+    name = ma.String(required=True)
+    key = ma.String(required=True)
+    description = ma.String(required=True)
+
+    class Meta:
+        model = Target
+        sqla_session = db.session
+
+
+class TargetList(Resource):
+    """Sample target modification and multiple entries query
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        schema = TargetSchema(many=True)
+        targets = Target.query.filter_by(user_id=current_user.id).order_by('id')
+        return schema.dump(targets)
+
+    def post(self):
+
+        # Load schema
+        schema = TargetSchema()
+
+        # Check if already in database
+        old_id = request.json.get('id', None)
+
+        if old_id:
+
+            # Get target
+            target = Target.query.get_or_404(old_id)
+
+            # Run modifications
+            for k, v in request.json.items():
+                setattr(target, k, v)
+
+            # Commit modification
+            db.session.add(target)
+            db.session.commit()
+
+            return {"msg": "target modified", "target": schema.dump(target)}, 201
+
+        else:
+
+            # Target schema
+            target = Target(**request.json)
+
+            # Add user
+            target.user_id = current_user.id
+
+            db.session.add(target)
+            db.session.commit()
+
+            return {"msg": "target created", "target": schema.dump(target)}, 201
+
+
+class TargetResource(Resource):
+    """Single resource for targets
+    """
+
+    def delete(self, target_id):
+
+        # Run delete
+        target = Target.query.get_or_404(target_id)
+        db.session.delete(target)
+        db.session.commit()
+
+        # Return message
+        return {"msg": "target deleted"}, 204
+
+
 class LocationResource(Resource):
     """ Single resource for locations
     """
@@ -578,7 +586,7 @@ class LocationResource(Resource):
         db.session.delete(location)
         db.session.commit()
 
-        return {"msg": "location deleted"}, 201
+        return {"msg": "location deleted"}, 204
 
 
 class LocatedSamples(Resource):
@@ -598,13 +606,116 @@ class LocatedSamples(Resource):
         return located_samples
 
 
+class ExperimentSamplesList(Resource):
+    """Get all samples from a certain experiment
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        schema = SampleSchema(many=True)
+        samples = Sample.query.filter_by(
+            experiment_id=experiment_id).order_by('id')
+        return {'samples': schema.dump(samples)}
+
+
+class ExperimentFluorescenceList(Resource):
+    """Get patients fluorescence data
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        """Get a single patient's raw Fluorescence data
+        """
+        fluorescence_data = experiment_fluorescences(experiment_id)
+        return {'fluorescence_data': fluorescence_data}
+
+
+class ExperimentSampleTable(Resource):
+    """Get all samples from an experiment with their results
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        """Get samples from experiment"""
+
+        return {'samples': sample_table(experiment_id)}
+
+
+class ExperimentMaxGradient(Resource):
+    """Compute the maximum gradient and respective cycle of a project
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        """Get grads and cycles
+        """
+
+        return maximum_gradient(experiment_id)
+
+
+class ProjectBrief(Resource):
+    """Get Project Briefing of amount of experiments and samples performed
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Return a two element list with total experiments and samples processed by mode (daily: 1, all-time: 0)
+        """
+        return get_brief()
+
+
+class AmpStatData(Resource):
+    """Get amplification data from experiments
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        """Time-based amplification status from each sample"""
+
+        return jsonify(amp_stat_data())
+
+
+class ExperimentPCA(Resource):
+    """Experiment results PCA based on amplification cycle
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, experiment_id):
+        """Principal Component Analysis of Threshold Cycle data
+        """
+
+        try:
+            return experiment_pca_kmeans(experiment_id)
+
+        except:
+            raise RuntimeError('ExperimentPCA analysis failed.')
+
+
+class TagDistribution(Resource):
+    """Get tag distribution from experiments
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        return tag_distrib()
+
+
 # Wilcard export overwrite
 __all__ = [
     'UserResource', 'UserList',
     'ExperimentResource', 'ExperimentList', 'LastExperimentResource',
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
-    'SampleResource', 'SampleList', 'SampleFluorescenceResource', 'SamplesQuery',
-    'ImportExperiment', 'ExportExperiment', 'AmplificationTimeSeriesResource',
+    'SampleResource', 'SampleList', 'SamplesQuery', 'ExperimentPCA',
+    'ImportExperiment', 'AmplificationTimeSeriesResource',
     'MarkerList', 'MarkerSpecificDataset', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
-    'LocatedSamples', 'LocationList', 'LocationResource', 'ExperimentSampleTable', 'ExperimentFluorescenceList'
+    'LocatedSamples', 'LocationList', 'LocationResource', 'ExperimentSampleTable', 'ExperimentFluorescenceList',
+    'TargetList', 'TargetResource', 'ExperimentMaxGradient'
 ]
