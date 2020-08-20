@@ -180,10 +180,10 @@ export default {
   methods: {
     downloadSampleTable() {
       // Make sure the table has content
-      if (this.currentTable.length > 1) {
+      if (this.filteredTable.length > 1) {
         // Generate csv
-        let file = [...this.currentTable.map(sample => { return Object.values(sample).slice(1, -1).join(',')})];
-        const header = [...Object.keys(this.currentTable[0]).slice(1, -1)];
+        let file = [...this.filteredTable.map(sample => { return Object.values(sample).slice(1, -1).join(',')})];
+        const header = [...Object.keys(this.filteredTable[0]).slice(1, -1)];
 
         // Add header
         file.unshift(header.join(','));
