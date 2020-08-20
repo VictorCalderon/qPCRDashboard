@@ -8,7 +8,7 @@
         <input
           type="text"
           id="inputUsername"
-          class="form-control text-center"
+          class="form-control text-center mb-1"
           placeholder="Username"
           required
           autofocus
