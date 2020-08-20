@@ -16,10 +16,10 @@
 
     <template v-slot:header>
       <b-form-row class="justify-content-center mb-0">
-        <b-col cols="8" offset="2">
+        <b-col cols="9" offset="0">
           <h6 class="mb-0 mt-2">Target Groups Configuration</h6>
         </b-col>
-        <b-col cols="1" class="ml-auto" v-if="!visible">
+        <b-col cols="2" class="ml-auto" v-if="!visible">
           <b-button
             id="add-group"
             block
@@ -32,7 +32,7 @@
             <i class="fas fa-plus-square"></i>
           </b-button>
         </b-col>
-        <b-col cols="1" class="ml-auto" v-if="visible">
+        <b-col cols="2" class="ml-auto" v-if="visible">
           <b-button
             block
             variant="secondary"
@@ -48,18 +48,7 @@
     </template>
     <b-collapse id="group-form" v-model="visible">
       <b-form-row class="justify-content-center">
-        <b-col cols="2" class="my-1">
-          <label for="group-key">ID</label>
-          <b-form-input
-            id="group-key"
-            aria-label="Key"
-            placeholder="001"
-            v-model="newGroup.key"
-            class="text-center"
-            size="sm"
-          ></b-form-input>
-        </b-col>
-        <b-col cols="3" class="my-1">
+        <b-col cols="5" class="mt-1">
           <label for="group-target">Group Name</label>
           <b-form-input
             id="group-target"
@@ -70,7 +59,7 @@
             size="sm"
           ></b-form-input>
         </b-col>
-        <b-col cols="6" class="my-1">
+        <b-col cols="7" class="mt-1">
           <label for="group-desc">Description</label>
           <b-form-input
             id="group-desc"
@@ -83,7 +72,7 @@
         </b-col>
       </b-form-row>
       <b-form-row class="justify-content-center">
-        <b-col cols="2">
+        <b-col cols="3">
           <label for="secret-text" class="text-light">Save</label>
           <b-button
             block
@@ -127,14 +116,7 @@
           responsive="sm"
           select-mode="single"
           @row-selected="onRowSelected"
-        >
-          <template v-slot:head(id)>
-            <span>Group ID</span>
-          </template>
-          <template v-slot:head(group_target)>
-            <span>Group Name</span>
-          </template>
-        </b-table>
+        ></b-table>
       </b-col>
     </b-form-row>
     <b-form-row v-if="noTargetGroups">
@@ -183,10 +165,9 @@ export default {
       visible: false,
       modification: false,
       selectedGroup: null,
-      fields: ["key", "target", "description"],
+      fields: ["target", "description"],
       newGroup: {
         id: null,
-        key: null,
         target: null,
         description: null,
       },
@@ -204,12 +185,11 @@ export default {
 
     addGroup() {
       // Check if group is present
-      const keys = this.groups.filter(s => s.key == this.newGroup.key);
       const targets = this.groups.filter(g => g.target == this.newGroup.target)
 
       // Add if condition is met
-      if (keys.length > 0 || targets.length > 0) {
-        alert("ID or Group Name already in use!");
+      if (targets.length > 0) {
+        alert("Group Name already in use!");
       }
 
       // Add group and clear inputs
@@ -220,9 +200,6 @@ export default {
     },
 
     cleanGroupForm() {
-      // Clear id
-      this.newGroup.key = null;
-
       // Clear target
       this.newGroup.target = null;
 
@@ -295,7 +272,7 @@ export default {
     },
 
     formReady() {
-      if ( this.newGroup.key && this.newGroup.target ) {
+      if (this.newGroup.target ) {
         return true;
       } else return false;
     }
