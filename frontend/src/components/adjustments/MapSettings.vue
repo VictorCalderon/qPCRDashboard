@@ -2,17 +2,15 @@
   <b-card
     bg-variant="light"
     align="center"
-    header="Map Settings"
+    header="Map Center and Markers Settings"
     header-bg-variant="dark"
     header-text-variant="white"
     class="m-2"
   >
     <div>
       <b-form-row class="justify-content-center">
-        <b-col cols="12">
-          <h5 class="font-weight-light">Map center coordinates</h5>
-        </b-col>
-        <b-col cols="5">
+        <b-col cols="6">
+          <h5 class="font-weight-light">Latitude</h5>
           <b-form-input
             id="center-langitude"
             type="number"
@@ -20,7 +18,8 @@
             class="text-center"
           ></b-form-input>
         </b-col>
-        <b-col cols="5">
+        <b-col cols="6">
+          <h5 class="font-weight-light">Longitude</h5>
           <b-form-input
             id="center-longitude"
             type="number"
@@ -71,7 +70,7 @@
 
     <div>
       <b-form-row class="justify-content-center">
-        <b-col cols="5">
+        <b-col cols="6">
           <h5 class="font-weight-light">Marker size</h5>
           <b-form-input
             class="text-center"
@@ -80,7 +79,7 @@
             v-model="newMarkerSize"
           ></b-form-input>
         </b-col>
-        <b-col cols="5">
+        <b-col cols="6">
           <h5 class="font-weight-light">Marker opacity</h5>
           <b-form-input
             class="text-center"
