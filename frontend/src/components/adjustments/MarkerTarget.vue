@@ -59,7 +59,7 @@
             size="md"
             @click="modifyMarkers()"
           >
-            <i class="fas fa-edit"></i>
+            <i class="fas fa-save"></i>
           </b-button>
         </b-col>
         <b-col cols="2" v-if="updatingMarkerTargets">
