@@ -18,7 +18,7 @@
         dismissible
         @dismissed="hideModal()"
       >{{ updateMsg }}</b-alert>
-      <b-row class="mb-2">
+      <b-form-row class="mb-2">
         <b-col>
           <div class="text-center">
             <label for="edit-experimentname">Type name</label>
@@ -43,8 +43,8 @@
             ></b-form-datepicker>
           </div>
         </b-col>
-      </b-row>
-      <b-row class="mb-2" align-h="center">
+      </b-form-row>
+      <b-form-row class="mb-2" align-h="center">
         <b-col>
           <div class="text-center">
             <label for="edit-experimentobservations">Observations</label>
@@ -56,8 +56,8 @@
             ></b-form-input>
           </div>
         </b-col>
-      </b-row>
-      <b-row class="mb-2" align-h="center">
+      </b-form-row>
+      <b-form-row class="mb-2" align-h="center">
         <b-col>
           <div class="text-center mt-1">
             <label for="edit-experimenttags">Experiment tags</label>
@@ -74,9 +74,9 @@
             ></b-form-tags>
           </div>
         </b-col>
-      </b-row>
+      </b-form-row>
       <hr />
-      <b-row align-h="center" v-if="!deleteConfirmation">
+      <b-form-row align-h="center" v-if="!deleteConfirmation">
         <b-col cols="6">
           <div class="text-center">
             <label for="delete-experiment-button">Delete experiment</label>
@@ -110,9 +110,9 @@
             >{{ experiment.analyzed ? "Experiment analyzed" : "Analysis pending..."}}</p>
           </div>
         </b-col>
-      </b-row>
+      </b-form-row>
       <hr class="my-1" v-if="!deleteConfirmation" />
-      <b-row v-if="deleteConfirmation" align-h="center">
+      <b-form-row v-if="deleteConfirmation" align-h="center">
         <div class="text-center">
           <p class="text-center">Are you sure? This cannot be undone</p>
         </div>
@@ -134,8 +134,8 @@
             block
           >Delete</b-button>
         </b-col>
-      </b-row>
-      <b-row class="mt-2" v-if="!deleteConfirmation">
+      </b-form-row>
+      <b-form-row class="mt-2" v-if="!deleteConfirmation">
         <b-col>
           <b-button
             id="update-experiment-button"
@@ -154,12 +154,12 @@
             block
           >Cancel</b-button>
         </b-col>
-      </b-row>
+      </b-form-row>
     </b-container>
     <b-container v-else>
-      <b-row align-h="center">
+      <b-form-row align-h="center">
         <h5 class="my-2">Please open a experiment!</h5>
-      </b-row>
+      </b-form-row>
     </b-container>
   </b-modal>
 </template>
@@ -256,5 +256,14 @@ export default {
 };
 </script>
 
-<style>
+<style lang='css' scoped>
+.big-table {
+  display: inline-block;
+}
+
+@media (max-width: 480px) {
+  .big-table {
+    display: none;
+  }
+}
 </style>
