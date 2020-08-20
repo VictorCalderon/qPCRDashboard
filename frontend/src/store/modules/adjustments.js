@@ -18,14 +18,26 @@ const mutations = {
     },
 
     SET_MAP_MARKER_SIZE(state, markerSize) {
+        // Save to local storage
+        localStorage.setItem('markerSize', markerSize);
+
+        // Save to Vue
         Vue.set(state, 'markerSize', markerSize);
     },
 
     SET_MAP_MARKER_OPACITY(state, markerOpacity) {
+        // Save to local storage
+        localStorage.setItem('markerOpacity', markerOpacity);
+
+        // Save to Vue
         Vue.set(state, 'markerOpacity', markerOpacity);
     },
 
     SET_MAP_CENTER(state, newCenter) {
+        // Save to local storage
+        localStorage.setItem('newCenter', newCenter);
+
+        // Save to Vue
         Vue.set(state, 'mapCenter', newCenter);
     },
 
@@ -115,14 +127,37 @@ const getters = {
     },
 
     mapCenter(state) {
+
+        // Check if saved in LocalStorage
+        const mapCenter = localStorage.getItem('mapCenter') || null;
+
+        if (mapCenter) {
+            return mapCenter
+        }
+
         return state.mapCenter
     },
 
     markerSize(state) {
+
+        // Check if saved in LocalStorage
+        const markerSize = localStorage.getItem('markerSize') || null;
+
+        if (markerSize) {
+            return markerSize
+        }
+
         return state.markerSize
     },
 
     markerOpacity(state) {
+
+        // Check if saved in LocalStorage
+        const markerOpacity = localStorage.getItem('markerOpacity') || null;
+
+        if (markerOpacity) {
+            return markerOpacity
+        }
         return state.markerOpacity
     },
 
