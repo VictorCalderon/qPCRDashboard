@@ -93,7 +93,6 @@
             size="md"
             v-b-tooltip.hover.top
             title="Edit experiment"
-            :disabled="!sampleSelected"
           >
             <i class="fas fa-pencil-alt"></i>
           </b-button>
@@ -122,6 +121,7 @@
           scrollable
           responsive
           hover
+          small
           sticky-header="73vh"
           head-variant="light"
           :fields="fields"
@@ -161,7 +161,7 @@ import FileDownload from "js-file-download";
 export default {
   data() {
     return {
-      perPage: 14,
+      perPage: 21,
       currentPage: 1,
       selectedRow: null,
       xSampleFilter: null,
