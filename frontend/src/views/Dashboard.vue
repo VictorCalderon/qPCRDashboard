@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <b-form-row class="mt-3" v-if="allExperiments">
+    <b-form-row class="mt-1" v-if="allExperiments">
       <b-col lg="8" md="6" sm="10">
         <b-form-row>
           <b-col>
@@ -10,7 +10,7 @@
               header="Detection Percetange by Target Group"
               header-bg-variant="dark"
               header-text-variant="white"
-              class="m-2"
+              class="my-1"
             >
               <AmplifiedSamples></AmplifiedSamples>
             </b-card>
@@ -24,7 +24,7 @@
               header="Mapped Collected Samples"
               header-bg-variant="dark"
               header-text-variant="white"
-              class="m-2"
+              class="my-1"
             >
               <SampleLocationMap></SampleLocationMap>
             </b-card>
@@ -33,7 +33,7 @@
       </b-col>
       <b-col lg="4" md="6" sm="10">
         <b-form-row>
-          <b-col class="m-2">
+          <b-col class="my-1">
             <ProjectBriefing></ProjectBriefing>
           </b-col>
         </b-form-row>
@@ -45,7 +45,7 @@
               header="Experiment Tag Distribution"
               header-bg-variant="dark"
               header-text-variant="white"
-              class="m-2"
+              class="my-1"
             >
               <ExperimentObservations></ExperimentObservations>
             </b-card>
@@ -59,7 +59,7 @@
               header="Log Samples Collected by Region"
               header-bg-variant="dark"
               header-text-variant="white"
-              class="m-2"
+              class="my-1"
             >
               <LocatedSamplesCount></LocatedSamplesCount>
             </b-card>
