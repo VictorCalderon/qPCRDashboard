@@ -9,13 +9,25 @@
           header-text-variant="white"
         >
           <b-tabs card pills justified>
-            <b-tab title="Amplification Plot" lazy>
+            <b-tab lazy>
+              <template v-slot:title>
+                <span class="full-text">Amplification Plot</span>
+                <span class="short-text">AmpPlot</span>
+              </template>
               <AmpPlot></AmpPlot>
             </b-tab>
-            <b-tab title="PCA Clusterization" lazy>
+            <b-tab lazy>
+              <template v-slot:title>
+                <span class="full-text">PCA Clusterization</span>
+                <span class="short-text">PCAClust</span>
+              </template>
               <PCAKMeans></PCAKMeans>
             </b-tab>
-            <b-tab title="Maximum Gradient" lazy>
+            <b-tab lazy>
+              <template v-slot:title>
+                <span class="full-text">Maximum Gradient</span>
+                <span class="short-text">MaxGrad</span>
+              </template>
               <MaxGrad></MaxGrad>
             </b-tab>
           </b-tabs>
@@ -88,8 +100,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// Normal card height on fullscreen
 .card-height {
   height: 90vh;
+}
+
+// Hide short text by default (resolution > 1200px)
+.short-text {
+  display: none;
+}
+
+// When resolution <= 1200px, hide full text and show short text
+@media (max-width: 1200px) {
+  .short-text {
+    display: inline-block;
+  }
+  .full-text {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
