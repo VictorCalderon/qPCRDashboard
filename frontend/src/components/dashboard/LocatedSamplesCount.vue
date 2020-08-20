@@ -1,11 +1,12 @@
 <template>
-  <BarChart
-    :chartData="chartData"
-    :options="chartConfig"
-    class="locationcount-height"
-    v-if="smallDataset"
-  ></BarChart>
-  <HBarChart :chartData="chartData" :options="chartConfig" class="locationcount-height" v-else></HBarChart>
+  <b-form-row>
+    <b-col cols="12" v-if="smallDataset">
+      <BarChart :chartData="chartData" :options="chartConfig" class="locationcount-height"></BarChart>
+    </b-col>
+    <b-col cols="12" v-else>
+      <HBarChart :chartData="chartData" :options="chartConfig" class="locationcount-height"></HBarChart>
+    </b-col>
+  </b-form-row>
 </template>
 
 <script>
@@ -55,7 +56,7 @@ export default {
           labels: this.samplingLabels,
           datasets: [
             {
-              label: "Samples collected",
+              label: "Collected",
               data: this.samplingDatasets.map(c => {return Math.log(c)}),  // Log scaled plot
               backgroundColor: this.samplingColors,
               hoverWidth: 2,
@@ -73,36 +74,37 @@ export default {
         maintainAspectRatio: false,
         reponsive: true,
         legend: {
-          display: true,
+          display: false,
           position: "bottom",
-          maxWidth: 100,
           labels: {
             fontColor: "#1E152A",
             boxWidth: 0,
             fontSize: 0
           }
         },
-
-        layout: {
-          // padding: {
-          //     top: 50,
-          // },
-        },
-
-        tooltips: {
-        callbacks: {
-          label: function(tooltipItem, data) {
-            var label = data.datasets[tooltipItem.datasetIndex].label || "";
-
-            if (label) {
-              label += ": ";
+        yAxes: [
+          {
+            scaleLabel: {
+              display: false,
+            },
+            ticks: {
+              display: false,
+            },
+            gridLines: {
+              display: true
             }
-
-            label += Math.exp(tooltipItem.yLabel);
-            return label;
           }
-        }
-      },
+        ],
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem, data) {
+              let label = data.datasets[tooltipItem.datasetIndex].label || "";
+              if (label) { label += ": " }
+              label += Math.exp(tooltipItem.yLabel);
+              return label;
+            }
+          }
+        },
       }
     };
   }
@@ -111,12 +113,12 @@ export default {
 
 <style lang='scss' scoped>
 .locationcount-height {
-  height: 40vh;
+  height: 37vh;
 }
 
 @media (max-width: 480px) {
   .locationcount-height {
-    height: 30vh;
+    height: 35vh;
   }
 }
 </style>
