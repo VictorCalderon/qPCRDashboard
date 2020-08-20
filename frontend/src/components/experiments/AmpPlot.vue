@@ -198,7 +198,7 @@ export default {
 
 <style lang='scss' scoped>
 .ampplot-height {
-  height: 75vh;
+  height: 80vh;
 }
 
 @media (max-width: 480px) {

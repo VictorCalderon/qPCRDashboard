@@ -174,7 +174,7 @@ export default {
 
 <style lang='scss' scoped>
 .clusterplot-height {
-  height: 72vh;
+  height: 80vh;
 }
 
 @media (max-width: 480px) {
