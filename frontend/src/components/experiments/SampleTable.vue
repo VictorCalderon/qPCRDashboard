@@ -7,108 +7,102 @@
   >
     <template v-slot:header>
       <b-form-row>
-        <b-col lg="6" md="6">
+        <b-col cols="6">
           <h5 class="my-2 thin-font text-center">{{ currentExperiment.name }}</h5>
         </b-col>
-        <b-col class="my-0 py-0">
-          <b-button
-            class="text-dark border"
-            variant="light"
-            id="previous-samples"
-            size="md"
-            v-b-tooltip.hover.top
-            title="Previous page"
-            @click="prevPage"
-            :disabled="currentPage == 1"
-          >
-            <i class="fas fa-arrow-left"></i>
-          </b-button>
-        </b-col>
-        <b-col class="my-0 py-0">
-          <b-button
-            class="text-dark border"
-            variant="light"
-            id="next-samples"
-            size="md"
-            v-b-tooltip.hover.top
-            title="Next page"
-            @click="nextPage"
-            :disabled="currentPage == lastPage"
-          >
-            <i class="fas fa-arrow-right"></i>
-          </b-button>
-        </b-col>
-        <b-col class="my-0 py-0">
-          <b-button
-            class="text-dark border"
-            variant="light"
-            id="filter-popover"
-            size="md"
-            v-b-tooltip.hover.top
-            title="Filter table"
-          >
-            <i class="fas fa-filter"></i>
-          </b-button>
-          <b-popover target="filter-popover" placement="bottom">
-            <b-form-row>
-              <b-col cols="12" class="text-center">Filter Samples</b-col>
-              <b-col cols="12">
-                <b-form-input
-                  v-model="xSampleFilter"
-                  placeholder="Enter sample name"
-                  class="placeholder-light text-center bg-light borderless border-bottom my-1"
-                  lazy
-                ></b-form-input>
-              </b-col>
-            </b-form-row>
-            <b-form-row class="mt-2">
-              <b-col cols="12" class="text-center">Filter Markers</b-col>
-              <b-col cols="12">
-                <b-form-group label-for="dropdown-form-password" @submit.stop.prevent>
-                  <b-form-select
-                    v-model="xMarkerFilter"
-                    :options="options"
-                    size="sm"
-                    placeholder="Select Marker"
-                  ></b-form-select>
-                </b-form-group>
-              </b-col>
-            </b-form-row>
+        <b-col cols="6">
+          <b-button-group>
+            <b-button
+              class="text-dark border"
+              variant="light"
+              id="previous-samples"
+              size="md"
+              v-b-tooltip.hover.top
+              title="Previous page"
+              @click="prevPage"
+              :disabled="currentPage == 1"
+            >
+              <i class="fas fa-arrow-left"></i>
+            </b-button>
+            <b-button
+              class="text-dark border"
+              variant="light"
+              id="next-samples"
+              size="md"
+              v-b-tooltip.hover.top
+              title="Next page"
+              @click="nextPage"
+              :disabled="currentPage == lastPage"
+            >
+              <i class="fas fa-arrow-right"></i>
+            </b-button>
+            <b-button
+              class="text-dark border"
+              variant="light"
+              id="filter-popover"
+              size="md"
+              v-b-tooltip.hover.top
+              title="Filter table"
+            >
+              <i class="fas fa-filter"></i>
+            </b-button>
+            <b-popover target="filter-popover" placement="bottom">
+              <b-form-row>
+                <b-col cols="12" class="text-center">Filter Samples</b-col>
+                <b-col cols="12">
+                  <b-form-input
+                    v-model="xSampleFilter"
+                    placeholder="Enter sample name"
+                    class="placeholder-light text-center bg-light borderless border-bottom my-1"
+                    lazy
+                  ></b-form-input>
+                </b-col>
+              </b-form-row>
+              <b-form-row class="mt-2">
+                <b-col cols="12" class="text-center">Filter Markers</b-col>
+                <b-col cols="12">
+                  <b-form-group label-for="dropdown-form-password" @submit.stop.prevent>
+                    <b-form-select
+                      v-model="xMarkerFilter"
+                      :options="options"
+                      size="sm"
+                      placeholder="Select Marker"
+                    ></b-form-select>
+                  </b-form-group>
+                </b-col>
+              </b-form-row>
 
-            <hr class="my-1" />
+              <hr class="my-1" />
 
-            <b-form-row>
-              <b-col class="12">
-                <b-button block @click="clearFilters()">Clear Filters</b-button>
-              </b-col>
-            </b-form-row>
-          </b-popover>
-        </b-col>
-        <b-col class="my-0 py-0">
-          <b-button
-            class="text-dark border"
-            variant="light"
-            v-b-modal.edit-experiments-modal
-            id="modify-sample"
-            size="md"
-            v-b-tooltip.hover.top
-            title="Edit experiment"
-          >
-            <i class="fas fa-pencil-alt"></i>
-          </b-button>
-        </b-col>
-        <b-col class="my-0 py-0">
-          <b-button
-            class="text-dark border"
-            variant="light"
-            @click="downloadSampleTable"
-            id="download-dataset"
-            size="md"
-            v-b-tooltip.hover.top
-            title="Download this table"
-          >
-            <i class="fas fa-download"></i>
-          </b-button>
+              <b-form-row>
+                <b-col class="12">
+                  <b-button block @click="clearFilters()">Clear Filters</b-button>
+                </b-col>
+              </b-form-row>
+            </b-popover>
+            <b-button
+              class="text-dark border"
+              variant="light"
+              v-b-modal.edit-experiments-modal
+              id="modify-sample"
+              size="md"
+              v-b-tooltip.hover.top
+              title="Edit experiment"
+            >
+              <i class="fas fa-pencil-alt"></i>
+            </b-button>
+            <b-button
+              class="text-dark border"
+              variant="light"
+              @click="downloadSampleTable"
+              id="download-dataset"
+              size="md"
+              v-b-tooltip.hover.top
+              title="Download this table"
+            >
+              <i class="fas fa-download"></i>
+            </b-button>
+          </b-button-group>
         </b-col>
       </b-form-row>
     </template>
@@ -121,8 +115,7 @@
           scrollable
           responsive
           hover
-          small
-          sticky-header="73vh"
+          sticky-header="80vh"
           head-variant="light"
           :fields="fields"
           :items="filteredTable"
@@ -315,7 +308,7 @@ export default {
 
 <style lang="scss" scoped>
 .sample-table {
-  height: 85vh;
+  height: 90vh;
 }
 
 @media (max-width: 480px) {
