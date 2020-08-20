@@ -55,8 +55,8 @@ export default {
           labels: this.samplingLabels,
           datasets: [
             {
-              label: "Sampling Site Counts",
-              data: this.samplingDatasets.map(c => {return Math.log(c)}),
+              label: "Samples collected",
+              data: this.samplingDatasets.map(c => {return Math.log(c)}),  // Log scaled plot
               backgroundColor: this.samplingColors,
               hoverWidth: 2,
               hoverColor: "#000"
@@ -87,7 +87,22 @@ export default {
           // padding: {
           //     top: 50,
           // },
+        },
+
+        tooltips: {
+        callbacks: {
+          label: function(tooltipItem, data) {
+            var label = data.datasets[tooltipItem.datasetIndex].label || "";
+
+            if (label) {
+              label += ": ";
+            }
+
+            label += Math.exp(tooltipItem.yLabel);
+            return label;
+          }
         }
+      },
       }
     };
   }
