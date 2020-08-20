@@ -6,12 +6,12 @@
     header-text-variant="black"
   >
     <template v-slot:header>
-      <b-form-row>
-        <b-col lg="6" sm="6">
+      <b-form-row class="justify-content-center">
+        <b-col lg="6" md="6">
           <h5 class="my-2 thin-font text-center">{{ currentExperiment.name }}</h5>
         </b-col>
-        <b-col lg="6" sm="4" offset="2">
-          <b-button-group>
+        <b-col lg="6" offset-lg="0" md offset-md="1" offset-sm="0" offset="2">
+          <b-button-group size="md">
             <b-button
               class="text-dark border"
               variant="light"
@@ -39,14 +39,14 @@
             <b-button
               class="text-dark border"
               variant="light"
-              id="filter-popover"
+              id="table-filter"
               size="md"
-              v-b-tooltip.hover.top
+              v-b-tooltip.hover.bottom
               title="Filter table"
             >
               <i class="fas fa-filter"></i>
             </b-button>
-            <b-popover target="filter-popover" placement="bottom">
+            <b-popover target="table-filter" placement="bottom">
               <b-form-row>
                 <b-col cols="12" class="text-center">Filter Samples</b-col>
                 <b-col cols="12">
@@ -107,43 +107,41 @@
       </b-form-row>
     </template>
 
-    <b-form-row>
-      <b-col>
-        <b-table
-          borderless
-          selectable
-          scrollable
-          responsive
-          hover
-          sticky-header="80vh"
-          head-variant="light"
-          :fields="fields"
-          :items="filteredTable"
-          select-mode="multi"
-          :per-page="perPage"
-          :current-page="currentPage"
-          @row-selected="onRowSelected"
-          class="text-center"
-        >
-          <template v-slot:cell(sample)="data">
-            <b
-              :style="{color: currentSample.find(s => s.result_id == data.item.result_id) ? '#296EB4' : '#36382E' }"
-            >{{ data.item.sample }}</b>
-          </template>
+    <b-form-row class="px-0">
+      <b-table
+        borderless
+        selectable
+        scrollable
+        responsive
+        hover
+        sticky-header="80vh"
+        head-variant="light"
+        :fields="fields"
+        :items="filteredTable"
+        select-mode="multi"
+        :per-page="perPage"
+        :current-page="currentPage"
+        @row-selected="onRowSelected"
+        class="text-center"
+      >
+        <template v-slot:cell(sample)="data">
+          <b
+            :style="{color: currentSample.find(s => s.result_id == data.item.result_id) ? '#296EB4' : '#36382E' }"
+          >{{ data.item.sample }}</b>
+        </template>
 
-          <template v-slot:cell(score)="data">
-            <b
-              :style="{color: data.item.score < 0.75 ? data.item.score < 0.25 ? '#CC2936' : '#F2BB05' : '#124E78' }"
-            >{{ data.item.score }}</b>
-          </template>
+        <template v-slot:cell(score)="data">
+          <b
+            :style="{color: data.item.score < 0.75 ? data.item.score < 0.25 ? '#CC2936' : '#F2BB05' : '#124E78' }"
+          >{{ data.item.score }}</b>
+        </template>
 
-          <template v-slot:cell(amp_status)="data">
-            <b
-              :style="{color: data.item.cq != 0 ? '#124E78' : '#CC2936' }"
-            >{{ data.item.cq != 0 ? 'Yes' : 'No' }}</b>
-          </template>
-        </b-table>
-      </b-col>
+        <template v-slot:cell(amp_status)="data">
+          <b
+            :style="{color: data.item.cq != 0 ? '#124E78' : '#CC2936' }"
+          >{{ data.item.cq != 0 ? 'Yes' : 'No' }}</b>
+        </template>
+      </b-table>
     </b-form-row>
   </b-card>
 </template>
@@ -154,16 +152,16 @@ import FileDownload from "js-file-download";
 export default {
   data() {
     return {
-      perPage: 21,
+      perPage: 15,
       currentPage: 1,
       selectedRow: null,
       xSampleFilter: null,
       xMarkerFilter: null,
       options: [{ 'text': 'All', 'value': null }],
       fields: [
-        { key: "sample", sortable: true, label: "Sample Name" },
+        { key: "sample", sortable: true, label: "Samples" },
         { key: "marker", sortable: true },
-        { key: "amp_status", sortable: false, label: 'Amplified'},
+        { key: "amp_status", sortable: true, label: 'Amp'},
         { key: "cq", sortable: true },
         // { key: "score", sortable: true },
       ]
@@ -200,6 +198,7 @@ export default {
     clearFilters() {
       this.xSampleFilter = null;
       this.xMarkerFilter = null;
+      this.$root.$emit("bv::hide::popover", "table-filter")
     },
 
     // filterTable() {
@@ -313,7 +312,7 @@ export default {
 
 @media (max-width: 480px) {
   .sample-table {
-    height: 90vh;
+    height: 750px;
   }
 }
 </style>

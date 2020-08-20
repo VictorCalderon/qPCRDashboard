@@ -9,7 +9,7 @@
   >
     <b-form-row>
       <b-col lg="6" md="12">
-        <b-card class="my-1">
+        <b-card class="my-0">
           <h6 class="card-subtitle mt-1 text-muted">Samples</h6>
           <span>
             <h4>
@@ -20,7 +20,7 @@
         </b-card>
       </b-col>
       <b-col lg="6" md="12">
-        <b-card class="my-1">
+        <b-card class="my-0">
           <h6 class="card-subtitle mt-1 text-muted">Experiments</h6>
           <span>
             <h4>

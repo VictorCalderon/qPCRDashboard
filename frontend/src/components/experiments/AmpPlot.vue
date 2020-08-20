@@ -123,7 +123,7 @@ export default {
           xAxes: [
             {
               scaleLabel: {
-                display: true,
+                display: false,
                 labelString: 'qPCR Cycles'
               },
               ticks: {
@@ -138,7 +138,7 @@ export default {
           yAxes: [
             {
               scaleLabel: {
-                display: true,
+                display: false,
                 labelString: 'Fluorescence'
               },
               ticks: {
@@ -202,6 +202,12 @@ export default {
 }
 
 @media (max-width: 480px) {
+  .ampplot-height {
+    height: 53vh;
+  }
+}
+
+@media (max-width: 360px) {
   .ampplot-height {
     height: 50vh;
   }
