@@ -7,10 +7,10 @@
   >
     <template v-slot:header>
       <b-form-row>
-        <b-col cols="6">
+        <b-col lg="6" sm="6">
           <h5 class="my-2 thin-font text-center">{{ currentExperiment.name }}</h5>
         </b-col>
-        <b-col cols="6">
+        <b-col lg="6" sm="4" offset="2">
           <b-button-group>
             <b-button
               class="text-dark border"
