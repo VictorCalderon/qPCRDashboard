@@ -56,7 +56,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Processed Experiments by Region"
+              header="Log Samples Collected by Region"
               header-bg-variant="dark"
               header-text-variant="white"
               class="m-2"
