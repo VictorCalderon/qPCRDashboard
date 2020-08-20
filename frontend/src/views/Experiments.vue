@@ -12,7 +12,7 @@
             <b-tab title="Amplification Plot" lazy>
               <AmpPlot></AmpPlot>
             </b-tab>
-            <b-tab title="PCA - KMeans" lazy>
+            <b-tab title="PCA Clusterization" lazy>
               <PCAKMeans></PCAKMeans>
             </b-tab>
             <b-tab title="Maximum Gradient" lazy>
@@ -89,7 +89,7 @@ export default {
 
 <style lang="scss" scoped>
 .card-height {
-  height: 85vh;
+  height: 90vh;
 }
 
 @media (max-width: 480px) {
