@@ -2,7 +2,7 @@
   <b-card
     bg-variant="light"
     align="center"
-    header="Project Statistics"
+    header="Sample Processed"
     header-bg-variant="dark"
     header-text-variant="white"
     class
