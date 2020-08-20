@@ -14,10 +14,10 @@
     </b-tooltip>
     <template v-slot:header>
       <b-form-row class="justify-content-center mb-0">
-        <b-col cols="8" offset="2">
+        <b-col cols="8" offset="1">
           <h6 class="mb-0 mt-2">Sample Location Schema</h6>
         </b-col>
-        <b-col cols="1" class="ml-auto" v-if="!visible">
+        <b-col cols="2" class="ml-auto" v-if="!visible">
           <b-button
             id="add-schema"
             block
@@ -30,7 +30,7 @@
             <i class="fas fa-plus-square"></i>
           </b-button>
         </b-col>
-        <b-col cols="1" class="ml-auto" v-if="visible">
+        <b-col cols="2" class="ml-auto" v-if="visible">
           <b-button
             id="add-schema"
             block
@@ -94,8 +94,8 @@
             size="sm"
           ></b-form-input>
         </b-col>
-        <b-col cols="1" class="my-1">
-          <label for="location-color" class="text-light">Color</label>
+        <b-col sm="12" lg="1" class="mt-1">
+          <label for="location-color" class>Color</label>
           <b-form-input
             type="color"
             id="location-color"
