@@ -173,29 +173,33 @@ class ImportExperiment(Resource):
     def post(self):
 
         # Get data from post
-        file = request.files.get('file', None)
+        expfile = request.files.get('file', None)
 
         # Experiment name and experiment Date
-        name = request.form.get('name', None)
-        date = request.form.get('date', None)
-        observations = request.form.get('observations', None)
-        tags = ';'.join(request.form.get('tags', None))
+        name = request.form.get('name', 'DefaultName')
+        date = request.form.get('date', '1996-05-25')
+
+        # Experiment tags
+        tags = request.form.get('tags', None)
+        if isinstance(tags, list):
+            tags = ';'.join(tags)
+
         fmt = request.form.get('format', None)
 
         # Check if required data is not present
-        if (name is None) or (date is None) or (file is None) or (fmt is None):
+        if (expfile is None) or (fmt is None):
             return {'msg': 'Experiment is missing information'}, 400
 
         # Experiment instantiation
-        current_experiment = Experiment(name=name, date=date, user=current_user, observations=observations, tags=tags)
+        current_experiment = Experiment(name=name, date=date, user=current_user, tags=tags)
 
         try:
             if fmt == 'zip':
-                feed_DA2(file, current_experiment, current_user)
+                load_DA2(expfile, current_experiment)
                 return {'msg': 'Experiment added successfully'}
 
             if fmt == 'txt':
-                feed_7500(file, current_experiment, current_user)
+                feed_7500(expfile, current_experiment, current_user)
                 return {'msg': 'Experiment Successfully Added'}
 
             if fmt == 'default':
@@ -205,7 +209,10 @@ class ImportExperiment(Resource):
             return {'msg': 'This format option is not implemented yet!'}, 400
 
         except ValueError:
-            return {'msg': 'Invalid format type'}, 400
+            return {'msg': 'Invalid Format'}, 400
+
+        except TypeError:
+            return {'msg': 'There was a problem importing your experiment'}, 400
 
         except:
             return {'msg': 'There was a problem importing your experiment'}, 400
