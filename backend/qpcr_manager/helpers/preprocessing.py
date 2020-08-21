@@ -567,30 +567,6 @@ def available_markers():
     return markers.to_json(orient='records')
 
 
-def marker_dataset(marker_id, current_user):
-    """Query dashboard data(date, perc_cases, total_samples, total_experiments)
-    """
-
-    # [SUGGESTION] (preprocessing.py) This should be a postgreSQL view
-    query = f"""
-    SELECT name, date, methodology, sample, amp_status, amp_cq
-    FROM samples AS s
-    JOIN experiments as p on s.experiment_id = p.id
-    JOIN results as r on r.sample_id = s.id
-    JOIN markers as m on r.marker_id = m.id
-    WHERE m.id = {marker_id} AND p.user_id = {current_user.id}
-    """
-
-    # Run query in pandas
-    dataset = pd.read_sql(query, db.session.bind)
-
-    # Make Amp Status Binary
-    dataset['amp_status'] = dataset['amp_status'].apply(lambda x: 1 if x else 0)
-
-    # Return dataset as a csv
-    return dataset.to_csv(index=False)
-
-
 def get_brief():
     """Count the number of experiments and samples processed
     """
@@ -598,7 +574,7 @@ def get_brief():
     query = f"""
     SELECT s.sample, e.name FROM samples AS s
     JOIN experiments AS e ON s.experiment_id = e.id
-    WHERE e.user_id = {current_user.id}
+    WHERE e.user_id = {current_user.id} AND e.analyzed = true
     """
 
     # Run query
@@ -680,7 +656,7 @@ def tag_distrib():
     # Prepare query
     query = f"""
     SELECT tags FROM experiments
-    WHERE experiments.user_id = {current_user.id}
+    WHERE experiments.user_id = {current_user.id} AND experiments.analyzed = true
     """
 
     # Run query with pandas
@@ -761,8 +737,8 @@ def get_located_samples():
     # Get sample data
     sample_query = f"""
     SELECT sample FROM samples
-    JOIN experiments ON samples.experiment_id= experiments.id
-    WHERE experiments.user_id= {current_user.id}
+    JOIN experiments ON samples.experiment_id = experiments.id
+    WHERE experiments.user_id= {current_user.id} AND experiments.analyzed = true
     """
 
     # Run sample query
@@ -808,10 +784,10 @@ def sample_table(experiment_id):
     # Build query
     query = f"""
     SELECT samples.id, sample, marker, amp_status AS amp, amp_cq AS cq, score, results.id AS result_id FROM experiments
-    JOIN samples on samples.experiment_id= experiments.id
+    JOIN samples on samples.experiment_id = experiments.id
     JOIN results on results.sample_id= samples.id
     JOIN markers on results.marker_id= markers.id
-    WHERE experiments.user_id= {current_user.id} and experiments.id = {experiment_id};
+    WHERE experiments.user_id = {current_user.id} and experiments.id = {experiment_id};
     """
 
     # Run query
