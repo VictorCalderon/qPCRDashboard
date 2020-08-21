@@ -56,7 +56,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Log Samples Collected by Region"
+              header="Samples Collected by Region"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
