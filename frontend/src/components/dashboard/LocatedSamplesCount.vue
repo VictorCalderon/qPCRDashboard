@@ -57,7 +57,7 @@ export default {
           datasets: [
             {
               label: "Collected",
-              data: this.samplingDatasets.map(c => {return Math.log(c)}),  // Log scaled plot
+              data: this.samplingDatasets,
               backgroundColor: this.samplingColors,
               hoverWidth: 2,
               hoverColor: "#000"
@@ -100,7 +100,7 @@ export default {
             label: function(tooltipItem, data) {
               let label = data.datasets[tooltipItem.datasetIndex].label || "";
               if (label) { label += ": " }
-              label += Math.exp(tooltipItem.yLabel);
+              label += tooltipItem.yLabel;
               return label;
             }
           }
