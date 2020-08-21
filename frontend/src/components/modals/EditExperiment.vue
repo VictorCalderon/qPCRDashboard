@@ -48,12 +48,13 @@
         <b-col>
           <div class="text-center">
             <label for="edit-experimentobservations">Observations</label>
-            <b-form-input
-              id="edit-experimentobservations"
+            <b-form-textarea
+              id="textarea"
               v-model="experiment.observations"
-              class="text-center"
-              :placeholder="currentExperiment.observations"
-            ></b-form-input>
+              placeholder="Enter description"
+              rows="3"
+              max-rows="6"
+            ></b-form-textarea>
           </div>
         </b-col>
       </b-form-row>
@@ -245,15 +246,15 @@ export default {
   },
 
   watch: {
-    // currentExperiment() {
-    //   this.experiment = this.currentExperiment;
-
-    //   if (this.currentExperiment.tags) {
-    //     this.experiment.tags = this.currentExperiment.tags.split(",");
-    //   }
-    // }
+    currentExperiment() {
+      this.experiment = { ...this.currentExperiment };
+      if (this.experiment.tags) {
+        this.experment.tags = this.experiment.tags.split(';')
+      }
+      }
+    }
   }
-};
+
 </script>
 
 <style lang='css' scoped>
