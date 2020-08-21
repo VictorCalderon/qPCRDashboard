@@ -157,19 +157,6 @@
 import axios from "axios";
 export default {
   methods: {
-    getToday() {
-      // Get today
-      let today = new Date();
-
-      // Get day. month, year
-      const dd = String(today.getDate()).padStart(2, "0");
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const yyyy = today.getFullYear();
-
-      // Set variable
-      this.date = yyyy + "-" + mm + "-" + dd;
-    },
-
     async updateData() {
       await this.$store.dispatch("loadExperiments");
     },
@@ -194,7 +181,6 @@ export default {
       formData.append("file", this.file);
       formData.append("name", this.name);
       formData.append("date", this.date);
-      formData.append("methodology", this.methodology);
       formData.append("tags", this.tags);
       formData.append("format", this.format);
 
@@ -210,7 +196,7 @@ export default {
           this.message = res.data.msg;
           this.showMessage = true;
           this.$store.dispatch("loadExperiments");
-          this.$store.dispatch("getMarkers");
+          // this.$store.dispatch("getMarkers");
         })
         .catch(err => {
           this.message = err.response.data.msg;
@@ -264,7 +250,7 @@ export default {
   },
 
   mounted() {
-    this.getToday();
+    // this.getToday();
   }
 };
 </script>
