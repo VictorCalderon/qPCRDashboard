@@ -206,14 +206,6 @@ export default {
       this.$store.dispatch("loadExperiments");
       this.$refs["edit-experiments-modal"].hide();
       this.deleteConfirmation = false;
-      this.experiment = {
-        name: null,
-        date: null,
-        analyzed: null,
-        id: null,
-        observations: null,
-        tags: null
-      };
     },
 
     async deleteCurrentExperiment() {
