@@ -195,6 +195,17 @@ export default {
 
     },
 
+    updateMarkerFilter() {
+      // Filter unique markers
+      const markers = [...new Set(this.currentTable.map((p) => { return p.marker}))];
+
+      // Transform to options format
+      const newOptions = markers.map(m => { return { 'text': m, 'value': m }})
+
+      // Generate options dictionary
+      this.options = [{'text': 'All', 'value': null }, ...newOptions]
+    },
+
     clearFilters() {
       this.xSampleFilter = null;
       this.xMarkerFilter = null;
@@ -276,14 +287,7 @@ export default {
     },
 
     currentTable() {
-      // Filter unique markers
-      const markers = [...new Set(this.currentTable.map((p) => { return p.marker}))];
-
-      // Transform to options format
-      const newOptions = markers.map(m => { return { 'text': m, 'value': m }})
-
-      // Generate options dictionary
-      this.options = [{'text': 'All', 'value': null }, ...newOptions]
+      this.updateMarkerFilter()
     },
 
     async sampleFilter() {
@@ -301,6 +305,10 @@ export default {
         this.selectedRow = null
       }
     }
+  },
+
+  mounted() {
+    this.updateMarkerFilter()
   }
 };
 </script>
