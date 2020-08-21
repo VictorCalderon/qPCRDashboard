@@ -143,7 +143,7 @@ export default {
               },
               ticks: {
                 display: true,
-                suggestedMax: 2, min: 0
+                suggestedMax: 2, min: -0.1
               },
               gridLines: {
                 display: true
