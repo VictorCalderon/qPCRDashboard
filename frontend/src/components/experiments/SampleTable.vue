@@ -212,10 +212,6 @@ export default {
       this.$root.$emit("bv::hide::popover", "table-filter")
     },
 
-    // filterTable() {
-    //   this.$store.dispatch('filterTable', this.sampleFilter, this.markerFilter)
-    // },
-
     onRowSelected(items) {
       this.selectedRow = items;
       this.$store.dispatch('selectSample', items)
