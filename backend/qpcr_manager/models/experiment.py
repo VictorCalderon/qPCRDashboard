@@ -10,7 +10,7 @@ class Experiment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     date = db.Column(db.Date, nullable=False)
-    observations = db.Column(db.String)
+    observations = db.Column(db.Text)
     tags = db.Column(db.String)
     analyzed = db.Column(db.Boolean, default=False)
 
