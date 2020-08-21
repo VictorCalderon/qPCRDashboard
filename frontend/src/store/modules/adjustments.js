@@ -140,24 +140,10 @@ const getters = {
 
     markerSize(state) {
 
-        // Check if saved in LocalStorage
-        const markerSize = localStorage.getItem('markerSize') || null;
-
-        if (markerSize) {
-            return markerSize
-        }
-
         return state.markerSize
     },
 
     markerOpacity(state) {
-
-        // Check if saved in LocalStorage
-        const markerOpacity = localStorage.getItem('markerOpacity') || null;
-
-        if (markerOpacity) {
-            return markerOpacity
-        }
         return state.markerOpacity
     },
 
