@@ -15,6 +15,7 @@ from re import search
 from uuid import uuid1
 from datetime import date
 from zipfile import ZipFile
+import re
 
 # Data Structures
 from collections import defaultdict, deque, Counter
@@ -32,86 +33,205 @@ from sklearn.neighbors import KernelDensity
 from sklearn.pipeline import Pipeline
 
 
-def query_samples(current_user, sample):
-    """Query database for samples based on sample name
+# Dye list
+qs_ = {
+    'Cy5.5': 'X6_M6', 'Cy5': 'X5_M5', 'MUSTANG PURPLE': 'X5_M5', 'JUN': 'X4_M4',
+    'ROX': 'X4_M4', 'Texas Red': 'X4_M4', 'ABY': 'X3_M3', 'NED': 'X3_M3', 'TAMRA': 'X3_M3',
+    'Cy3': 'X3_M3', 'VIC': 'X2_M2', 'JOE': 'X2_M2', 'HEX': 'X2_M2', 'TET': 'X2_M2', 'FAM': 'X1_M1',
+    'SYBR': 'X1_M1'
+}
+
+
+def save_to_temp(filebuffer) -> str:
+    """Save file to temp folder
     """
 
-    # Build query
-    query = f"""
-    SELECT experiments.id as experiment_id, sample, name, marker, amp_status, amp_cq FROM experiments
-    JOIN samples on samples.experiment_id = experiments.id
-    JOIN results on results.sample_id = samples.id
-    JOIN markers on results.marker_id = markers.id
-    WHERE experiments.user_id = {current_user.id} and samples.sample like '%%{sample}%%';
-    """
+    # Generate temp directory path
+    temp_ = f'temp/{uuid1()}'
+    temp_filename_ = f"{temp_}/{uuid1()}"
 
-    # Run in pandas
-    return pd.read_sql(query, con=db.session.bind).to_dict(orient='records')
+    # Check if the correct file was sent over
+    try:
+        assert hasattr(filebuffer, 'save') == True
 
-
-def import_DA2(buffered_zip):
-    """ Extract data from zipped qPCR experiment
-
-    Arguments:
-        buffered_zip {werkzeug.io} -- [A werkzeug file buffer]
-    """
-
-    # Make temporary file directory
-    dir_uuid = f'/code/experiments/{uuid1()}'
-    makedirs(dir_uuid)
-
-    # Save file
-    filename = dir_uuid + '/zipped_experiment.zip'
-    buffered_zip.save(filename)
+    except AssertionError:
+        raise AssertionError('Input file must be of type Werkzeug and have a `save` function to write on disk.')
 
     try:
+        # Write path to disk
+        makedirs(temp_)
 
-        # Open file
-        with ZipFile(filename, 'r') as zippedObj:
+        # Save file
+        filebuffer.save(temp_filename_)
 
-            # Extract data to temporary dir_uuid folder
-            zippedObj.extractall(dir_uuid)
+    except FileExistsError:
+        raise FileExistsError('Could not write as it already exists.')
 
-            # Make a data container with relevant data
-            data_container = {}
+    # Return filename
+    return temp_, temp_filename_
 
-            # Get Results, Amplification and Sample data
-            try:
-                amp_data = glob(f'{dir_uuid}/*Amplification*')[0]
-                results = glob(f'{dir_uuid}/*Results*')[0]
 
-            except:
-                raise ValueError('The Zip Folder must contain Amplification and Results csv')
+def parse_DA2(zippedDA2, current_experiment):
+    """Extract dataset from zipped results
 
-            # Open dataframes
-            amp_data = pd.read_csv(amp_data, comment='#').replace('', pd.NA).dropna()
-            results = pd.read_csv(results, comment='#').replace('', pd.NA).dropna()
+    Args:
+        buffered_zup {werkzeug.io} -- io.Werkzeug file buffer with a save attr
+    """
 
-            # Change Undetermined to 0
-            results = results.replace('Undetermined', 0)
+    # Check if the correct file was sent over
+    try:
+        assert hasattr(zippedDA2, 'save') == True
 
-            # Column order
-            amp_data_columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
-            results_columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
+    except AssertionError:
+        raise AssertionError('Input file must be of type Werkzeug and have a `save` function to write on disk.')
 
-            # Make them the correct datatype
-            amp_data = amp_data.astype({
-                'Well Position': str, 'Sample': str,
-                'Cycle Number': int, 'Target': str, 'Rn': float
-            })
+    # Save file to dist
+    filedir_, filepath = save_to_temp(zippedDA2)
 
-            results = results.astype({
-                'Well Position': str, 'Sample': str, 'Target': str,
-                'Amp Status': str, 'Cq': float
-            })
+    # Open ZipFile in context manager
+    with ZipFile(filepath, 'r') as zippedObj:
 
-    except:
-        raise 'Data could not be parsed'
+        # Extract everything to filepath
+        zippedObj.extractall(filedir_)
 
-    # Remove files
-    rmtree(dir_uuid, ignore_errors=True)
+        # Find files of importance
+        results_dir = glob(f"{filedir_}/*Results*")
+        raw_dir = glob(f"{filedir_}/*Raw*")
 
-    return {'Amplification': amp_data[amp_data_columns], 'Results': results[results_columns]}
+        # Assert
+        try:
+            assert len(results_dir) == 1
+            assert len(raw_dir) == 1
+
+        except AssertionError:
+            print('The Zip must contain both Results and Raw Data.')
+
+        # Add description
+        with open(results_dir[0]) as r:
+
+            # Read first 22 lines
+            description = '\n'.join([next(r).strip().lstrip('# ') for x in range(22)])
+            date = re.search('Last Modified Date/Time: \d{4}-\d{2}-\d{2}', description)[0].split(':')[1].strip()
+            name = re.search('Plate File Name: .+', description)[0].split(':')[1].strip().strip('.eds')
+
+        # Add data to current experiment
+        if (current_experiment.name != 'DefaultName'):
+            current_experiment.name = name
+
+        if (current_experiment.date != '1996-05-25'):
+            current_experiment.date = date
+
+        # Add description
+        current_experiment.observations = description
+
+        # Add results
+        results = pd.read_csv(
+            results_dir[0], comment='#', usecols=[
+                'Well Position', 'Reporter', 'Sample', 'Target', 'Cq']
+        ).replace('', pd.NA).dropna()
+
+        # Remove undetermined
+        results['Cq'] = results['Cq'].replace('Undetermined', 0)
+
+        # Round Cq values
+        results['Cq'] = np.around(results['Cq'].astype(float), 2)
+
+        # Unique reporters
+        used_channels = {qs_[r]: r for r in results['Reporter'].unique()}
+
+        # Open Raw Data
+        raw = pd.read_csv(
+            raw_dir[0], comment='#', usecols=[
+                "Well Position", "Cycle Number", *used_channels.keys()]
+        ).replace('', pd.NA).dropna()
+
+        # Rename columns based on their reporters
+        raw.rename(used_channels, axis=1, inplace=True)
+
+        # Melt dataset
+        raw = raw.melt(id_vars=['Well Position', 'Cycle Number'],
+                       var_name='Reporter', value_name='Fluorescence')
+
+        # Generate Indexer
+        raw['Indexer'] = raw['Well Position'] + '-' + raw['Reporter']
+
+        # Remove duplicate cycles
+        raw.drop_duplicates(
+            subset=['Indexer', 'Cycle Number'], inplace=True)
+
+        # Pivot table
+        raw = raw.pivot(index='Indexer',
+                        columns='Cycle Number', values='Fluorescence')
+
+        # Extract and expand indexer
+        indexer = raw.reset_index()['Indexer'].str.split(
+            '-', expand=True).values
+
+        # Insert expanded indexer
+        for idx, col in enumerate(['Well Position', 'Reporter']):
+
+            # Add column
+            raw.insert(idx, col, indexer[:, idx])
+
+        # Reset Index Inplace
+        raw.reset_index(drop=True, inplace=True)
+
+        # Merge with results table
+        results = pd.merge(raw, results, on=[
+            'Well Position', 'Reporter'])
+
+        # Replace "Undetermined" to 0
+        results.replace('Undetermined', 0, inplace=True)
+
+    # Save table
+    # results.to_csv(filename + '/csv', index=False)
+
+    # Remove file tree
+    rmtree(filedir_)
+
+    return results
+
+
+def load_DA2(filebuffer, current_experiment):
+    """Load DA2 data format to dataset
+    """
+
+    # Parse dataset
+    results = parse_DA2(filebuffer, current_experiment)
+
+    # Add markers to database
+    m_hash = add_markers(results['Target'].unique())
+
+    # Total cycles
+    maxc = len(results.columns) - 5
+
+    # Iterate over samples
+    for sample in results['Sample'].unique():
+
+        # Instantiate sample
+        s_ = Sample(sample=sample, experiment=current_experiment)
+
+        # Mask results
+        for res in results[results['Sample'] == sample].itertuples(index=False):
+
+            # Hash marker_id
+            marker_id = m_hash[res[-2]]
+
+            # Instantiate result
+            Result(amp_cq=res[-1], marker_id=marker_id, sample=s_)
+
+            # Iterate over cycles
+            for i in range(1, maxc + 1):
+
+                # Instantiate fluorescences
+                Fluorescence(
+                    well=res[0], cycle=i, rn=res[i + 1],
+                    sample=s_, marker_id=marker_id
+                )
+
+    # Commit to database
+    db.session.add(current_experiment)
+    db.session.commit()
 
 
 def import_7500(filebuffer, section_sep='\w+') -> dict:
@@ -228,6 +348,23 @@ def parse_7500(data_container, sep='\t'):
 
     # Remove empty spaces and NaNs and
     return amp, results
+
+
+def query_samples(current_user, sample):
+    """Query database for samples based on sample name
+    """
+
+    # Build query
+    query = f"""
+    SELECT experiments.id as experiment_id, sample, name, marker, amp_status, amp_cq FROM experiments
+    JOIN samples on samples.experiment_id = experiments.id
+    JOIN results on results.sample_id = samples.id
+    JOIN markers on results.marker_id = markers.id
+    WHERE experiments.user_id = {current_user.id} and samples.sample like '%%{sample}%%';
+    """
+
+    # Run in pandas
+    return pd.read_sql(query, con=db.session.bind).to_dict(orient='records')
 
 
 @lru_cache(maxsize=10)
