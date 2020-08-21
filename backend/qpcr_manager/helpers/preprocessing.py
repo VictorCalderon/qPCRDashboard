@@ -622,7 +622,7 @@ def amp_stat_data():
     JOIN results on results.sample_id = samples.id
     JOIN markers on results.marker_id = markers.id
     JOIN targets on markers.target_id = targets.id
-    WHERE experiments.user_id = {current_user.id}
+    WHERE experiments.user_id = {current_user.id} AND experiments.analyzed = true
     """
 
     # Run query in pandas
@@ -658,77 +658,6 @@ def amp_stat_data():
 
         # Add data to struct
         datasets.append({'target': target, 'data': percs.to_list()})
-
-    # Sort list of dictionaries
-    datasets = sorted(datasets, key=lambda i: np.mean(i['data']))
-
-    # Use last iteration day-month column
-    return {'dates': df['day-month'].to_list(), 'datasets': datasets}
-
-
-def amp_stat_data_2():
-    """ Return the following data structure:
-        {
-            labels: ["26 Jun", "27 Jun", "28 Jun", "29 Jun"],
-            datasets: [
-                {
-                    label: "Marker 1",
-                    data: [19, 18, 19, 22]
-                },
-                {
-                    label: 'Marker 2',
-                    data: [21, 23, 27, 26],
-                },
-                {
-                    label: 'Marker 3',
-                    data: [99, 98, 99, 99],
-                }, ...
-            ]
-        }
-
-        The order of datasets must be decreasing by mean data
-    """
-
-    # Prepare query
-    query = f"""
-        SELECT date, sample, amp_status, amp_cq, marker
-        FROM samples
-        JOIN experiments ON experiments.id = samples.experiment_id
-        JOIN results ON results.sample_id = samples.id
-        JOIN markers ON results.marker_id = markers.id
-        WHERE experiments.user_id = {current_user.id}
-        """
-
-    # Run query
-    dataset = pd.read_sql(query, db.session.bind)
-
-    # Parse date as datetime
-    dataset['date'] = pd.to_datetime(dataset['date'])
-
-    # Group by date and marker and calculate amplification (binary mean) percentages
-    dataset = dataset.groupby(['date', 'marker'])['amp_status'].mean().reset_index()
-
-    # Parse dates
-    dataset['day'] = dataset['date'].dt.day
-    dataset['month'] = dataset['date'].dt.month_name()
-
-    # Make then pretty
-    dataset['day-month'] = dataset['day'].astype(str) + '-' + dataset['month'].astype(str)
-
-    # Instantiate data struct [{'marker': 'example 1, 'data': [1, 2, 3]}]
-    datasets = []
-
-    # Generate parsed dataset
-    for marker in dataset['marker'].unique():
-
-        # Mask dataset to keep marker specific
-        df = dataset[dataset['marker'] == marker]
-
-        # Get dataset
-        percs = df['amp_status'] * 100
-
-        # Add data to struct
-        datasets.append({'marker': marker, 'data': percs.to_list()})
 
     # Sort list of dictionaries
     datasets = sorted(datasets, key=lambda i: np.mean(i['data']))
