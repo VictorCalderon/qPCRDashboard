@@ -880,8 +880,8 @@ def sliding_denoiser(raw_data, window=5):
     # Compute denoised data
     denoised_data = raw_data - np.mean(raw_data[std_argmin: std_argmin + window])
 
-    # Clip data to 0 for plotting
-    return np.clip(denoised_data, 0, 10)
+    # Clip data to -1 for plotting
+    return np.clip(denoised_data, -1, 10)
 
 
 @lru_cache(maxsize=10)
