@@ -43,7 +43,7 @@
               <label for="input-method">Observations</label>
               <b-form-input
                 id="input-method"
-                v-model="observations"
+                v-model="tags"
                 class="text-center"
                 locale="en"
                 placeholder="3rd sampling round"
@@ -145,17 +145,7 @@
                 :current-page="currentPageSamples"
                 head-variant="light"
                 class="mt-1 text-center"
-              >
-                <template v-slot:head(sample)="data">
-                  <span>{{ data.label }}</span>
-                </template>
-                <template v-slot:head(amp_cq)>
-                  <span>{{ 'Cq' }}</span>
-                </template>
-                <template v-slot:head(name)>
-                  <span>{{ 'Run' }}</span>
-                </template>
-              </b-table>
+              ></b-table>
             </b-col>
           </b-form-row>
 
@@ -216,14 +206,15 @@ export default {
       experimentFields: [
         {
           key: "name",
-          sortable: true
+          sortable: true,
+          label: 'Run'
         },
         {
           key: "date",
           sortable: true
         },
         {
-          key: "observations",
+          key: "tags",
           sortable: true
         },
         {
@@ -249,7 +240,7 @@ export default {
       date: null,
       name: null,
       analyzed: null,
-      observations: null,
+      tags: null,
       sample: null
     };
   },
@@ -260,7 +251,7 @@ export default {
         name: this.name,
         date: this.date,
         analyzed: this.analyzed,
-        observations: this.observations
+        tags: this.tags
       };
       this.loadingResults = true;
       await this.$store
