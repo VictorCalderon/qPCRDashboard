@@ -115,6 +115,24 @@ Vue.filter('shortName', function (value) {
 
 Vue.config.productionTip = false
 
+// Load marker size
+const markerSize = localStorage.getItem('markerSize') || null;
+if (markerSize) {
+  store.dispatch('updateMarkerSize', markerSize)
+}
+
+// Load marker opacity
+const markerOpacity = localStorage.getItem('markerOpacity') || null;
+if (markerOpacity) {
+  store.dispatch('updateMarkerOpacity', markerOpacity)
+}
+
+// Load marker opacity
+const mapCenter = localStorage.getItem('mapCenter') || null;
+if (mapCenter) {
+  store.dispatch('updateMapCenter', mapCenter)
+}
+
 
 new Vue({
   router,
