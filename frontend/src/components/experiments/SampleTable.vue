@@ -10,7 +10,7 @@
         <b-col lg="6" md="6">
           <h5 class="my-2 thin-font text-center">{{ currentExperiment.name }}</h5>
         </b-col>
-        <b-col lg="6" offset-lg="0" md offset-md="1" offset-sm="0" offset="2">
+        <b-col lg="5" offset-lg="1" md offset-md="1" offset-sm="0" offset="2">
           <b-button-group size="md">
             <b-button
               class="text-dark border"
