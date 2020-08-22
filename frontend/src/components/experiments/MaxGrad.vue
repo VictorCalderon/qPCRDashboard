@@ -142,7 +142,7 @@ export default {
               },
               ticks: {
                 display: true,
-                max: 40, min: 10
+                max: 40, min: 5
               },
               gridLines: {
                 display: true
