@@ -931,7 +931,6 @@ def compute_fluorescences(experiment_id):
 
 
 def experiment_fluorescences(experiment_id):
-    # def experiment_fluorescences(experiment_id):
     """Send experiment to frontend
     """
 
