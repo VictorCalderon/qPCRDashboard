@@ -931,6 +931,7 @@ def compute_fluorescences(experiment_id):
 
 
 def experiment_fluorescences(experiment_id):
+    # def experiment_fluorescences(experiment_id):
     """Send experiment to frontend
     """
 
@@ -955,8 +956,8 @@ def maximum_gradient(experiment_id):
         # Compute second order gradient
         grad_ = np.gradient(f['data'])
 
-        # Extract argmax
-        cycle = np.argmax(grad_)
+        # Extract argmax from index 5 onward to avoid weirdness
+        cycle = np.argmax(grad_[5:]) + 5
 
         # Add to dataset
         max_grad.append({
