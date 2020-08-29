@@ -82,19 +82,38 @@ export default {
             fontSize: 0
           }
         },
-        yAxes: [
-          {
-            scaleLabel: {
-              display: false,
-            },
-            ticks: {
-              display: false,
-            },
-            gridLines: {
-              display: true
+        scales: {
+          xAxes: [
+            {
+              // scaleLabel: {
+              //   display: true,
+              //   labelString: 'MaxCycle'
+              // },
+              ticks: {
+                display: true,
+                suggestedMax: 1000, min: 0
+              },
+              gridLines: {
+                display: true
+              }
             }
-          }
-        ],
+          ],
+          yAxes: [
+            {
+              // scaleLabel: {
+              //   display: true,
+              //   labelString: 'MaxGrad'
+              // },
+              ticks: {
+                display: true,
+                suggestedMax: 0, min: 0
+              },
+              gridLines: {
+                display: true
+              }
+            }
+          ]
+        },
         tooltips: {
           callbacks: {
             label: function(tooltipItem, data) {
