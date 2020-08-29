@@ -29,7 +29,7 @@
         </b-col>
       </b-form-row>
       <b-form-row class="justify-content-center mt-2">
-        <b-col cols="3">
+        <b-col cols="3" v-if="!updatingMapCenter">
           <b-button
             block
             class="px-1"
@@ -37,14 +37,15 @@
             variant="info"
             id="save-map-center"
             @click="updateMapCenter"
-            v-if="!updatingMapCenter"
             :disabled="noCenterChange"
             v-b-tooltip.hover
             title="Save changes"
           >
             <i class="fas fa-save"></i>
           </b-button>
-          <b-button class variant="success" @click="updateMapCenter" v-if="updatingMapCenter">
+        </b-col>
+        <b-col cols="3" v-if="updatingMapCenter">
+          <b-button class="px-1" size="md" id="update-map-center" variant="success" @click="updateMapCenter" block>
             <i class="fas fa-check-square"></i>
           </b-button>
         </b-col>
