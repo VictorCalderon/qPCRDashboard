@@ -195,12 +195,13 @@ class ImportExperiment(Resource):
 
         try:
             if fmt == 'zip':
-                load_DA2(expfile, current_experiment)
-                return {'msg': 'Experiment added successfully'}
+                m = load_DA2(expfile, current_experiment)
+                return {'msg': 'Experiment added successfully', 'data': m}
 
             if fmt == 'txt':
-                feed_7500(expfile, current_experiment, current_user)
-                return {'msg': 'Experiment Successfully Added'}
+                m = load_7500(expfile, current_experiment)
+                return {'msg': 'Experiment Added Successfuly', 'data': m}
+                # return {'msg': 'Experiment Successfully Added'}
 
             if fmt == 'default':
                 raise NotImplementedError
@@ -211,11 +212,14 @@ class ImportExperiment(Resource):
         except ValueError:
             return {'msg': 'Invalid Format'}, 400
 
-        except TypeError:
-            return {'msg': 'There was a problem importing your experiment'}, 400
+        # except TypeError:
+        #     return {'msg': 'There was a problem importing your experiment'}, 400
+        
+        except BadZipFile:
+            return {'msg': 'File must be zipped'}, 400
 
-        except:
-            return {'msg': 'There was a problem importing your experiment'}, 400
+        # except:
+        #     return {'msg': 'There was a problem importing your experiment'}, 400
 
 
 class ExperimentResults(Resource):
