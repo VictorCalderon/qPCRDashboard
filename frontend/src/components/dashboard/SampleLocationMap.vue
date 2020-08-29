@@ -1,7 +1,7 @@
 <template>
   <b-form-row>
     <l-map
-      :zoom="zoom"
+      :zoom="mapZoom"
       :center="mapCenter"
       :options="mapOptions"
       class="locationmap-height"
@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import { latLng } from "leaflet";
 import { LMap, LTileLayer, LCircle, LTooltip } from "vue2-leaflet";
 
 export default {
@@ -39,13 +38,11 @@ export default {
   },
   data() {
     return {
-      zoom: 8,
-      center: latLng(19.007237, -70.41502),
+      zoom: 12,
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      currentZoom: 11.5,
-      currentCenter: latLng(19.007237, -70.41502),
+      currentZoom: 12,
       mapOptions: {
         zoomSnap: 0.5
       }
@@ -66,6 +63,10 @@ export default {
 
     markerOpacity() {
       return this.$store.getters.markerOpacity;
+    },
+
+    mapZoom() {
+      return this.$store.getters.mapZoom;
     }
   },
 
