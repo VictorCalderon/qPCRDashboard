@@ -41,6 +41,12 @@ qs_ = {
     'SYBR': 'X1_M1'
 }
 
+abi7500 = {
+    'FAM': '1', 'SYBR': '1', 'JOE': '2', 'VIC': '2', 
+    'NED': '3', 'TAMRA': '3', 'Cy3': '3', 'ROX': '4', 
+    'Texas Red': '4', 'Cy5': '5'
+}
+
 
 def save_to_temp(filebuffer) -> str:
     """Save file to temp folder
@@ -71,133 +77,51 @@ def save_to_temp(filebuffer) -> str:
     return temp_, temp_filename_
 
 
-def parse_DA2(zippedDA2, current_experiment):
-    """Extract dataset from zipped results
-
-    Args:
-        buffered_zup {werkzeug.io} -- io.Werkzeug file buffer with a save attr
+def merge_results_fluorescence(results: pd.DataFrame, raw: pd.DataFrame) -> pd.DataFrame:
+    """Merge results and fluorescence raw data into a single table
     """
 
-    # Check if the correct file was sent over
-    try:
-        assert hasattr(zippedDA2, 'save') == True
+    # Melt dataset
+    raw = raw.melt(id_vars=['Well Position', 'Cycle Number'],
+                    var_name='Reporter', value_name='Fluorescence')
 
-    except AssertionError:
-        raise AssertionError('Input file must be of type Werkzeug and have a `save` function to write on disk.')
+    # Generate Indexer
+    raw['Indexer'] = raw['Well Position'] + '-' + raw['Reporter']
 
-    # Save file to dist
-    filedir_, filepath = save_to_temp(zippedDA2)
+    # Remove duplicate cycles
+    raw.drop_duplicates(
+        subset=['Indexer', 'Cycle Number'], inplace=True)
 
-    # Open ZipFile in context manager
-    with ZipFile(filepath, 'r') as zippedObj:
+    # Pivot table
+    raw = raw.pivot(index='Indexer',
+                    columns='Cycle Number', values='Fluorescence')
 
-        # Extract everything to filepath
-        zippedObj.extractall(filedir_)
+    # Extract and expand indexer
+    indexer = raw.reset_index()['Indexer'].str.split(
+        '-', expand=True).values
 
-        # Find files of importance
-        results_dir = glob(f"{filedir_}/*Results*")
-        raw_dir = glob(f"{filedir_}/*Raw*")
+    # Insert expanded indexer
+    for idx, col in enumerate(['Well Position', 'Reporter']):
 
-        # Assert
-        try:
-            assert len(results_dir) == 1
-            assert len(raw_dir) == 1
+        # Add column
+        raw.insert(idx, col, indexer[:, idx])
 
-        except AssertionError:
-            print('The Zip must contain both Results and Raw Data.')
+    # Reset Index Inplace
+    raw.reset_index(drop=True, inplace=True)
 
-        # Add description
-        with open(results_dir[0]) as r:
+    # Merge with results table
+    results = pd.merge(raw, results, on=[
+        'Well Position', 'Reporter'])
 
-            # Read first 22 lines
-            description = '\n'.join([next(r).strip().lstrip('# ') for x in range(22)])
-            date = re.search('Last Modified Date/Time: \d{4}-\d{2}-\d{2}', description)[0].split(':')[1].strip()
-            name = re.search('Plate File Name: .+', description)[0].split(':')[1].strip().strip('.eds')
-
-        # Add data to current experiment
-        if (current_experiment.name != 'DefaultName'):
-            current_experiment.name = name
-
-        if (current_experiment.date != '1996-05-25'):
-            current_experiment.date = date
-
-        # Add description
-        current_experiment.observations = description
-
-        # Add results
-        results = pd.read_csv(
-            results_dir[0], comment='#', usecols=[
-                'Well Position', 'Reporter', 'Sample', 'Target', 'Cq']
-        ).replace('', pd.NA).dropna()
-
-        # Remove undetermined
-        results['Cq'] = results['Cq'].replace('Undetermined', 0)
-
-        # Round Cq values
-        results['Cq'] = np.around(results['Cq'].astype(float), 2)
-
-        # Unique reporters
-        used_channels = {qs_[r]: r for r in results['Reporter'].unique()}
-
-        # Open Raw Data
-        raw = pd.read_csv(
-            raw_dir[0], comment='#', usecols=[
-                "Well Position", "Cycle Number", *used_channels.keys()]
-        ).replace('', pd.NA).dropna()
-
-        # Rename columns based on their reporters
-        raw.rename(used_channels, axis=1, inplace=True)
-
-        # Melt dataset
-        raw = raw.melt(id_vars=['Well Position', 'Cycle Number'],
-                       var_name='Reporter', value_name='Fluorescence')
-
-        # Generate Indexer
-        raw['Indexer'] = raw['Well Position'] + '-' + raw['Reporter']
-
-        # Remove duplicate cycles
-        raw.drop_duplicates(
-            subset=['Indexer', 'Cycle Number'], inplace=True)
-
-        # Pivot table
-        raw = raw.pivot(index='Indexer',
-                        columns='Cycle Number', values='Fluorescence')
-
-        # Extract and expand indexer
-        indexer = raw.reset_index()['Indexer'].str.split(
-            '-', expand=True).values
-
-        # Insert expanded indexer
-        for idx, col in enumerate(['Well Position', 'Reporter']):
-
-            # Add column
-            raw.insert(idx, col, indexer[:, idx])
-
-        # Reset Index Inplace
-        raw.reset_index(drop=True, inplace=True)
-
-        # Merge with results table
-        results = pd.merge(raw, results, on=[
-            'Well Position', 'Reporter'])
-
-        # Replace "Undetermined" to 0
-        results.replace('Undetermined', 0, inplace=True)
-
-    # Save table
-    # results.to_csv(filename + '/csv', index=False)
-
-    # Remove file tree
-    rmtree(filedir_)
+    # Replace "Undetermined" to 0
+    results.replace('Undetermined', 0, inplace=True)
 
     return results
 
 
-def load_DA2(filebuffer, current_experiment):
-    """Load DA2 data format to dataset
+def load_experiment(results, current_experiment):
+    """ Add experiment to database
     """
-
-    # Parse dataset
-    results = parse_DA2(filebuffer, current_experiment)
 
     # Add markers to database
     m_hash = add_markers(results['Target'].unique())
@@ -234,120 +158,322 @@ def load_DA2(filebuffer, current_experiment):
     db.session.commit()
 
 
-def import_7500(filebuffer, section_sep='\w+') -> dict:
-    """Open qPCR csv file and saves each subdocument in dictionary of pandas DataFrames
+def parse_DA2(zippedDA2, current_experiment):
+    """Extract dataset from zipped results
+
+    Args:
+        buffered_zup {werkzeug.io} -- io.Werkzeug file buffer with a save attr
     """
 
-    # Create unique id
-    file_uuid = f'/code/temp/{uuid1()}'
-
-    # Save file
-    filebuffer.save(file_uuid)
-
-    # Re-open file
-    with open(file_uuid) as file:
-
-        # Empty dictionary and split by empty line
-        data_container, data = dict(), file.read().split('\n\n')
-
-        # Iterate over separated data(skip first)
-        for d in data[1:]:
-
-            # Remove trialing white space
-            d = d.strip()
-
-            # Split by new line
-            split_data = d.split('\n')
-
-            # First line as header (Remove non work characters)
-            header = search(section_sep, split_data[0])
-
-            # Check if header exists
-            if header:
-
-                # Extract matching subtring
-                header = header.group(0)
-
-            else:
-
-                # Else raise error
-                raise('Section delimiters before data')
-
-            # Add header and data to container
-            data_container[header] = split_data[1:]
-
-    # Remove file from system
-    remove(file_uuid)
-
-    return data_container
-
-
-def parse_7500(data_container, sep='\t'):
-    """Parse qPCR data coming from a determined raw file
-    """
-
-    # Get Sample Data and instantiate dataframe
+    # Check if the correct file was sent over
     try:
-        results = [record.split(sep) for record in data_container['Results']]
-        results = pd.DataFrame.from_records(data=results[1:], columns=results[0])
+        assert hasattr(zippedDA2, 'save') == True
 
-    except KeyError:
-        raise('[Sample Setup] header was not found in file')
+    except AssertionError:
+        raise AssertionError('Input file must be of type Werkzeug and have a `save` function to write on disk.')
 
-    # Get qPCR data and instantiate dataframe
+    # Save file to dist
+    filedir_, filepath = save_to_temp(zippedDA2)
+
+    # Open ZipFile in context manager
+    with ZipFile(filepath, 'r') as zippedObj:
+
+        # Extract everything to filepath
+        zippedObj.extractall(filedir_)
+
+    # Find files of importance
+    results_dir = glob(f"{filedir_}/*Results*")
+    raw_dir = glob(f"{filedir_}/*Raw*")
+
+    # Assert
     try:
-        amp = [record.split(sep) for record in data_container['Amplification']]
-        amp = pd.DataFrame.from_records(data=amp[1:], columns=amp[0])
+        assert len(results_dir) == 1
+        assert len(raw_dir) == 1
 
-    except KeyError:
-        raise('[Amplification Data] header not found in file')
+    except AssertionError:
+        print('The Zip must contain both Results and Raw Data.')
+
+    # Add description
+    with open(results_dir[0]) as r:
+
+        # Read first 22 lines
+        description = '\n'.join([next(r).strip().lstrip('# ') for _ in range(22)])
+        date = re.search('Last Modified Date/Time: \d{4}-\d{2}-\d{2}', description)[0].split(':')[1].strip()
+        name = re.search('Plate File Name: .+', description)[0].split(':')[1].strip().strip('.eds')
+
+    # Add data to current experiment
+    if (current_experiment.name != 'DefaultName'):
+        current_experiment.name = name
+
+    if (current_experiment.date != '1996-05-25'):
+        current_experiment.date = date
+
+    # Add description
+    current_experiment.observations = description
+
+    # Add results
+    results = pd.read_csv(
+        results_dir[0], comment='#', usecols=[
+            'Well Position', 'Reporter', 'Sample', 'Target', 'Cq']
+    ).replace('', pd.NA).dropna()
+
+    # Remove undetermined
+    results['Cq'] = results['Cq'].replace('Undetermined', 0)
+
+    # Round Cq values
+    results['Cq'] = np.around(results['Cq'].astype(float), 2)
+
+    # Unique reporters
+    used_channels = {qs_[r]: r for r in results['Reporter'].unique()}
+
+    # Open Raw Data
+    raw = pd.read_csv(
+        raw_dir[0], comment='#', usecols=[
+            "Well Position", "Cycle Number", *used_channels.keys()]
+    ).replace('', pd.NA).dropna()
+
+    # Rename columns based on their reporters
+    raw.rename(used_channels, axis=1, inplace=True)
+
+    # Remove file tree
+    rmtree(filedir_)
 
     # Merge data
+    return merge_results_fluorescence(results, raw)
+
+def parse_7500(flat7500, current_experiment):
+    """Parse flat 7500 export file
+
+    Args:
+        flat7500 {werkzeug.io} -- io.Werkzeug file buffer with a save attr
+    """
+
+  # Check if the correct file was sent over
     try:
-        amp_with_results = pd.merge(amp, results, how='inner', on=['Well', 'Target Name'])
+        assert hasattr(flat7500, 'save') == True
 
-    except:
-        raise('Both [Results] and [Amplification Data] must share columns `Well` and `Target Name`')
+    except AssertionError:
+        raise AssertionError('Input file must be of type Werkzeug and have a `save` function to write on disk.')
 
-    # Filter necessary data
-    amp = amp_with_results[['Well', 'Sample Name', 'Cycle', 'Target Name', 'Rn']]  # 'ΔRn'
+    # Save file to dist
+    filedir_, filepath = save_to_temp(flat7500)
 
-    # Remove empty spaces
-    amp = amp.replace('', pd.NA).dropna()
+    # Read file results
+    with open(filepath, 'r') as r:
 
-    # Change amp dtype
-    amp = amp.astype({
-        'Well': str, 'Sample Name': str,
-        'Cycle': int, 'Target Name': str, 'Rn': float
-    })
+        # Read description
+        description = '\n'.join(next(r).strip().lstrip('* ') for _ in range(6))
+        date = re.search('Experiment Run End Time = \d{4}-\d{2}-\d{2}', description)[0].split('=')[1].strip()
+        name = re.search('Experiment File Name = .+', description)[0].split('=')[1].strip().strip('.eds').split('\\')[-1]
+        data, raw_file = {}, r.read().split('\n\n')
 
-    # Change amp column names for consistency
-    amp.columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
 
-    # Extract columns from results
-    results = results[['Well', 'Sample Name', 'Target Name', 'Cт']]
+    # Add data to current experiment
+    if (current_experiment.name != 'DefaultName'):
+        current_experiment.name = name
 
-    # Change Undetermined to 0
-    results = results.replace('Undetermined', 0)
+    if (current_experiment.date != '1996-05-25'):
+        current_experiment.date = date
 
-    # Remove empty spaces
-    results = results.replace('', pd.NA).dropna()
+    # Add description
+    current_experiment.observations = description
 
-    # Generate Amplification Status column
-    amp_status = results['Cт'].astype('float').apply(lambda x: 'Amp' if x > 0 else 'No Amp')
+    # Iterate over separated data(skip first)
+    for d in raw_file[1:]:
 
-    # Insert into dataframe
-    results.insert(3, 'Amp Status', amp_status)
+        # Remove trialing white space
+        d = d.strip()
 
-    # Rename columns for consistency
-    results.columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
+        # Split by new line
+        split_data = d.split('\n')
 
-    # Change dtypes
-    results = results.astype({'Well Position': str, 'Sample': str, 'Target': 'category',
-                              'Amp Status': 'category', 'Cq': float})
+        # First line as header (Remove non work characters)
+        header = search(r'\w+', split_data[0])
 
-    # Remove empty spaces and NaNs and
-    return amp, results
+        # Check if header exists
+        if header:
+
+            # Extract matching subtring
+            header = header.group(0)
+
+        else:
+
+            # Else raise error
+            raise('Section delimiters before data')
+
+        # Add header and data to container
+        data[header] = split_data[1:]
+    
+    # Read results and raw tables
+    try:
+        assert all(item in list(data.keys()) for item in ['Raw', 'Results'])
+    
+    except AssertionError:
+        print('Your raw data must contain both Raw Data and Results exports.')
+    
+    # Transform results to records into records
+    results = [record.split('\t') for record in data['Results']]
+    results = pd.DataFrame.from_records(data=results[1:], columns=results[0])
+    results = results.replace('', pd.NA)[['Well', 'Reporter', 'Sample Name', 'Target Name']].dropna()
+
+    # Change column names for compatibility
+    results.columns = ['Well Position', 'Reporter', 'Sample', 'Target']
+
+    # Unique reporters and filter columns
+    used_channels = {abi7500.get(r, 'NOT_SUPPORTED'): r for r in results['Reporter'].unique()}
+    filter_columns = ['Well', 'Cycle'] + list(used_channels.keys())
+    
+    # Transform raw data to records
+    raw = [record.split('\t') for record in data['Raw']]
+    raw = pd.DataFrame.from_records(data=raw[1:], columns=raw[0])
+    raw = raw.replace('', pd.NA)[filter_columns].dropna()
+
+    # Rename columns based on their reporters
+    raw.rename({'Well': 'Well Position', 'Cycle': 'Cycle Number', **used_channels}, axis=1, inplace=True)
+
+    # Remove temp
+    rmtree(filedir_)
+
+    # Return data
+    return merge_results_fluorescence(results, raw)
+
+
+def load_DA2(filebuffer, current_experiment):
+    """Load DA2 data format to dataset
+    """
+
+    # Parse dataset
+    results = parse_DA2(filebuffer, current_experiment)
+
+    # Load Experiment to database
+    load_experiment(results, current_experiment)
+
+
+def load_7500(filebuffer, current_experiment):
+    """Load ABI 7500 data to database
+    """
+
+    # Parse dataset
+    results = parse_7500(filebuffer, current_experiment)
+
+    # Load experiment to database
+    return load_experiment(results, current_experiment)
+
+
+# def import_7500(filebuffer, section_sep=r'\w+') -> dict:
+#     """Open qPCR csv file and saves each subdocument in dictionary of pandas DataFrames
+#     """
+
+#     # Create unique id
+#     file_uuid = f'/code/temp/{uuid1()}'
+
+#     # Save file
+#     filebuffer.save(file_uuid)
+
+#     # Re-open file
+#     with open(file_uuid) as file:
+
+#         # Empty dictionary and split by empty line
+#         data_container, data = dict(), file.read().split('\n\n')
+
+#         # Iterate over separated data(skip first)
+#         for d in data[1:]:
+
+#             # Remove trialing white space
+#             d = d.strip()
+
+#             # Split by new line
+#             split_data = d.split('\n')
+
+#             # First line as header (Remove non work characters)
+#             header = search(section_sep, split_data[0])
+
+#             # Check if header exists
+#             if header:
+
+#                 # Extract matching subtring
+#                 header = header.group(0)
+
+#             else:
+
+#                 # Else raise error
+#                 raise('Section delimiters before data')
+
+#             # Add header and data to container
+#             data_container[header] = split_data[1:]
+
+#     # Remove file from system
+#     remove(file_uuid)
+
+#     return data_container
+
+
+# def parse_7500(data_container, sep='\t'):
+#     """Parse qPCR data coming from a determined raw file
+#     """
+
+#     # Get Sample Data and instantiate dataframe
+#     try:
+#         results = [record.split(sep) for record in data_container['Results']]
+#         results = pd.DataFrame.from_records(data=results[1:], columns=results[0])
+
+#     except KeyError:
+#         raise('[Sample Setup] header was not found in file')
+
+#     # Get qPCR data and instantiate dataframe
+#     try:
+#         amp = [record.split(sep) for record in data_container['Amplification']]
+#         amp = pd.DataFrame.from_records(data=amp[1:], columns=amp[0])
+
+#     except KeyError:
+#         raise('[Amplification Data] header not found in file')
+
+#     # Merge data
+#     try:
+#         amp_with_results = pd.merge(amp, results, how='inner', on=['Well', 'Target Name'])
+
+#     except:
+#         raise('Both [Results] and [Amplification Data] must share columns `Well` and `Target Name`')
+
+#     # Filter necessary data
+#     amp = amp_with_results[['Well', 'Sample Name', 'Cycle', 'Target Name', 'Rn']]  # 'ΔRn'
+
+#     # Remove empty spaces
+#     amp = amp.replace('', pd.NA).dropna()
+
+#     # Change amp dtype
+#     amp = amp.astype({
+#         'Well': str, 'Sample Name': str,
+#         'Cycle': int, 'Target Name': str, 'Rn': float
+#     })
+
+#     # Change amp column names for consistency
+#     amp.columns = ['Well Position', 'Sample', 'Cycle Number', 'Target', 'Rn']
+
+#     # Extract columns from results
+#     results = results[['Well', 'Sample Name', 'Target Name', 'Cт']]
+
+#     # Change Undetermined to 0
+#     results = results.replace('Undetermined', 0)
+
+#     # Remove empty spaces
+#     results = results.replace('', pd.NA).dropna()
+
+#     # Generate Amplification Status column
+#     amp_status = results['Cт'].astype('float').apply(lambda x: 'Amp' if x > 0 else 'No Amp')
+
+#     # Insert into dataframe
+#     results.insert(3, 'Amp Status', amp_status)
+
+#     # Rename columns for consistency
+#     results.columns = ['Well Position', 'Sample', 'Target', 'Amp Status', 'Cq']
+
+#     # Change dtypes
+#     results = results.astype({'Well Position': str, 'Sample': str, 'Target': 'category',
+#                               'Amp Status': 'category', 'Cq': float})
+
+#     # Remove empty spaces and NaNs and
+#     return amp, results
 
 
 def query_samples(current_user, sample):
@@ -414,119 +540,119 @@ def amp_status(x, amp_keyword='Amp'):
     return True if x == amp_keyword else False
 
 
-def feed_DA2(filebuffer, current_experiment, current_user):
-    """Add DA2 ZIP experiment to database
-    """
+# def feed_DA2(filebuffer, current_experiment, current_user):
+#     """Add DA2 ZIP experiment to database
+#     """
 
-    # Import data
-    data_container = import_DA2(filebuffer)
+#     # Import data
+#     data_container = import_DA2(filebuffer)
 
-    # Extract data
-    amp, results, details = data_container['Amplification'], data_container['Results'], None
+#     # Extract data
+#     amp, results, details = data_container['Amplification'], data_container['Results'], None
 
-    # Get unique samples
-    unique_samples = results['Sample'].unique()
+#     # Get unique samples
+#     unique_samples = results['Sample'].unique()
 
-    # Unique markers
-    unique_markers = amp['Target'].unique()
+#     # Unique markers
+#     unique_markers = amp['Target'].unique()
 
-    # Get marker hash
-    m_hash = add_markers(unique_markers)
+#     # Get marker hash
+#     m_hash = add_markers(unique_markers)
 
-    # Iterate over samples
-    for sample_name in unique_samples:
+#     # Iterate over samples
+#     for sample_name in unique_samples:
 
-        # Instantiate sample
-        sample = Sample(sample=sample_name, experiment=current_experiment)
+#         # Instantiate sample
+#         sample = Sample(sample=sample_name, experiment=current_experiment)
 
-        # Mask dataframe for qPCRs
-        sample_qpcrs = amp[amp['Sample'] == sample_name]
+#         # Mask dataframe for qPCRs
+#         sample_qpcrs = amp[amp['Sample'] == sample_name]
 
-        # Iterate over qpcrs cycles
-        for qpcr in sample_qpcrs.itertuples():
+#         # Iterate over qpcrs cycles
+#         for qpcr in sample_qpcrs.itertuples():
 
-            # Get marker_id
-            marker_id = m_hash[qpcr[4]]
+#             # Get marker_id
+#             marker_id = m_hash[qpcr[4]]
 
-            # Instantiate qPCR
-            qpcr = Fluorescence(
-                well=qpcr[1], cycle=qpcr[3],
-                rn=qpcr[5], sample=sample, marker_id=marker_id)
+#             # Instantiate qPCR
+#             qpcr = Fluorescence(
+#                 well=qpcr[1], cycle=qpcr[3],
+#                 rn=qpcr[5], sample=sample, marker_id=marker_id)
 
-        # Mask for results
-        sample_results = results[results['Sample'] == sample_name]
+#         # Mask for results
+#         sample_results = results[results['Sample'] == sample_name]
 
-        # Iterate over sample results
-        for result in sample_results.itertuples():
+#         # Iterate over sample results
+#         for result in sample_results.itertuples():
 
-            # Get marker_id
-            marker_id = m_hash[result[3]]
+#             # Get marker_id
+#             marker_id = m_hash[result[3]]
 
-            # Instantiate Result
-            result = Result(
-                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), marker_id=marker_id, sample=sample
-            )
+#             # Instantiate Result
+#             result = Result(
+#                 amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), marker_id=marker_id, sample=sample
+#             )
 
-    # Add experiment to DB
-    db.session.add(current_experiment)
-    db.session.commit()
+#     # Add experiment to DB
+#     db.session.add(current_experiment)
+#     db.session.commit()
 
 
-def feed_7500(filebuffer, current_experiment, current_user):
-    """Add data to database
-    """
-    # Import data
-    data_container = import_7500(filebuffer)
+# def feed_7500(filebuffer, current_experiment, current_user):
+#     """Add data to database
+#     """
+#     # Import data
+#     data_container = import_7500(filebuffer)
 
-    # Parse Fluorescence and Results
-    amp, results = parse_7500(data_container)
+#     # Parse Fluorescence and Results
+#     amp, results = parse_7500(data_container)
 
-    # Get unique samples
-    unique_samples = results['Sample'].unique()
+#     # Get unique samples
+#     unique_samples = results['Sample'].unique()
 
-    # Unique Markers
-    unique_markers = results['Target'].unique()
+#     # Unique Markers
+#     unique_markers = results['Target'].unique()
 
-    # Get Marker Hash
-    m_hash = add_markers(unique_markers)
+#     # Get Marker Hash
+#     m_hash = add_markers(unique_markers)
 
-    # Iterate over samples
-    for sample_name in unique_samples:
+#     # Iterate over samples
+#     for sample_name in unique_samples:
 
-        # Instantiate sample
-        sample = Sample(sample=sample_name, experiment=current_experiment)
+#         # Instantiate sample
+#         sample = Sample(sample=sample_name, experiment=current_experiment)
 
-        # Mask dataframe for qPCRs
-        sample_qpcrs = amp[amp['Sample'] == sample_name]
+#         # Mask dataframe for qPCRs
+#         sample_qpcrs = amp[amp['Sample'] == sample_name]
 
-        # Iterate over qpcrs cycles
-        for qpcr in sample_qpcrs.itertuples():
+#         # Iterate over qpcrs cycles
+#         for qpcr in sample_qpcrs.itertuples():
 
-            # Get marker_id
-            marker_id = m_hash[qpcr[4]]
+#             # Get marker_id
+#             marker_id = m_hash[qpcr[4]]
 
-            # Instantiate qPCR
-            qpcr = Fluorescence(
-                well=qpcr[1], cycle=qpcr[3],
-                rn=qpcr[5], sample=sample, marker_id=marker_id)
+#             # Instantiate qPCR
+#             qpcr = Fluorescence(
+#                 well=qpcr[1], cycle=qpcr[3],
+#                 rn=qpcr[5], sample=sample, marker_id=marker_id)
 
-        # Mask for results
-        sample_results = results[results['Sample'] == sample_name]
+#         # Mask for results
+#         sample_results = results[results['Sample'] == sample_name]
 
-        # Iterate over sample results
-        for result in sample_results.itertuples():
+#         # Iterate over sample results
+#         for result in sample_results.itertuples():
 
-            # Get marker_id
-            marker_id = m_hash[result[3]]
+#             # Get marker_id
+#             marker_id = m_hash[result[3]]
 
-            # Instantiate Result
-            result = Result(
-                amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), marker_id=marker_id, sample=sample
-            )
+#             # Instantiate Result
+#             result = Result(
+#                 amp_status=amp_status(result[4]), amp_cq=round(result[5], 3), marker_id=marker_id, sample=sample
+#             )
 
-    # Add experiment to DB
-    db.session.add(current_experiment)
-    db.session.commit()
+#     # Add experiment to DB
+#     db.session.add(current_experiment)
+#     db.session.commit()
 
 
 @lru_cache(maxsize=100)
@@ -607,11 +733,11 @@ def amp_stat_data():
     # Compute all amplified samples
     dataset['amp_status'] = dataset['amp_cq'] != 0
 
-    # Parse date as datetime
-    dataset['date'] = pd.to_datetime(dataset['date'])
-
     # Group by date and target and calculate amplification (binary mean) percentages
     dataset = dataset.groupby(['date', 'target'])['amp_status'].mean().reset_index()
+
+    # Parse date as datetime
+    dataset['date'] = pd.to_datetime(dataset['date'])
 
     # Parse dates
     dataset['day'] = dataset['date'].dt.day
@@ -622,6 +748,7 @@ def amp_stat_data():
 
     # Instantiate data struct [{'target': 'example 1, 'data': [1, 2, 3]}]
     datasets = []
+    dates = None
 
     # Generate parsed dataset
     for target in dataset['target'].unique():
@@ -635,11 +762,14 @@ def amp_stat_data():
         # Add data to struct
         datasets.append({'target': target, 'data': percs.to_list()})
 
+        # Times will become the x axis
+        dates = df['day-month'].to_list()
+
     # Sort list of dictionaries
     datasets = sorted(datasets, key=lambda i: np.mean(i['data']))
 
     # Use last iteration day-month column
-    return {'dates': df['day-month'].to_list(), 'datasets': datasets}
+    return {'dates': dates, 'datasets': datasets}
 
 
 def tag_distrib():
