@@ -28,7 +28,7 @@ Vue.use(BootstrapVue)
 import axios from 'axios'
 
 // Set basic URL
-axios.defaults.baseURL = 'http://192.168.70.2:5000/'
+axios.defaults.baseURL = 'http://localhost:5000/'
 axios.defaults.headers['Content-Type'] = 'application/json'
 
 // Set token interceptor
@@ -127,10 +127,12 @@ if (markerOpacity) {
   store.dispatch('updateMarkerOpacity', markerOpacity)
 }
 
-// Load marker opacity
-const mapCenter = localStorage.getItem('mapCenter') || null;
+// Load map center
+const mapCenter = localStorage.getItem('mapLat') || null;
+const mapCenter2 = localStorage.getItem('mapLong') || null;
+
 if (mapCenter) {
-  store.dispatch('updateMapCenter', mapCenter)
+  store.dispatch('updateMapCenter', [mapCenter, mapCenter2])
 }
 
 

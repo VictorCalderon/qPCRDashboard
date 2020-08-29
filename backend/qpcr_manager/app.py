@@ -12,7 +12,7 @@ def create_app(testing=False, cli=False):
 
     @app.route('/')
     def hello_world():
-        return 'Ñiamo!'
+        return 'Server up and working!'
 
     if testing is True:
         app.config["TESTING"] = True
