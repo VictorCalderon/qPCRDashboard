@@ -239,13 +239,17 @@ export default {
 
   watch: {
     currentExperiment() {
+
+      // Copy current experiment to local object
       this.experiment = { ...this.currentExperiment };
-      if (this.experiment.tags) {
-        this.experment.tags = this.experiment.tags.split(';')
-      }
+
+      // Check if a project was set
+      if (this.currentExperiment.tags) {
+        this.experiment.tags = this.experiment.tags.split(';')
       }
     }
   }
+}
 
 </script>
 
