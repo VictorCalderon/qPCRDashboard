@@ -130,6 +130,10 @@
           >{{ data.item.sample }}</b>
         </template>
 
+        <template v-slot:cell(marker)="data">
+          <b :style="{color: markerColor[data.item.marker] }">{{ data.item.marker }}</b>
+        </template>
+
         <template v-slot:cell(score)="data">
           <b
             :style="{color: data.item.score < 0.75 ? data.item.score < 0.25 ? '#CC2936' : '#F2BB05' : '#124E78' }"
@@ -152,7 +156,7 @@ import FileDownload from "js-file-download";
 export default {
   data() {
     return {
-      perPage: 15,
+      perPage: 20,
       currentPage: 1,
       selectedRow: null,
       xSampleFilter: null,
@@ -171,7 +175,8 @@ export default {
   methods: {
     downloadSampleTable() {
       // Make sure the table has content
-      if (this.filteredTable.length > 1) {
+      if (this.filteredTable) {
+
         // Generate csv
         let file = [...this.filteredTable.map(sample => { return Object.values(sample).slice(1, -1).join(',')})];
         const header = [...Object.keys(this.filteredTable[0]).slice(1, -1)];
@@ -246,7 +251,11 @@ export default {
     },
 
     markerFilter() {
-           return this.xMarkerFilter != "" ? this.xMarkerFilter : null
+      return this.xMarkerFilter != "" ? this.xMarkerFilter : null
+    },
+
+    markerColor() {
+      return this.$store.getters.markerColor
     },
 
     currentTable() {
@@ -275,7 +284,7 @@ export default {
   watch: {
     filteredTable() {
       if (this.filteredTable == []) return [];
-      if (this.selectedRow.length > 0) return void 0;
+      if (this.selectedRow) return void 0;
       // else {
       //   const firstSample = this.filteredTable.slice(0, 1);
       //   this.$store.dispatch('selectSample', firstSample);
