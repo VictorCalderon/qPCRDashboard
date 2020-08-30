@@ -82,19 +82,30 @@ export default {
             fontSize: 0
           }
         },
-        yAxes: [
-          {
-            scaleLabel: {
-              display: false,
-            },
-            ticks: {
-              display: false,
-            },
-            gridLines: {
-              display: true
+        scales: {
+          xAxes: [
+            {
+              ticks: {
+                display: true,
+                suggestedMax: 1000, min: 0
+              },
+              gridLines: {
+                display: true
+              }
             }
-          }
-        ],
+          ],
+          yAxes: [
+            {
+              ticks: {
+                display: true,
+                suggestedMax: 0, min: 0
+              },
+              gridLines: {
+                display: true
+              }
+            }
+          ]
+        },
         tooltips: {
           callbacks: {
             label: function(tooltipItem, data) {
