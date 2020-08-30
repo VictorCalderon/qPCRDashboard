@@ -4,7 +4,8 @@ import Vue from 'vue'
 const state = {
     targetGroups: [],
     sampleLocationSchemas: null,
-    mapCenter: [19.007237, -70.41502],
+    mapCenter: [18.512961, -69.901458],
+    mapZoom: 10,
     markerSize: 50,
     markerOpacity: 0.8,
     markerSizeOpacity: [50, 0.8],
@@ -35,7 +36,8 @@ const mutations = {
 
     SET_MAP_CENTER(state, newCenter) {
         // Save to local storage
-        localStorage.setItem('newCenter', newCenter);
+        localStorage.setItem('mapLat', newCenter[0]);
+        localStorage.setItem('mapLong', newCenter[1]);
 
         // Save to Vue
         Vue.set(state, 'mapCenter', newCenter);
@@ -127,19 +129,10 @@ const getters = {
     },
 
     mapCenter(state) {
-
-        // Check if saved in LocalStorage
-        const mapCenter = localStorage.getItem('mapCenter') || null;
-
-        if (mapCenter) {
-            return mapCenter
-        }
-
-        return state.mapCenter
+        return state.mapCenter ? state.mapCenter : [19.4857, -69.9876]  // some default center
     },
 
     markerSize(state) {
-
         return state.markerSize
     },
 
@@ -150,6 +143,10 @@ const getters = {
     sampleLocationSchemas(state) {
         return state.sampleLocationSchemas
     },
+
+    mapZoom(state) {
+        return state.mapZoom
+    }
 
 }
 
