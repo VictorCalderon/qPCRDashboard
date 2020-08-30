@@ -131,7 +131,7 @@ export default {
 
 <style lang='scss' scoped>
 .timeseries-height {
-  height: 50vh;
+  height: 40vh;
 }
 
 @media (max-width: 480px) {
