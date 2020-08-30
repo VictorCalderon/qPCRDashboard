@@ -12,7 +12,7 @@
       <div v-for="(s, i) in samplingSites" :key="i">
         <l-circle
           :lat-lng="s.loc"
-          :radius="+markerSize"
+          :radius="+markerSize * 100"
           :color="s.bgColor"
           :fillColor="s.bgColor"
           :opacity="s.perc"
@@ -110,12 +110,12 @@ export default {
 
 <style lang='scss' scoped>
 .locationmap-height {
-  height: 600px;
+  height: 43vh;
 }
 
 @media (max-width: 480px) {
   .locationmap-height {
-    height: 400px;
+    height: 40vh;
   }
 }
 </style>
