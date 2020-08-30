@@ -853,6 +853,9 @@ def experiment_pca_kmeans(experiment_id, k=None):
     # Count unique markers
     n_components = len(results_df['marker'].unique())
 
+    # Assert there are no duplicates
+    assert len(results_df.duplicated(subset=['sample', 'marker'])) != 0
+
     # Pivot Table
     results_df = results_df.pivot(index='sample', columns='marker', values='amp_cq')
 
