@@ -1,7 +1,7 @@
 <template>
   <b-form-row>
     <l-map
-      :zoom="zoom"
+      :zoom="mapZoom"
       :center="mapCenter"
       :options="mapOptions"
       class="locationmap-height"
@@ -12,13 +12,21 @@
       <div v-for="(s, i) in samplingSites" :key="i">
         <l-circle
           :lat-lng="s.loc"
-          :radius="s.count * markerSize"
+          :radius="markerSize"
           :color="s.bgColor"
           :fillColor="s.bgColor"
-          :opacity="markerOpacity"
+          :opacity="s.perc"
         >
           <l-tooltip :options="{ permanent: false, interactive: true }">
-            <div @click="innerClick(s.description)">{{s.name}}</div>
+            <div @click="innerClick(s.description)">
+              <div>
+                <span class="text-bold">{{ s.name }}</span>
+                <br />
+                <span>Detected: {{ s.count }}</span>
+                <br />
+                <span>Percentage: {{ Math.round(s.perc * 100) }}%</span>
+              </div>
+            </div>
           </l-tooltip>
         </l-circle>
       </div>
@@ -27,7 +35,6 @@
 </template>
 
 <script>
-import { latLng } from "leaflet";
 import { LMap, LTileLayer, LCircle, LTooltip } from "vue2-leaflet";
 
 export default {
@@ -39,13 +46,11 @@ export default {
   },
   data() {
     return {
-      zoom: 8,
-      center: latLng(19.007237, -70.41502),
+      zoom: 12,
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       attribution:
         '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-      currentZoom: 11.5,
-      currentCenter: latLng(19.007237, -70.41502),
+      currentZoom: 12,
       mapOptions: {
         zoomSnap: 0.5
       }
@@ -66,6 +71,10 @@ export default {
 
     markerOpacity() {
       return this.$store.getters.markerOpacity;
+    },
+
+    mapZoom() {
+      return this.$store.getters.mapZoom;
     }
   },
 
@@ -101,12 +110,12 @@ export default {
 
 <style lang='scss' scoped>
 .locationmap-height {
-  height: 400px;
+  height: 600px;
 }
 
 @media (max-width: 480px) {
   .locationmap-height {
-    height: 300px;
+    height: 400px;
   }
 }
 </style>
