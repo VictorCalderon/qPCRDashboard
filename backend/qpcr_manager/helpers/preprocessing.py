@@ -345,6 +345,9 @@ def parse_7500(flat7500, current_experiment):
     # Return data
     return merge_results_fluorescence(results, raw)
 
+    # Load Experiment to database
+    load_experiment(results, current_experiment)
+
 
 def parse_q2000(flatq2000, current_experiment):
     """Parse flat q2000 export file
@@ -541,7 +544,7 @@ def add_markers(markers):
 def amp_status(x, amp_keyword='Amp'):
     return True if x == amp_keyword else False
 
-
+# Load results fast
 @lru_cache(maxsize=100)
 def get_experiment_results(experiment_id):
     """Query and parse a DataFrame with Experiment(experiment_id) results
