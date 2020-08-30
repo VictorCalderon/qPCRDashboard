@@ -26,9 +26,9 @@ export default {
 
         // Return color array
         return Array(Math.floor(colorLen / 5) + 1)
-          .fill(["#BD632F", "#D8C99B", "#D8973C", "#5C9EAD", "#273E47"])
+          .fill(["#EAEBED", "#006989", "#A3BAC3", "#007090", "#01A7C2"])
           .flat(colorLen);
-      } else return ["#BD632F", "#D8C99B", "#D8973C", "#5C9EAD", "#273E47"];
+      } else return ["#EAEBED", "#006989", "#A3BAC3", "#007090", "#01A7C2"];
     },
 
     tagDistribution() {
