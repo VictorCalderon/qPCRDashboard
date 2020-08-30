@@ -212,17 +212,20 @@ class ImportExperiment(Resource):
         except NotImplementedError:
             return {'msg': 'This format option is not implemented yet!'}, 400
 
-        # except ValueError:
-            # return {'msg': 'Invalid Format'}, 400
+        except ValueError:
+            return {'msg': 'Invalid Format'}, 400
 
-        # except TypeError:
-        #     return {'msg': 'There was a problem importing your experiment'}, 400
+        except TypeError:
+            return {'msg': 'There was a problem importing your experiment'}, 400
+
+        except AssertionError as e:
+            return {'msg': str(e)}, 400
 
         except BadZipFile:
             return {'msg': 'File must be zipped'}, 400
 
-        # except:
-        #     return {'msg': 'There was a problem importing your experiment'}, 400
+        except:
+            return {'msg': 'There was a problem importing your experiment'}, 400
 
 
 class ExperimentResults(Resource):
@@ -628,8 +631,7 @@ class ExperimentSamplesList(Resource):
 
     def get(self, experiment_id):
         schema = SampleSchema(many=True)
-        samples = Sample.query.filter_by(
-            experiment_id=experiment_id).order_by('id')
+        samples = Sample.query.filter_by(experiment_id=experiment_id).order_by('id')
         return {'samples': schema.dump(samples)}
 
 
@@ -707,6 +709,9 @@ class ExperimentPCA(Resource):
 
         try:
             return experiment_pca_kmeans(experiment_id)
+
+        except AssertionError:
+            return {'msg': 'Duplicate sample/marker pairs found in your experiment.'}, 400
 
         except:
             raise RuntimeError('ExperimentPCA analysis failed.')
