@@ -12,7 +12,7 @@
       <div v-for="(s, i) in samplingSites" :key="i">
         <l-circle
           :lat-lng="s.loc"
-          :radius="markerSize"
+          :radius="+markerSize"
           :color="s.bgColor"
           :fillColor="s.bgColor"
           :opacity="s.perc"
