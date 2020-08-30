@@ -115,7 +115,7 @@ export default {
 
 @media (max-width: 480px) {
   .locationmap-height {
-    height: 40vh;
+    height: 420px;
   }
 }
 </style>
