@@ -110,7 +110,7 @@ export default {
 
 <style lang='scss' scoped>
 .locationmap-height {
-  height: 43vh;
+  height: 420px;
 }
 
 @media (max-width: 480px) {
