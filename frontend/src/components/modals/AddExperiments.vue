@@ -232,7 +232,7 @@ export default {
       name: "",
       file: null,
       date: null,
-      format: "zip",
+      format: null,
       methodology: null,
       tags: [],
       message: false,
@@ -243,8 +243,9 @@ export default {
       tagsDescription: "e.g. Independent experiments variables",
       options: [
         { value: null, text: "Choose a format" },
-        { value: "txt", text: "ABI 7500" },
-        { value: "zip", text: "Design and Analysis 2" }
+        { value: "7500", text: "ABI 7500" },
+        { value: "ds2", text: "Design and Analysis 2" },
+        { value: "q2000", text: 'Q2000'}
       ]
     };
   },
