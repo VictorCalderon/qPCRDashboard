@@ -29,7 +29,13 @@
           type="submit"
           @click="submitLogin"
           value="Sign In"
+          v-if="!logInError"
         >Sign in</button>
+        <div
+          class="alert alert-danger alert-dismissible fade show"
+          role="alert"
+          v-else
+        >{{ logInError }}</div>
         <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
       </form>
     </div>
@@ -38,7 +44,7 @@
 
 
 <script>
-import router from "@/router/index";
+// import router from "@/router/index";
 
 export default {
   data() {
@@ -70,16 +76,18 @@ export default {
     postLogin() {
       this.$store
         .dispatch("authLogin", {
-          username: this.username,
+          username: this.username.toLowerCase(),
           password: this.password
         })
-        .then(() => {
-          if (this.$route.name != "Dashboard") {
-            router.push({
-              name: "Dashboard"
-            });
-          }
-        });
+        // .then(() => {
+        //   if (this.$route.name != "Dashboard") {
+        //     router.push({
+        //       name: "Dashboard"
+        //     });
+        //   }
+        // }).catch(() => {
+        //   this.badLogin = true;
+        // });
     },
     postSignup() {
       this.$store.dispatch("authSignUp", {
@@ -102,9 +110,8 @@ export default {
   },
   watch: {
     logInError() {
-      this.badLogin = true;
       setTimeout(() => {
-        this.badLogin = false;
+        this.$store.dispatch('clearLogInError');
       }, 1500);
     }
   }
