@@ -128,7 +128,7 @@ export default {
               },
               ticks: {
                 display: true,
-                max: 40, min: 10
+                max: 40, min: 2
               },
               gridLines: {
                 display: true
@@ -143,7 +143,7 @@ export default {
               },
               ticks: {
                 display: true,
-                suggestedMax: 2, min: -0.1
+                // suggestedMax: 2, min: -0.1
               },
               gridLines: {
                 display: true
