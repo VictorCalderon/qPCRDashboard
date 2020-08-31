@@ -202,7 +202,8 @@ const actions = {
     updateExperiment({ commit, getters }, experiment) {
         axios.put(`api/v1/experiments/${getters.currentExperiment.id}`, experiment).then(
             res => {
-                commit('UPDATE_MSG', res.data.msg)
+                commit('UPDATE_MSG', res.data.msg);
+                commit('SELECT_EXPERIMENT', res.data.experiment)
             }
         )
     },
