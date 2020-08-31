@@ -22,8 +22,8 @@ const mutations = {
     Vue.set(state, 'refreshToken', refreshToken);
   },
 
-  'STORE_ERROR'(state, { errorMsg }) {
-    Vue.set(state, 'errorMsg', errorMsg);
+  'STORE_ERROR'(state, errorMsg) {
+    Vue.set(state, 'authErrorMsg', errorMsg);
   },
 
   'CLEAR_TOKEN'(state) {
@@ -45,8 +45,12 @@ const actions = {
         commit('STORE_USER', { username: username })
       })
       .catch(e => {
-        commit('STORE_ERROR', { errorMsg: e.response.data.msg })
+        commit('STORE_ERROR', e.response.data.msg)
       })
+  },
+
+  clearLogInError({ commit }) {
+    commit('STORE_ERROR', null)
   },
 
   authRefresh({ commit }) {
