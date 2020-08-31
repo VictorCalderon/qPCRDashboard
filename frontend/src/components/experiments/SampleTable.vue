@@ -8,7 +8,7 @@
     <template v-slot:header>
       <b-form-row class="justify-content-center">
         <b-col lg="4" md="6">
-          <h5 class="my-2 thin-font text-center">{{ currentExperiment.name }}</h5>
+          <h5 class="my-2 mx-0 thin-font text-center h6">{{ currentExperiment.name }}</h5>
         </b-col>
         <b-col lg="5" offset-lg="1" md offset-md="1" offset-sm="0" offset="2">
           <b-button-group size="md">
@@ -166,7 +166,7 @@ export default {
         { key: "sample", sortable: true, label: "Samples" },
         { key: "marker", sortable: true },
         // { key: "amp_status", sortable: true, label: 'Amp'},
-        { key: "cq", sortable: true },
+        { key: "cq", sortable: true, label: 'Ct' },
         // { key: "score", sortable: true },
       ]
     };
