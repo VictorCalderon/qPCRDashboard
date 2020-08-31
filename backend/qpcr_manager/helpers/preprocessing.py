@@ -54,6 +54,12 @@ q2000 = {
     'TEXAS-RED': 'Channel3', 'CY5': 'Channel3', 'CY5': 'Channel4'
 }
 
+abi7500n = {
+    'FAM': 'FAM-CYBRGreen', 'JOE': 'JOE-VIC', 'VIC': 'JOE-VIC',
+    'TAMRA': 'TAMRA-NED-Cy3', 'NED': 'TAMRA-NED-Cy3', 'Cy3': 'TAMRA-NED-Cy3',
+    'ROX': 'ROX-TEXASRed', 'TEXASRed': 'ROX-TEXASRed'
+}
+
 
 def save_to_temp(filebuffer) -> str:
     """Save file to temp folder
@@ -115,6 +121,10 @@ def merge_results_fluorescence(results: pd.DataFrame, raw: pd.DataFrame) -> pd.D
 
     # Reset Index Inplace
     raw.reset_index(drop=True, inplace=True)
+
+    # Sort columns
+    sorted_columns = ['Well Position', 'Reporter'] + [str(x) for x in range(1, len(raw.columns) - 1)]
+    raw = raw[sorted_columns]
 
     # Merge with results table
     results = pd.merge(raw, results, on=[
@@ -322,13 +332,13 @@ def parse_7500(flat7500, current_experiment):
     # Transform results to records into records
     results = [record.split('\t') for record in data['Results']]
     results = pd.DataFrame.from_records(data=results[1:], columns=results[0])
-    results = results.replace('', pd.NA)[['Well', 'Reporter', 'Sample Name', 'Target Name', 'Ct']].dropna()
+    results = results.replace('', pd.NA)[['Well', 'Reporter', 'Sample Name', 'Target Name', 'Cт']].dropna()
 
     # Change column names for compatibility
     results.columns = ['Well Position', 'Reporter', 'Sample', 'Target', 'Ct']
 
     # Unique reporters and filter columns
-    used_channels = {abi7500.get(r, 'NOT_SUPPORTED'): r for r in results['Reporter'].unique()}
+    used_channels = {abi7500n.get(r, 'NOT_SUPPORTED'): r for r in results['Reporter'].unique()}
     filter_columns = ['Well', 'Cycle'] + list(used_channels.keys())
 
     # Transform raw data to records
@@ -900,8 +910,8 @@ def sliding_denoiser(raw_data, window=5):
     # Compute argmin
     std_argmin = np.argmin(stds_)
 
-    # Log transform data
-    raw_data = np.log(raw_data)
+    # Log transform data (add small amount to remove zeros)
+    raw_data = np.log(raw_data + 1e-5)
 
     # Compute denoised data
     denoised_data = raw_data - np.mean(raw_data[std_argmin: std_argmin + window])
@@ -935,7 +945,7 @@ def compute_fluorescences(experiment_id):
     dataset = dataset.pivot(index='indexer', columns='cycle', values='rn')
 
     # Log transform and remove noise
-    dataset.iloc[:, :] = dataset.apply(lambda row: sliding_denoiser(row), axis=1).values
+    # dataset.iloc[:, :] = dataset.apply(lambda row: sliding_denoiser(row), axis=1).values
 
     # Reset index
     dataset.reset_index(inplace=True)
@@ -979,7 +989,7 @@ def maximum_gradient(experiment_id):
     for f in fluo_data:
 
         # Compute second order gradient
-        grad_ = np.gradient(f['data'])
+        grad_ = np.gradient(np.log(np.array(f['data']) + 5e-5))
 
         # Extract argmax from index 5 onward to avoid weirdness
         cycle = np.argmax(grad_[5:]) + 5
