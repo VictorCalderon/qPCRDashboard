@@ -12,7 +12,7 @@
       <!-- Collapse content-->
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item to="/Dashboard">Overview</b-nav-item>
+          <b-nav-item to="/">Overview</b-nav-item>
           <b-nav-item to="/Experiments">Experiments</b-nav-item>
           <b-nav-item to="/Adjustments">Adjustments</b-nav-item>
         </b-navbar-nav>
