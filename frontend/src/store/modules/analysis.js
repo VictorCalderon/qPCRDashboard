@@ -19,55 +19,55 @@ const mutations = {
         Vue.set(state, 'currentExperimentResults', null);
     },
 
-    'LOAD_ALL_EXPERIMENTS'(state, experiments) {
+    LOAD_ALL_EXPERIMENTS(state, experiments) {
         Vue.set(state, 'allExperiments', experiments)
     },
 
-    'LOAD_NEXT_EXPERIMENTS'(state, nextUrl) {
+    LOAD_NEXT_EXPERIMENTS(state, nextUrl) {
         Vue.set(state, 'next', nextUrl)
     },
 
-    'LOAD_PREV_EXPERIMENTS'(state, prevUrl) {
+    LOAD_PREV_EXPERIMENTS(state, prevUrl) {
         Vue.set(state, 'prev', prevUrl)
     },
 
-    'SELECT_EXPERIMENT'(state, experiment) {
+    SELECT_EXPERIMENT(state, experiment) {
         Vue.set(state, 'currentExperiment', experiment)
     },
 
-    'UPDATE_MSG'(state, msg) {
+    UPDATE_MSG(state, msg) {
         Vue.set(state, 'updateMsg', msg)
     },
 
-    'EXPORT_EXPERIMENT_FILE'(state, file) {
+    EXPORT_EXPERIMENT_FILE(state, file) {
         Vue.set(state, 'currentExperimentFile', file)
     },
 
-    'CLEAR_EXPERIMENTS'(state) {
+    CLEAR_EXPERIMENTS(state) {
         Vue.set(state, 'allExperiments', [])
     },
 
-    'EXPERIMENTS_QUERY'(state, experiments) {
+    EXPERIMENTS_QUERY(state, experiments) {
         Vue.set(state, 'queriedExperiments', experiments)
     },
 
-    'CLEAR_CURRENT_EXPERIMENT'(state) {
+    CLEAR_CURRENT_EXPERIMENT(state) {
         Vue.set(state, 'currentExperiment', null)
     },
 
-    'SET_EXPERIMENT_RESULTS'(state, results) {
+    SET_EXPERIMENT_RESULTS(state, results) {
         Vue.set(state, 'currentExperimentResults', results)
     },
 
-    'SET_EXPERIMENT_FLUORESCENCES'(state, results) {
+    SET_EXPERIMENT_FLUORESCENCES(state, results) {
         Vue.set(state, 'currentExperimentFluorescences', results)
     },
 
-    'SET_EXPERIMENT_PCA'(state, pca) {
+    SET_EXPERIMENT_PCA(state, pca) {
         Vue.set(state, 'experimentPCA', pca)
     },
 
-    'SET_EXPERIMENT_MAXGRAD'(state, maxGrad) {
+    SET_EXPERIMENT_MAXGRAD(state, maxGrad) {
         Vue.set(state, 'experimentMaxGrad', maxGrad)
     },
 

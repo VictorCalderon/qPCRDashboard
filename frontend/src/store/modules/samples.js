@@ -9,53 +9,54 @@ const state = {
 
 const mutations = {
 
-    'LOAD_SAMPLES'(state, allSamples) {
+    LOAD_SAMPLES(state, allSamples) {
         Vue.set(state, 'allSamples', allSamples)
     },
 
-    'LOAD_NEXT_SAMPLES'(state, nextUrl) {
+    LOAD_NEXT_SAMPLES(state, nextUrl) {
         Vue.set(state, 'next', nextUrl)
     },
 
-    'LOAD_PREV_SAMPLES'(state, prevUrl) {
+    LOAD_PREV_SAMPLES(state, prevUrl) {
         Vue.set(state, 'prev', prevUrl)
     },
 
-    'LOAD_CURRENT_SAMPLES'(state, currentSamples) {
+    LOAD_CURRENT_SAMPLES(state, currentSamples) {
         Vue.set(state, 'currentSamples', currentSamples);
     },
 
-    'LOAD_CURRENT_TABLE'(state, currentTable) {
+    LOAD_CURRENT_TABLE(state, currentTable) {
         Vue.set(state, 'currentTable', currentTable);
     },
 
-    'SELECT_SAMPLE'(state, sample) {
+    SELECT_SAMPLE(state, sample) {
         Vue.set(state, 'currentSample', sample)
     },
 
-    'ADD_SAMPLE_RESULT'(state, result) {
+    ADD_SAMPLE_RESULT(state, result) {
         state.currentSample.result = result
     },
 
-    'SAMPLES_FILTER'(state, sampleFilter) {
+    SAMPLES_FILTER(state, sampleFilter) {
         Vue.set(state, 'filter', sampleFilter)
     },
 
-    'TABLE_SAMPLE_FILTER'(state, sampleFilter) {
+    TABLE_SAMPLE_FILTER(state, sampleFilter) {
         Vue.set(state, 'sampleFilter', sampleFilter)
     },
 
-    'TABLE_MARKER_FILTER'(state, markerFilter) {
+    TABLE_MARKER_FILTER(state, markerFilter) {
         Vue.set(state, 'markerFilter', markerFilter)
     },
 
-    'SAMPLE_MODIFIED'(state) {
+    SAMPLE_MODIFIED(state) {
         Vue.set(state, 'sampleModifiedSignal', !state.sampleModifiedSignal)
     },
 
-    'SAMPLES_QUERY'(state, samples) {
+    SAMPLES_QUERY(state, samples) {
         Vue.set(state, 'queriedSamples', samples)
     },
+
 }
 
 const actions = {
@@ -108,6 +109,7 @@ const actions = {
                 commit('SAMPLES_QUERY', res.data)
             })
     },
+
 }
 
 
@@ -151,8 +153,9 @@ const getters = {
     },
 
     currentTable(state) {
-        return state.currentTable ? state.currentTable : []
+        return state.currentTable || []
     },
+
 }
 
 

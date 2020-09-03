@@ -2,9 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 // Import views
-import Experiment from '../views/Experiments.vue'
+import Analysis from '../views/Analysis.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Adjustments from '../views/Adjustments.vue'
+import Experiment from '../views/Experiment.vue'
 
 // User plugin
 Vue.use(VueRouter)
@@ -23,15 +24,20 @@ const routes = [
     component: Dashboard,
   },
   {
-    path: '/Experiments',
-    name: 'Experiments',
-    component: Experiment,
+    path: '/Analysis',
+    name: 'Analysis',
+    component: Analysis,
   },
   {
     path: '/Adjustments',
     name: 'Adjustments',
     component: Adjustments,
   },
+  {
+    path: '/Experiment',
+    name: 'Experiment',
+    component: Experiment
+  }
 ]
 
 // Add routes
