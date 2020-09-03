@@ -12,15 +12,15 @@
       <!-- Collapse content-->
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item to="/">Overview</b-nav-item>
-          <b-nav-item to="/Experiments">Experiments</b-nav-item>
-          <b-nav-item to="/Adjustments">Adjustments</b-nav-item>
+          <b-nav-item to="/" :class="{'text-uppercase': currentRoute == 'Dashboard'}">Overview</b-nav-item>
+          <b-nav-item to="/Experiment" :class="{'text-uppercase': currentRoute == 'Experiment'}">Experiment</b-nav-item>
+          <b-nav-item to="/Analysis" :class="{'text-uppercase': currentRoute == 'Analysis'}">Analysis</b-nav-item>
         </b-navbar-nav>
 
         <b-navbar-nav class="ml-auto">
           <b-nav-item
             v-b-modal.add-experiments-modal
-            v-if="this.$route.name == 'Experiments' && allExperiments"
+            v-if="this.$route.name == 'Analysis' && allExperiments"
           >
             <span>
               <i class="fas fa-plus"></i>&nbsp;Add
@@ -28,10 +28,15 @@
           </b-nav-item>
           <b-nav-item
             v-b-modal.search-experiments-modal
-            v-if="this.$route.name == 'Experiments' && allExperiments"
+            v-if="this.$route.name == 'Analysis' && allExperiments"
           >
             <i class="fas fa-search"></i>&nbsp;
             <span class>Search</span>
+          </b-nav-item>
+          <b-nav-item 
+            to="/Adjustments" 
+            :class="{'text-uppercase': currentRoute == 'Adjustments'}"
+          ><i class="fas fa-cog mr-1"></i>Adjustments
           </b-nav-item>
           <b-nav-item @click="logOut">
             <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
@@ -67,6 +72,10 @@ export default {
 
     currentUser() {
       return this.$store.getters.currentUser;
+    },
+
+    currentRoute() {
+      return this.$route.name
     }
   },
   methods: {
