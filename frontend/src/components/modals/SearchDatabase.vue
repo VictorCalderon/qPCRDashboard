@@ -220,7 +220,7 @@ export default {
         {
           key: "analyzed",
           sortable: true,
-          label: "Done"
+          label: "Reported"
         }
       ],
       sampleFields: [
