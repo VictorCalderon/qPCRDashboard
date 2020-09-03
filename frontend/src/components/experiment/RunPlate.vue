@@ -92,7 +92,7 @@ export default {
 
     modalTitle() {
       if (this.selectedSample) {
-        return this.selectedSample.well + " - " + this.selectedSample.cedula;
+        return this.selectedSample.well + " - " + this.selectedSample.barcode;
       } else return "Select a sample";
     },
   },
