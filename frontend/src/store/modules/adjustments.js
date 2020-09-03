@@ -4,8 +4,8 @@ import Vue from 'vue'
 const state = {
     targetGroups: [],
     sampleLocationSchemas: null,
-    mapCenter: [18.512961, -69.901458],
-    mapZoom: 10,
+    mapCenter: [18.7264685, -70.867401],
+    mapZoom: 8,
     markerSize: 50,
     markerOpacity: 0.8,
     markerSizeOpacity: [50, 0.8],
