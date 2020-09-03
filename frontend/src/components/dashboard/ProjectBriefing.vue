@@ -9,7 +9,7 @@
   >
     <b-form-row>
       <b-col lg="6" md="12">
-        <b-card class="my-0">
+        <b-card class="my-1">
           <h6 class="card-subtitle my-1 text-muted">Samples</h6>
           <span>
             <h4>
@@ -20,7 +20,7 @@
         </b-card>
       </b-col>
       <b-col lg="6" md="12">
-        <b-card class="my-0">
+        <b-card class="my-1">
           <h6 class="card-subtitle my-1 text-muted">Experiments</h6>
           <span>
             <h4>
@@ -31,7 +31,7 @@
         </b-card>
       </b-col>
       <b-col lg="6" md="12">
-        <b-card class="my-0 mt-2">
+        <b-card class="my-0 mt-1">
           <h6 class="card-subtitle my-1 text-muted">Pending</h6>
           <span>
             <h4>
@@ -42,7 +42,7 @@
         </b-card>
       </b-col>
       <b-col lg="6" md="12">
-        <b-card class="my-0 mt-2">
+        <b-card class="my-0 mt-1">
           <h6 class="card-subtitle my-1 text-muted">Reported</h6>
           <span>
             <h4>
