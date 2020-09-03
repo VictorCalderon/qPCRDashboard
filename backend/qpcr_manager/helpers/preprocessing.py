@@ -501,10 +501,10 @@ def query_samples(current_user, sample):
     # Build query
     query = f"""
     SELECT experiments.id as experiment_id, sample, name, marker, amp_status, amp_cq FROM experiments
-    JOIN samples on samples.experiment_id = experiments.id
-    JOIN results on results.sample_id = samples.id
-    JOIN markers on results.marker_id = markers.id
-    WHERE experiments.user_id = {current_user.id} and samples.sample like '%%{sample}%%';
+    JOIN samples ON samples.experiment_id = experiments.id
+    JOIN results ON results.sample_id = samples.id
+    JOIN markers ON results.marker_id = markers.id
+    WHERE experiments.user_id = {current_user.id} and samples.sample LIKE '%%{sample}%%';
     """
 
     # Run in pandas
