@@ -7,7 +7,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Add or Modify Sample"
+              header="Add or Modify Samples"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
@@ -28,6 +28,38 @@
               header-text-variant="white"
               class="my-1"
             >
+              <template v-slot:header>
+                <b-form-row>
+                  <b-col cols="1"></b-col>
+                  <b-col cols="3"></b-col>
+                  <b-col cols="4">Current Experiment Plate</b-col>
+                  <b-col cols="2"></b-col>
+                  <b-col cols="2">
+                    <b-button
+                      class="text-dark border"
+                      variant="light"
+                      @click="saveSamplePlates"
+                      id="download-dataset"
+                      size="sm"
+                      v-b-tooltip.hover.top
+                      title="Save sample plate"
+                    >
+                      <i class="fas fa-save"></i>
+                    </b-button>
+                    <b-button
+                      class="text-dark border ml-2"
+                      variant="light"
+                      @click="downloadSampleTable"
+                      id="download-dataset"
+                      size="sm"
+                      v-b-tooltip.hover.top
+                      title="Export current plate"
+                    >
+                      <i class="fas fa-download"></i>
+                    </b-button>
+                  </b-col>
+                </b-form-row>
+              </template>
               <AllSamples></AllSamples>
             </b-card>
           </b-col>
@@ -52,9 +84,10 @@
 </template>
 
 <script>
-import AllSamples from "@/components/runprep/RunTable.vue";
-import NewSample from "@/components/runprep/NewSample.vue";
-import NewSampleTable from "@/components/runprep/NewSampleTable.vue";
+import FileDownload from "js-file-download";
+import AllSamples from "@/components/experiment/RunTable.vue";
+import NewSample from "@/components/experiment/NewSample.vue";
+import NewSampleTable from "@/components/experiment/NewSampleTable.vue";
 
 export default {
   components: {
@@ -71,6 +104,10 @@ export default {
     currentRoute() {
       return this.$route.name;
     },
+
+    currentExperimentPlate() {
+      return this.$store.getters.newSamplePlate;
+    },
   },
 
   mounted() {
@@ -78,6 +115,41 @@ export default {
   },
 
   watch: {},
+
+  data() {
+    return {
+      currentPlateName: "Test Data",
+    };
+  },
+
+  methods: {
+    downloadSampleTable() {
+      // Make sure the table has content
+      if (this.currentExperimentPlate) {
+        // Generate csv
+        let file = [
+          ...this.filteredTable.map((sample) => {
+            return Object.values(sample).slice(1, -1).join(",");
+          }),
+        ];
+        const header = [...Object.keys(this.filteredTable[0]).slice(1, -1)];
+
+        // Add header
+        file.unshift(header.join(","));
+
+        // Join lines with \n
+        file = file.join("\r\n");
+
+        // Generate data blob
+        file = new Blob([file], { type: "text/plain" });
+
+        // Download file
+        FileDownload(file, this.currentPlateName.name + ".txt");
+      } else {
+        alert("The table is empty.");
+      }
+    },
+  },
 };
 </script>
 

@@ -3,6 +3,19 @@ import Vue from 'vue'
 
 const state = {
   newSamplePlate: [],
+
+  priorityOptions: [
+    { text: "Standard", value: 0 },
+    { text: "Urgent", value: 1 },
+  ],
+
+  stepOptions: [
+    { text: 'Rejected', value: 99 },
+    { text: 'Received', value: 0 },
+    { text: 'Extracted', value: 1 },
+    { text: 'Amplified', value: 2 },
+    { text: 'Reported', value: 3 },
+  ]
 }
 
 const mutations = {
@@ -30,6 +43,14 @@ const actions = {
 const getters = {
   newSamplePlate(state) {
     return state.newSamplePlate || []
+  },
+
+  priorityOptions(state) {
+    return state.priorityOptions
+  },
+
+  stepOptions(state) {
+    return state.stepOptions
   }
 }
 
