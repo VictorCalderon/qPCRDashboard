@@ -26,9 +26,7 @@ export default {
   data() {
     return {
       cID: 0,
-      groupedColors: {},
-      colors: ["#009DDC", "#F26430", "#2A2D34", '#465362'],
-      groupColors: ["#2A2D34", "#009DDC", "#F26430"],
+      groupedColors: {0: '#246EB9', 1: "#4CB944", 2: "#F06543", 3: '#F5EE9E'},
       toggleLegend: true
     };
   },
@@ -62,11 +60,11 @@ export default {
           datasets: [
             ...this.experimentPCA.map(d => {
 
-              // Color point
-              if (!this.groupedColors[d.Cluster]) {
-                  this.groupedColors[d.Cluster] = this.colors[this.cID]
-                  this.cID += 1
-              }
+              // // Color point
+              // if (!this.groupedColors[d.Cluster]) {
+              //     this.groupedColors[d.Cluster] = this.colors[this.cID]
+              //     this.cID += 1
+              // }
 
               // Check if current data belongs to anyone selected
               const isSelected = this.currentSample.find(s => s.sample == d.sample) ? true : false;
