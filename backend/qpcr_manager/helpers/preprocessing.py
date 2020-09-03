@@ -98,6 +98,9 @@ def merge_results_fluorescence(results: pd.DataFrame, raw: pd.DataFrame) -> pd.D
     raw = raw.melt(id_vars=['Well Position', 'Cycle Number'],
                    var_name='Reporter', value_name='Fluorescence')
 
+    # Transform cycles to strings
+    raw['Cycle Number'] = raw['Cycle Number'].astype(str)
+
     # Generate Indexer
     raw['Indexer'] = raw['Well Position'] + '-' + raw['Reporter']
 
@@ -716,7 +719,7 @@ def tag_distrib():
     return {'labels': list(tag_counter.keys()), 'dataset': list(tag_counter.values())}
 
 
-def location_moficiations(locations):
+def location_modifications(locations):
     """Manipulate location data from a single user
     """
 
@@ -870,7 +873,7 @@ def experiment_pca_kmeans(experiment_id, k=None):
     results_df = results_df.pivot(index='sample', columns='marker', values='amp_cq')
 
     # Drop NaN columns
-    results_df = results_df.dropna(axis=1)
+    results_df = results_df.dropna(axis=0)
 
     # Scaled dataset
     scaled_data = StandardScaler().fit_transform(results_df)
