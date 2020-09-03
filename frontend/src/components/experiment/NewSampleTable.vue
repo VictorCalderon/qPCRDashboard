@@ -24,9 +24,9 @@
       </template>
 
       <template v-slot:cell(step)="data" v-if="stepOptions">
-        <span
-         :style="{color: data.item.step == 99 ? '#E94F37' : '#393E41'}"
-        >{{ stepOptions.find(s => s.value == data.item.step)['text'] }}</span>
+        <b
+         :style="{color: data.item.step == 99 ? '	#FF9900' : '#393E41'}"
+        >{{ stepOptions.find(s => s.value == data.item.step)['text'] }}</b>
       </template>
     </b-table>
   </div>
