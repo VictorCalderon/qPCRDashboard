@@ -304,9 +304,7 @@ export default {
     },
 
     async loadSchemas() {
-      await this.$store.dispatch("getSampleLocationSchemas").then(() => {
-        // this.schemas = [...this.sampleLocationSchemas];
-      });
+      await this.$store.dispatch("getSampleLocationSchemas");
     }
   },
 
