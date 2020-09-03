@@ -1,8 +1,9 @@
 // import axios from 'axios'
 import Vue from 'vue'
+import Axios from 'axios';
 
 const state = {
-  newSamplePlate: [],
+  samplePlate: [],
 
   priorityOptions: [
     { text: "Standard", value: 0 },
@@ -29,26 +30,38 @@ const mutations = {
   ADD_NEW_SAMPLE(state, sample) {
 
     // Copy old samples to new array
-    let samples = [...state.newSamplePlate];
+    let samples = [...state.samplePlate];
 
     // Push new sample to stack
     samples.push(sample);
 
     // Set new samples as variable
-    Vue.set(state, 'newSamplePlate', samples)
+    Vue.set(state, 'samplePlate', samples)
+  },
+
+  PATIENTS_UPDATE_MSG(state, patientUpdateMessage) {
+
+    // Set message
+    Vue.set(state, 'patientMessage', patientUpdateMessage)
   }
 }
 
 const actions = {
   pushNewSample({ commit }, sample) {
     commit('ADD_NEW_SAMPLE', sample)
+  },
+
+  saveSamplePlate({ commit, getters }) {
+    Axios.post('api/v1/patients', getters.samplePlate).then((res) => {
+      commit('PATIENTS_UPDATE_MSG', res.data.msg)
+    })
   }
 }
 
 
 const getters = {
   newSamplePlate(state) {
-    return state.newSamplePlate || []
+    return state.samplePlate || []
   },
 
   priorityOptions(state) {
