@@ -16,6 +16,9 @@ class Sample(db.Model):
 
     experiment = db.relationship(
         'Experiment', backref='samples', cascade='all,delete', lazy=True)
+    
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
+    patient_id = db.relationship('Patient', backref="samples", lazy=True)
 
     def __repr__(self):
         return '<Sample: {}>'.format(self.id)
