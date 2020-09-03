@@ -53,11 +53,11 @@ export default {
     chartData() {
       if (this.samplingSites) {
         return {
-          labels: this.samplingLabels,
+          labels: this.samplingLabels.slice(0, 5),
           datasets: [
             {
               label: "Collected",
-              data: this.samplingDatasets,
+              data: this.samplingDatasets.slice(0, 5),
               backgroundColor: this.samplingColors,
               hoverWidth: 2,
               hoverColor: "#000"
@@ -126,12 +126,12 @@ export default {
 
 <style lang='scss' scoped>
 .locationcount-height {
-  height: 37vh;
+  height: 26vh;
 }
 
 @media (max-width: 480px) {
   .locationcount-height {
-    height: 35vh;
+    height: 30vh;
   }
 }
 </style>
