@@ -7,7 +7,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Detection Percetange by Target Group"
+              header="Target Group Detection Rate"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
@@ -21,7 +21,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Mapped Collected Samples"
+              header="Geolocalized Samples"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
@@ -42,7 +42,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Experiment Protocol Distribution"
+              header="Protocol Distribution"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
@@ -56,7 +56,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Most Prevalent Zones"
+              header="Prevalent Zones"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
