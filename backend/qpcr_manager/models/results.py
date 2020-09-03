@@ -13,8 +13,8 @@ class Result(db.Model):
     score = db.Column(db.Float)
 
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
-    marker_id = db.Column(db.Integer, db.ForeignKey('markers.id'))
     sample = db.relationship('Sample', backref='results', lazy=True)
 
+    marker_id = db.Column(db.Integer, db.ForeignKey('markers.id'))
     def __repr__(self):
         return '<Result: {}>'.format(self.id)
