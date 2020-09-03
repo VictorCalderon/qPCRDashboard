@@ -50,7 +50,7 @@
       </b-col>
     </b-form-row>
     <b-form-row>
-      <b-col cols="5" md="5" sm="12">
+      <b-col cols="4" md="4" sm="12">
         <b-form-group id="suspected-input" description="Suspected Illness">
           <b-form-input
             class="text-center text-muted"
@@ -59,14 +59,14 @@
           ></b-form-input>
         </b-form-group>
       </b-col>
-      <b-col cols="4" md="4" sm="12">
+      <b-col cols="3" md="3" sm="12">
         <b-form-group id="sex-select" description="Sex">
           <b-form-select v-model="patient.sex" :options="sexOptions"></b-form-select>
         </b-form-group>
       </b-col>
-      <b-col cols="3" md="3" sm="12">
-        <b-form-group id="age-input" description="Age">
-          <b-form-input v-model="patient.age" type="number"></b-form-input>
+      <b-col cols="5" md="5" sm="12">
+        <b-form-group id="age-input" description="BirthDate">
+          <b-form-input v-model="patient.birthDate" type="date"></b-form-input>
         </b-form-group>
       </b-col>
     </b-form-row>
@@ -105,7 +105,7 @@ export default {
         cedula: null,
         barcode: null,
         sex: 1,
-        age: 5,
+        birthDate: 5,
         priority: 0,
         description: null,
         geoZone: 1,
@@ -143,8 +143,8 @@ export default {
     sampleFormRead() {
       if (
         this.patient.barcode 
-        && this.patient.name && this.patient.age 
-        && this.patient.sex && this.patient.age 
+        && this.patient.name && this.patient.birthDate 
+        && this.patient.sex && this.patient.birthDate 
         && this.patient.geoZone) {
         return false
       }
@@ -188,6 +188,7 @@ export default {
     pushNewSample() {
       let patient = {...this.patient, 'well': this.nextWell}
       this.$store.dispatch('pushNewSample', patient)
+      this.cleanNewSampleForm()
     },
 
     cleanNewSampleForm() {
@@ -196,7 +197,7 @@ export default {
         name: "",
         cedula: "",
         sex: null,
-        age: 18,
+        birthDate: null,
         priority: 0,
         description: "",
         geoZone: 0,
