@@ -31,11 +31,13 @@
           value="Sign In"
           v-if="!logInError"
         >Sign in</button>
-        <div
-          class="alert alert-danger alert-dismissible fade show"
-          role="alert"
-          v-else
-        >{{ logInError }}</div>
+        <button
+          class="btn btn-lg btn-danger btn-block"
+          type="submit"
+          @click="submitLogin"
+          value="Sign In"
+         v-else
+        >{{ logInError }}</button>
         <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
       </form>
     </div>
