@@ -8,6 +8,7 @@ class Patient(db.Model):
     __tablename__ = 'patients'
 
     id = db.Column(db.Integer, primary_key=True)
+    unique_plate_name = db.Column(db.String, nullable=False)
     full_name = db.Column(db.String, nullable=False)
     cedula = db.Column(db.String, nullable=False)
     barcode = db.Column(db.String, nullable=False)
@@ -19,7 +20,6 @@ class Patient(db.Model):
 
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
     location = db.relationship('Location', backref="patients", lazy=True)
-
 
     def __repr__(self):
         return '<Patient: {}>'.format(self.id)
