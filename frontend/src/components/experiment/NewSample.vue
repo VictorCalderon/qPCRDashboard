@@ -111,18 +111,16 @@ export default {
         geoZone: 1,
         step: 0
       },
-
-      sexOptions: [
-        { text: "Choose", value: null },
-        { text: "Male", value: 1 },
-        { text: "Female", value: 0 },
-      ],
     };
   },
 
   computed: {
     priorityOptions() {
       return this.$store.getters.priorityOptions
+    },
+
+    sexOptions() {
+      return this.$store.getters.sexOptions
     },
 
     availableGeoZones() {
