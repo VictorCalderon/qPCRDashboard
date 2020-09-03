@@ -229,17 +229,18 @@ class ImportExperiment(Resource):
 
 
 class ExperimentResults(Resource):
-    """Get experiment results
-    """
+    pass
+#     """Get experiment results
+#     """
 
-    method_decorators = [jwt_required]
+#     method_decorators = [jwt_required]
 
-    def get(self, experiment_id):
-        """Get results from experiment.
-        """
+#     def get(self, experiment_id):
+#         """Get results from experiment.
+#         """
 
-        # Return processed experiment results
-        return experiment_statistics(experiment_id, current_user)
+#         # Return processed experiment results
+#         return experiment_statistics(experiment_id, current_user)
 
 
 class ExperimentsQuery(Resource):
@@ -257,7 +258,7 @@ class ExperimentsQuery(Resource):
         name = request.args.get('name', None)
         date = request.args.get('date', None)
         analyzed = request.args.get('analyzed', None)
-        observations = request.args.get('observations', None)
+        tags = request.args.get('tags', None)
 
         # Query db for users experiments
         query = Experiment.query.filter_by(user_id=current_user.id).order_by(Experiment.id.desc())
@@ -281,10 +282,10 @@ class ExperimentsQuery(Resource):
             query = query.filter_by(date=date)
 
         # Filter by date
-        if observations:
+        if tags:
 
             # Apply filter
-            query = query.filter_by(observations=observations)
+            query = query.filter_by(tags=tags)
 
         # Return query
         return paginate(query, schema)
@@ -346,41 +347,41 @@ class MarkerList(Resource):
             return {"msg": "No markers sent"}, 400
 
 
-class AmplificationTimeSeriesResource(Resource):
-    """Get Overview of Experiment Results
-    """
+# class AmplificationTimeSeriesResource(Resource):
+#     """Get Overview of Experiment Results
+#     """
 
-    method_decorators = [jwt_required]
+#     method_decorators = [jwt_required]
 
-    def get(self):
-        """Query for such data
-        """
+#     def get(self):
+#         """Query for such data
+#         """
 
-        # Get query configuration
-        marker_id = request.args.get('marker_id')
+#         # Get query configuration
+#         marker_id = request.args.get('marker_id')
 
-        return amped_timeseries(marker_id, current_user)
+#         return amped_timeseries(marker_id, current_user)
 
 
-class MarkerSpecificDataset(Resource):
-    """Get a marker specific dataset
-    """
+# class MarkerSpecificDataset(Resource):
+#     """Get a marker specific dataset
+#     """
 
-    method_decorators = [jwt_required]
+#     method_decorators = [jwt_required]
 
-    def get(self):
-        """Download specific dataset
-        """
+#     def get(self):
+#         """Download specific dataset
+#         """
 
-        # Get marker
-        marker_id = request.args.get('marker_id', None)
+#         # Get marker
+#         marker_id = request.args.get('marker_id', None)
 
-        # Check for errors
-        if None:
-            return {'msg': 'Marker id required'}, 400
+#         # Check for errors
+#         if None:
+#             return {'msg': 'Marker id required'}, 400
 
-        # Get dataset
-        return {'file': marker_dataset(marker_id, current_user)}
+#         # Get dataset
+#         return {'file': marker_dataset(marker_id, current_user)}
 
 
 class SampleSchema(ma.SQLAlchemyAutoSchema):
@@ -714,7 +715,7 @@ class ExperimentPCA(Resource):
             return {'msg': 'Duplicate sample/marker pairs found in your experiment.'}, 400
 
         except:
-            raise RuntimeError('ExperimentPCA analysis failed.')
+            return {'msg': 'You data could not be clustered.'}, 400
 
 
 class TagDistribution(Resource):
