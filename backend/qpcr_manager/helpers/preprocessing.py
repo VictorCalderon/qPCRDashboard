@@ -601,19 +601,23 @@ def get_brief():
     """
 
     query = f"""
-    SELECT s.sample, e.name FROM samples AS s
+    SELECT s.sample, e.name, e.analyzed FROM samples AS s
     JOIN experiments AS e ON s.experiment_id = e.id
-    WHERE e.user_id = {current_user.id} AND e.analyzed = true
+    WHERE e.user_id = {current_user.id}
     """
 
     # Run query
     dataset = pd.read_sql(query, db.session.bind)
 
+    # Pending experiments vs analzyzed experiments
+    not_reported = dataset['analyzed'] == False
+    pending, reported = np.sum(not_reported), np.sum(~not_reported)
+
     # Make unique
     exps, samples = len(dataset['name'].unique()), len(dataset['sample'])
 
     # Return dataset
-    return {"experiments": exps, "samples": samples}
+    return {"experiments": int(exps), "samples": int(samples), "pending": int(pending), "reported": int(reported)}
 
 
 def amp_stat_data():
