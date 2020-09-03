@@ -43,7 +43,7 @@ export default {
         { key: "barcode" },
         { key: "cedula" },
         { key: "sex" },
-        { key: "age" },
+        { key: "birthDate" },
         { key: "priority" },
         // { key: "description" },
         { key: "geoZone" },
