@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, current_user
 
-from qpcr_manager.models import *
+from qpcr_manager.models import User, Experiment, Marker, Sample, Location, Target
 from qpcr_manager.helpers import *
 from qpcr_manager.extensions import ma, db
 from qpcr_manager.commons.pagination import paginate
@@ -734,8 +734,7 @@ __all__ = [
     'ExperimentResource', 'ExperimentList', 'LastExperimentResource',
     'ExperimentsQuery', 'ExperimentResults', 'ExperimentSamplesList',
     'SampleResource', 'SampleList', 'SamplesQuery', 'ExperimentPCA',
-    'ImportExperiment', 'AmplificationTimeSeriesResource',
-    'MarkerList', 'MarkerSpecificDataset', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
+    'ImportExperiment', 'MarkerList', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
     'LocatedSamples', 'LocationList', 'LocationResource', 'ExperimentSampleTable', 'ExperimentFluorescenceList',
     'TargetList', 'TargetResource', 'ExperimentMaxGradient'
 ]
