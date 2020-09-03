@@ -22,7 +22,7 @@ export default {
   computed: {
     smallDataset() {
       if (this.$store.getters.samplingSites) {
-        if (this.$store.getters.samplingSites.length > 5) {
+        if (this.$store.getters.samplingSites.length > 4) {
           return false;
         } else return true;
       } else return null;
@@ -87,7 +87,7 @@ export default {
             {
               ticks: {
                 display: true,
-                suggestedMax: 1000, min: 0
+                suggestedMax: 0, min: 0
               },
               gridLines: {
                 display: true
@@ -111,7 +111,9 @@ export default {
             label: function(tooltipItem, data) {
               let label = data.datasets[tooltipItem.datasetIndex].label || "";
               if (label) { label += ": " }
-              label += tooltipItem.yLabel;
+              if(this.smallDataset) {label += tooltipItem.yLabel;}
+              else {label += tooltipItem.xLabel;}
+            
               return label;
             }
           }
