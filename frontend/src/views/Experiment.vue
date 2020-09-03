@@ -16,7 +16,7 @@
           </b-col>
           <b-col cols=12>
             <!-- <label for="experiment-name-btn" class="text-center"></label> -->
-            <b-button id="experiment-name-btn" size=md class="mt-2">Search</b-button>
+            <b-button id="experiment-name-btn" size=md class="mt-2 btn-success">Save</b-button>
           </b-col>
         </b-form-row>
       </b-modal>
