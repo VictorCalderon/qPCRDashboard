@@ -40,13 +40,13 @@
           </b-col>
           <b-col lg="4" sm="12" class="text-center mt-2 small-table">
             <div class="text-center">
-              <label for="input-method">Observations</label>
+              <label for="input-method">Protocol</label>
               <b-form-input
                 id="input-method"
                 v-model="tags"
                 class="text-center"
                 locale="en"
-                placeholder="3rd sampling round"
+                placeholder="Extraction"
               ></b-form-input>
             </div>
           </b-col>
