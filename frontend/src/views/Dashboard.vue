@@ -42,7 +42,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Experiment Tag Distribution"
+              header="Experiment Protocol Distribution"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
@@ -56,7 +56,7 @@
             <b-card
               bg-variant="light"
               align="center"
-              header="Samples Collected by Region"
+              header="Most Prevalent Zones"
               header-bg-variant="dark"
               header-text-variant="white"
               class="my-1"
