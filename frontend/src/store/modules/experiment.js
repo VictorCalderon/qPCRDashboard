@@ -15,7 +15,13 @@ const state = {
     { text: 'Extracted', value: 1 },
     { text: 'Amplified', value: 2 },
     { text: 'Reported', value: 3 },
-  ]
+  ],
+
+  sexOptions: [
+    { text: "Choose", value: null },
+    { text: "Male", value: 1 },
+    { text: "Female", value: 0 },
+  ],
 }
 
 const mutations = {
@@ -51,6 +57,10 @@ const getters = {
 
   stepOptions(state) {
     return state.stepOptions
+  },
+
+  sexOptions(state) {
+    return state.sexOptions
   }
 }
 
