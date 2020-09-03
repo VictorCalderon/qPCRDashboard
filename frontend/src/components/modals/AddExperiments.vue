@@ -56,8 +56,8 @@
       <b-col>
         <b-form-group
           id="fieldset-1"
-          description="Experiment tags that serve as variables."
-          label="Enter your experiment's tags"
+          description="Experiment protocol that serve as variables."
+          label="Enter your experiment's protocol"
           label-for="input-experimenttags"
           class="text-center"
         >
