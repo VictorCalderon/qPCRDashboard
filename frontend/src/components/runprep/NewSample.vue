@@ -1,0 +1,204 @@
+<template>
+  <b-container fluid>
+    <b-form-row class="mt-1">
+      <b-col cols="8" md="8" sm="12">
+        <b-form-group id="cedula-input" description="Patient Cedula">
+          <b-form-input
+            class="text-center text-muted"
+            placeholder="XXX-XXXXXXX-X"
+            v-model="patient.cedula"
+          ></b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col cols="4" md="4" sm="12">
+        <b-form-group id="priority-select" description="Priority Level">
+          <b-form-select v-model="patient.priority" :options="priorityOptions"></b-form-select>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col cols="12">
+        <hr />
+      </b-col>
+      <b-col cols="8">
+        <b-form-group id="name-input" description="Patient Name">
+          <b-form-input
+            class="text-center text-muted"
+            placeholder="Enter patient name"
+            v-model="patient.name"
+          ></b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col cols="4">
+        <b-form-group id="loc-input" description="Geo Zone">
+          <b-form-select
+            class="text-center text-muted"
+            placeholder="GeoZone"
+            v-model="patient.geoZone"
+            :options="availableGeoZones"
+          ></b-form-select>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col cols="5" md="5" sm="12">
+        <b-form-group id="suspected-input" description="Suspected Illness">
+          <b-form-input
+            class="text-center text-muted"
+            placeholder="COVID-19"
+            v-model="patient.suspected"
+          ></b-form-input>
+        </b-form-group>
+      </b-col>
+      <b-col cols="4" md="4" sm="12">
+        <b-form-group id="sex-select" description="Sex">
+          <b-form-select v-model="patient.sex" :options="sexOptions"></b-form-select>
+        </b-form-group>
+      </b-col>
+      <b-col cols="3" md="3" sm="12">
+        <b-form-group id="age-input" description="Age">
+          <b-form-input v-model="patient.age" type="number"></b-form-input>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <b-form-row>
+      <b-col cols="12">
+        <b-form-group id="description-textarea" description="Sample description">
+          <b-form-textarea
+            id="description-textarea"
+            placeholder="If available, the patient's anamnesis can be used."
+            v-model="patient.description"
+            class="text-center"
+            size="sm"
+          ></b-form-textarea>
+        </b-form-group>
+      </b-col>
+    </b-form-row>
+    <hr>
+    <b-form-row >
+      <b-col cols="5" offset=1>
+        <b-button class="mx-1 my-2 btn-success btn-block" @click="pushNewSample" :disabled="fullPlate || sampleFormRead">Add Sample</b-button>
+      </b-col>
+      <b-col cols=4>
+        <b-button class="mx-1 my-2 btn-info btn-block" @click="wellSkip++" :disabled="fullPlate">Skip Well</b-button>
+      </b-col>
+    </b-form-row>
+  </b-container>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      wellSkip: 0,
+      patient: {
+        name: null,
+        cedula: null,
+        sex: 1,
+        age: null,
+        priority: 0,
+        description: null,
+        geoZone: 1,
+        step: 'Extraction'
+      },
+
+      priorityOptions: [
+        { text: "Standard", value: 0 },
+        { text: "Urgent", value: 1 },
+      ],
+
+      sexOptions: [
+        { text: "Choose", value: null },
+        { text: "Male", value: 1 },
+        { text: "Female", value: 0 },
+      ],
+    };
+  },
+
+  computed: {
+    availableGeoZones() {
+      if (this.sampleLocationSchemas) {
+        return [
+          ...this.sampleLocationSchemas.map((loc) => {
+            return {
+              text: loc.location,
+              value: loc.id,
+            };
+          }),
+        ];
+      } else return [{ text: "No Schema available", value: null }];
+    },
+
+    fullPlate() {
+      return this.currentSamplePlate.length + this.wellSkip == 96
+    },
+
+    sampleFormRead() {
+      if (this.patient.name && this.patient.age && this.patient.sex && this.patient.age && this.patient.geoZone) {
+        return false
+      }
+      else return true
+    },
+
+    sampleLocationSchemas() {
+      return this.$store.getters.sampleLocationSchemas;
+    },
+
+    currentSamplePlate() {
+      return this.$store.getters.newSamplePlate || []
+    },
+
+    plateWells() {
+      // Basic
+      const cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+      // Iterate over it
+      let wells = [];
+
+      for (let i = 1; i < 13; i++) {
+        for (let j = 0; j < 8; j++) {
+          wells.push(cols[j] + i)
+        }}
+      
+      return wells
+    },
+
+    nextWell() {
+      // Generate next well
+      return this.plateWells[this.currentSamplePlate.length + this.wellSkip]
+    }
+  },
+
+  methods: {
+    async loadSchemas() {
+      await this.$store.dispatch("getSampleLocationSchemas");
+    },
+
+    pushNewSample() {
+      let patient = {...this.patient, 'well': this.nextWell}
+      this.$store.dispatch('pushNewSample', patient)
+    },
+
+    cleanNewSampleForm() {
+      this.patient = {
+        well: "",
+        name: "",
+        cedula: "",
+        sex: null,
+        age: 18,
+        priority: 0,
+        description: "",
+        geoZone: 0,
+        step: 1
+      }
+    }
+  },
+
+  mounted() {
+    this.loadSchemas();
+  },
+};
+</script>
+
+<style>
+</style>
