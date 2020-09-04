@@ -9,10 +9,11 @@ from qpcr_manager.models.results import Result
 from qpcr_manager.models.setting import Setting
 from qpcr_manager.models.location import Location
 from qpcr_manager.models.target import Target
+from qpcr_manager.models.status import Status
 
 
 __all__ = [
     "User", "TokenBlacklist", "Marker", "Experiment", "Sample",
     "Fluorescence", "Setting", "Result", "Location", "Target",
-    "Patient"
+    "Patient", "Status"
 ]
