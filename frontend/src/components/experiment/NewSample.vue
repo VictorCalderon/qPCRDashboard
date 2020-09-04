@@ -5,7 +5,7 @@
         <b-form-group id="cedula-input" description="Cedula">
           <b-form-input
             class="text-center text-muted"
-            placeholder="XXXXXXXXXXX"
+            placeholder="___-_______-_"
             v-model="patient.cedula"
           ></b-form-input>
         </b-form-group>
@@ -14,14 +14,14 @@
         <b-form-group id="barcode-input" description="Barcode">
           <b-form-input
             class="text-center text-muted"
-            placeholder="XXXXXXXXX"
+            placeholder="Scan"
             v-model="patient.barcode"
           ></b-form-input>
         </b-form-group>
       </b-col>
       <b-col cols="4" md="4" sm="12">
         <b-form-group id="priority-select" description="Priority Level">
-          <b-form-select v-model="patient.priority" :options="priorityOptions"></b-form-select>
+          <b-form-select v-model="patient.priority" :options="priorityOptions" class="text-center"></b-form-select>
         </b-form-group>
       </b-col>
     </b-form-row>
@@ -29,7 +29,7 @@
       <b-col cols="12">
         <hr />
       </b-col>
-      <b-col cols="8">
+      <b-col cols="7">
         <b-form-group id="name-input" description="Patient Name">
           <b-form-input
             class="text-center text-muted"
@@ -38,7 +38,7 @@
           ></b-form-input>
         </b-form-group>
       </b-col>
-      <b-col cols="4">
+      <b-col cols="5">
         <b-form-group id="loc-input" description="Geo Zone">
           <b-form-select
             class="text-center text-muted"
@@ -105,7 +105,7 @@ export default {
         cedula: null,
         barcode: null,
         sex: 1,
-        birthDate: 5,
+        birthDate: '1996-05-25',
         priority: 0,
         description: null,
         geoZone: 1,
