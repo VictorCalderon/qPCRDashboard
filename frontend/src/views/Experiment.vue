@@ -4,7 +4,7 @@
       <b-modal
         ref="open-table"
         id="open-table"
-        title="Create or Modify Amp Tables"
+        title="Change Sample Status"
         size="md"
         class="text-center"
         hide-footer
@@ -54,7 +54,7 @@
                   <b-col cols="4">Current Experiment Plate</b-col>
                   <b-col cols="2"></b-col>
                   <b-col cols="2">
-                    <b-button
+                    <!-- <b-button
                       class="text-dark border ml-2"
                       variant="light"
                       @click="saveSamplePlates"
@@ -65,7 +65,7 @@
                       title="New Experiment"
                     >
                       <i class="far fa-plus-square"></i>
-                    </b-button>
+                    </b-button> -->
                     <b-button
                       class="text-dark border ml-2"
                       variant="light"
@@ -154,6 +154,10 @@ export default {
   },
 
   methods: {
+    saveSamplePlates() {
+      alert('Implement me')
+    },
+
     downloadSampleTable() {
       // Make sure the table has content
       if (this.currentExperimentPlate) {
@@ -176,6 +180,7 @@ export default {
 
         // Download file
         FileDownload(file, this.currentPlateName.name + ".txt");
+
       } else {
         alert("The table is empty.");
       }
