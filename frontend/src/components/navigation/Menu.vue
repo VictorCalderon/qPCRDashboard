@@ -13,8 +13,14 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item to="/" :class="{'text-uppercase': currentRoute == 'Dashboard'}">Overview</b-nav-item>
-          <b-nav-item to="/Experiment" :class="{'text-uppercase': currentRoute == 'Experiment'}">Experiment</b-nav-item>
-          <b-nav-item to="/Analysis" :class="{'text-uppercase': currentRoute == 'Analysis'}">Analysis</b-nav-item>
+          <b-nav-item
+            to="/Experiment"
+            :class="{'text-uppercase': currentRoute == 'Experiment'}"
+          >Experiment</b-nav-item>
+          <b-nav-item
+            to="/Analysis"
+            :class="{'text-uppercase': currentRoute == 'Analysis'}"
+          >Analysis</b-nav-item>
         </b-navbar-nav>
 
         <b-navbar-nav class="ml-auto">
@@ -33,10 +39,20 @@
             <i class="fas fa-search"></i>&nbsp;
             <span class>Search</span>
           </b-nav-item>
-          <b-nav-item 
-            to="/Adjustments" 
-            :class="{'text-uppercase': currentRoute == 'Adjustments'}"
-          ><i class="fas fa-cog mr-1"></i>Adjustments
+
+          <b-nav-item
+            v-b-modal.open-plate-add-search
+            v-if="this.$route.name == 'Experiment'"
+            v-b-tooltip.hover.bottom
+            title="Add/Search Plates"
+          >
+            <span>
+              <i class="fas fa-search"></i>&nbsp;
+              <span>Add / Search Plates</span>
+            </span>
+          </b-nav-item>
+          <b-nav-item to="/Adjustments" :class="{'text-uppercase': currentRoute == 'Adjustments'}">
+            <i class="fas fa-cog mr-1"></i>Adjustments
           </b-nav-item>
           <b-nav-item @click="logOut">
             <i class="fas fa-sign-out-alt"></i>&nbsp;Sign Out
@@ -49,13 +65,12 @@
 
 
 <script>
-
 export default {
   data() {
     return {
       showMessage: null,
       message: null,
-      exportingExperiment: false
+      exportingExperiment: false,
     };
   },
   computed: {
@@ -75,8 +90,8 @@ export default {
     },
 
     currentRoute() {
-      return this.$route.name
-    }
+      return this.$route.name;
+    },
   },
   methods: {
     async selectExperiment(experiment) {
@@ -99,8 +114,8 @@ export default {
 
     logOut() {
       this.$store.dispatch("authLogOut");
-    }
-  }
+    },
+  },
 };
 </script>
 

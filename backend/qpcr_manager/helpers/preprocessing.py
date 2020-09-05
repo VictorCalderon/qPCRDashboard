@@ -169,7 +169,7 @@ def load_experiment(results, current_experiment):
 
                 # Instantiate fluorescences
                 Fluorescence(
-                    well=res[0], cycle=i, rn=res[i + 1],
+                    well=res[0], cycle=i, fluorescence=res[i + 1],
                     sample=s_, marker_id=marker_id
                 )
 
@@ -358,8 +358,8 @@ def parse_7500(flat7500, current_experiment):
     # Return data
     return merge_results_fluorescence(results, raw)
 
-    # Load Experiment to database
-    load_experiment(results, current_experiment)
+    # # Load Experiment to database
+    # load_experiment(results, current_experiment)
 
 
 def parse_q2000(flatq2000, current_experiment):
@@ -933,7 +933,7 @@ def compute_fluorescences(experiment_id):
 
     # Build query
     query = f"""
-    SELECT results.id as result_id, well, sample, marker, cycle, rn FROM samples
+    SELECT results.id as result_id, well, sample, marker, cycle, fluorescence FROM samples
     JOIN fluorescences on fluorescences.sample_id= samples.id
     JOIN markers on markers.id= fluorescences.marker_id
     JOIN experiments on experiments.id= samples.experiment_id
@@ -949,7 +949,7 @@ def compute_fluorescences(experiment_id):
         '&-&' + dataset['sample'] + '&-&' + dataset['marker']
 
     # Pivot and sort dataset
-    dataset = dataset.pivot(index='indexer', columns='cycle', values='rn')
+    dataset = dataset.pivot(index='indexer', columns='cycle', values='fluorescence')
 
     # Log transform and remove noise
     # dataset.iloc[:, :] = dataset.apply(lambda row: sliding_denoiser(row), axis=1).values

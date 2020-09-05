@@ -5,7 +5,7 @@
         <b-form-row v-if="selectedSample">
           <b-col cols=12 class="text-center">
             Priority Level:
-            <b>{{ priorityOptions.find(p => p.value == selectedSample.priority)['text'] }}</b>
+            <b>{{ priorityOptions.find(p => p.value == selectedSample.priority_level)['text'] }}</b>
           </b-col>
           <b-col cols=6 class="mt-3">
             <b-button class="mx-2" variant='info' @click="changeStep(1)">Set as Extracted</b-button>
@@ -20,7 +20,7 @@
           <b-col cols="1" v-for="column in columns" :key="column">
             <b-button
               class="border rounded"
-              :class="checkStep(samplePlate.find(s => s.well == row + column))"
+              :class="checkStep(samplePlate.find(s => s.tmpl_well == row + column))"
               @click="editSample(row + column)"
             >{{ row }}{{ column }}</b-button>
           </b-col>
@@ -67,7 +67,7 @@ export default {
   },
   computed: {
     samplePlate() {
-      return this.$store.getters.newSamplePlate;
+      return this.$store.getters.samplePlate;
     },
 
     rows() {
@@ -79,7 +79,7 @@ export default {
     },
 
     selectedSample() {
-      return this.samplePlate.find((s) => s.well == this.currentWell);
+      return this.samplePlate.find((s) => s.tmpl_well == this.currentWell);
     },
 
     stepOptions() {
@@ -95,6 +95,10 @@ export default {
         return this.selectedSample.well + " - " + this.selectedSample.barcode;
       } else return "Select a sample";
     },
+
+    currentExperiment() {
+      return this.$store.getters.currentExperiment
+    }
   },
 };
 </script>

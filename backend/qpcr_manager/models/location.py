@@ -14,6 +14,7 @@ class Location(db.Model):
     latitude = db.Column(db.String, nullable=False)
     color = db.Column(db.String, nullable=False)
 
+    # User
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref='locations', lazy=True)
 

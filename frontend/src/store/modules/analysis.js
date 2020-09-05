@@ -83,7 +83,7 @@ const mutations = {
         Vue.set(state, 'loadingPCA', !state.loadingPCA)
     },
 
-    ERROR_LOADING_PCAKMeans(state, error) {
+    ERROR_LOADING_PCAKMEANS(state, error) {
         Vue.set(state, 'errorLoadingExperiment', error)
     }
 }
@@ -92,7 +92,7 @@ const actions = {
     initExperiments({ commit }) {
         commit('INIT_EXPERIMENTS')
     },
-
+    
     loadExperiments({ commit }) {
         axios.get('api/v1/experiments', {
         }).then(res => {
@@ -112,7 +112,7 @@ const actions = {
                 commit('TOGGLE_LOADING_PCA')
             })
             .catch(() => {
-                commit('ERROR_LOADING_PCAKMeans', true)
+                commit('ERROR_LOADING_PCAKMEANS', true)
                 commit('TOGGLE_LOADING_PCA')
             })
     },

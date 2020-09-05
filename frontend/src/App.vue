@@ -5,7 +5,7 @@
     </div>
     <div v-else>
       <modal-SearchDatabase></modal-SearchDatabase>
-      <modal-AddExperiments></modal-AddExperiments>
+      <modal-AddExperimentData></modal-AddExperimentData>
       <modal-EditExperiment></modal-EditExperiment>
       <modal-ExportExperiment></modal-ExportExperiment>
       <Menu></Menu>
@@ -23,7 +23,7 @@
 
 <script>
 import Menu from "@/components/navigation/Menu";
-import AddExperiment from "@/components/modals/AddExperiments";
+import AddExperimentData from "@/components/modals/AddExperimentData";
 import SearchDatabase from "@/components/modals/SearchDatabase";
 import EditExperiment from "@/components/modals/EditExperiment";
 import ExportExperiment from "@/components/modals/ExportExperiment";
@@ -32,11 +32,11 @@ import Login from "@/components/modals/LoginModal";
 export default {
   components: {
     Menu,
-    "modal-AddExperiments": AddExperiment,
+    "modal-AddExperimentData": AddExperimentData,
     "modal-SearchDatabase": SearchDatabase,
     "modal-Login": Login,
     "modal-EditExperiment": EditExperiment,
-    "modal-ExportExperiment": ExportExperiment
+    "modal-ExportExperiment": ExportExperiment,
   },
 
   computed: {
@@ -46,14 +46,15 @@ export default {
 
     currentExperiment() {
       return this.$store.getters.currentExperiment;
-    }
+    },
   },
 
   methods: {
     startApp() {
       this.$store.dispatch("initExperiments");
       this.$store.dispatch("loadExperiments");
-    }
+      this.$store.dispatch("getSampleLocationSchemas");
+    },
   },
 
   watch: {
@@ -61,8 +62,8 @@ export default {
       if (this.accessToken != null) {
         this.startApp();
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

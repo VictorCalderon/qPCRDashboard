@@ -15,7 +15,7 @@ export default {
   components: {
     // BarChart,
     // HBarChart,
-    PieChart
+    PieChart,
   },
 
   computed: {
@@ -43,9 +43,9 @@ export default {
               data: this.$store.getters.tagDistribution.dataset,
               backgroundColor: this.tagColors,
               hoverWidth: 2,
-              hoverColor: "#000"
-            }
-          ]
+              hoverColor: "#000",
+            },
+          ],
         };
 
         // Return processed data
@@ -59,7 +59,7 @@ export default {
           return false;
         } else return true;
       } else return null;
-    }
+    },
   },
 
   data() {
@@ -71,7 +71,7 @@ export default {
           display: false,
           text: "Extraction Method",
           fontSize: 25,
-          fontColor: "#DC602E"
+          fontColor: "#DC602E",
         },
 
         legend: {
@@ -81,9 +81,9 @@ export default {
           labels: {
             fontColor: "#1E152A",
             boxWidth: 20,
-            fontSize: 12
-          }
-        }
+            fontSize: 12,
+          },
+        },
         // scales: {
         //   xAxes: [
         //     {
@@ -109,9 +109,9 @@ export default {
         //       top: 50,
         //   },
         // }
-      }
+      },
     };
-  }
+  },
 };
 </script>
 

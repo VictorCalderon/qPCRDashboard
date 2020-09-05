@@ -8,11 +8,15 @@ class Status(db.Model):
     __tablename__ = 'status'
 
     id = db.Column(db.Integer, primary_key=True)
-    step = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime)
 
-    # Status ID
+    # Sample id
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
-    sample = db.relationship('Sample', backref="status", lazy=True)
+    sample = db.relationship('Sample', backref="statuses", lazy=True)
+
+    # Process name
+    process_id = db.Column(db.Integer, db.ForeignKey('process.id'))
+    process = db.relationship('Process', backref='processes', lazy=True)
 
     def __repr__(self):
         return '<Status: {}>'.format(self.id)

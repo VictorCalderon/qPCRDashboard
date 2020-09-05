@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, current_user
 
-from qpcr_manager.models import User, Experiment, Marker, Sample, Location, Target
+from qpcr_manager.models import User, Experiment, Marker, Sample, Location, Target, Status, Patient
 from qpcr_manager.helpers import *
 from qpcr_manager.extensions import ma, db
 from qpcr_manager.commons.pagination import paginate
@@ -27,23 +27,23 @@ class UserResource(Resource):
     def get(self, user_id):
         schema = UserSchema()
         user = User.query.get_or_404(user_id)
-        return {"user": schema.dump(user)}
+
+        return {"user": schema.dump(user)}, 200
 
     def put(self, user_id):
         schema = UserSchema(partial=True)
         user = User.query.get_or_404(user_id)
         user = schema.load(request.json, instance=user)
-
         db.session.commit()
 
-        return {"msg": "user updated", "user": schema.dump(user)}
+        return {"msg": "user updated", "user": schema.dump(user)}, 201
 
     def delete(self, user_id):
         user = User.query.get_or_404(user_id)
         db.session.delete(user)
         db.session.commit()
 
-        return {"msg": "user deleted"}
+        return {"msg": "user deleted"}, 205
 
 
 class UserList(Resource):
@@ -66,6 +66,7 @@ class ExperimentSchema(ma.SQLAlchemyAutoSchema):
     name = ma.auto_field()
     date = ma.auto_field()
     analyzed = ma.auto_field()
+    amplified = ma.auto_field()
     observations = ma.auto_field()
     tags = ma.auto_field()
 
@@ -139,17 +140,66 @@ class ExperimentList(Resource):
 
     def get(self):
         schema = ExperimentSchema(many=True)
-        query = Experiment.query.filter_by(user_id=current_user.id)
+        query = Experiment.query
         return paginate(query, schema)
 
     def post(self):
         schema = ExperimentSchema()
         experiment = Experiment(**schema.load(request.json))
+        experiment.user_id = current_user.id
 
         db.session.add(experiment)
         db.session.commit()
 
         return {"msg": "experiment created", "experiment": schema.dump(experiment)}, 201
+
+
+class ExperimentsQuery(Resource):
+    """Query experiments from database
+    """
+
+    method_decorators = [jwt_required]
+
+    def post(self):
+
+        # Set schema
+        schema = ExperimentSchema(many=True)
+
+        # Parse params
+        name = request.args.get('name', None)
+        date = request.args.get('date', None)
+        analyzed = request.args.get('analyzed', None)
+        tags = request.args.get('tags', None)
+
+        # Query db for users experiments
+        query = Experiment.query.filter_by(user_id=current_user.id).order_by(Experiment.id.desc())
+
+        # Filter by date
+        if analyzed:
+
+            # Apply filter
+            query = query.filter_by(analyzed=analyzed)
+
+        # Filter by experiment name
+        if name:
+
+            # Apply filter
+            query = query.filter(Experiment.name.like(f'%{name}%'))
+
+        # Filter by date
+        if date:
+
+            # Apply filter
+            query = query.filter_by(date=date)
+
+        # Filter by date
+        if tags:
+
+            # Apply filter
+            query = query.filter_by(tags=tags)
+
+        # Return query
+        return paginate(query, schema)
 
 
 class LastExperimentResource(Resource):
@@ -241,54 +291,6 @@ class ExperimentResults(Resource):
 
 #         # Return processed experiment results
 #         return experiment_statistics(experiment_id, current_user)
-
-
-class ExperimentsQuery(Resource):
-    """Query experiments from database
-    """
-
-    method_decorators = [jwt_required]
-
-    def post(self):
-
-        # Set schema
-        schema = ExperimentSchema(many=True)
-
-        # Parse params
-        name = request.args.get('name', None)
-        date = request.args.get('date', None)
-        analyzed = request.args.get('analyzed', None)
-        tags = request.args.get('tags', None)
-
-        # Query db for users experiments
-        query = Experiment.query.filter_by(user_id=current_user.id).order_by(Experiment.id.desc())
-
-        # Filter by date
-        if analyzed:
-
-            # Apply filter
-            query = query.filter_by(analyzed=analyzed)
-
-        # Filter by experiment name
-        if name:
-
-            # Apply filter
-            query = query.filter(Experiment.name.like(f'%{name}%'))
-
-        # Filter by date
-        if date:
-
-            # Apply filter
-            query = query.filter_by(date=date)
-
-        # Filter by date
-        if tags:
-
-            # Apply filter
-            query = query.filter_by(tags=tags)
-
-        # Return query
-        return paginate(query, schema)
 
 
 class MarkerSchema(ma.SQLAlchemyAutoSchema):
@@ -388,7 +390,14 @@ class SampleSchema(ma.SQLAlchemyAutoSchema):
 
     id = ma.auto_field()
     sample = ma.auto_field()
+    description = ma.auto_field()
+    tmpl_well = ma.auto_field()
+    priority_level = ma.auto_field()
+    collection_date = ma.auto_field()
+    
+    location_id = ma.auto_field()
     experiment_id = ma.auto_field()
+    patient_id = ma.auto_field()
 
     class Meta:
         include_fk = True
@@ -433,7 +442,7 @@ class SampleList(Resource):
         return paginate(query, schema)
 
     def post(self):
-        schema = SampleSchema()
+        schema = SampleSchema(partial=True)
         sample = Sample(**schema.load(request.json))
 
         db.session.add(sample)
@@ -624,6 +633,64 @@ class LocatedSamples(Resource):
         return located_samples
 
 
+class StatusSchema(ma.SQLAlchemyAutoSchema):
+
+    id = ma.Int(dump_only=True)
+    timestamp = ma.DateTime(required=True)
+    process_id = ma.Int(required=True)
+
+    class Meta:
+        model = Status
+        sqla_session = db.session
+
+
+class StatusResource(Resource):
+    """Single object resource
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, status_id):
+        schema = StatusSchema()
+        status = Status.query.get_or_404(status_id)
+
+        return {"status": schema.dump(status)}, 200
+
+    # def put(self, status_id):
+    #     schema = UserSchema(partial=True)
+    #     status = User.query.get_or_404(status_id)
+    #     status = schema.load(request.json, instance=status)
+    #     db.session.commit()
+
+    #     return {"msg": "status updated", "status": schema.dump(status)}, 201
+
+    # def delete(self, status_id):
+    #     status = User.query.get_or_404(status_id)
+    #     db.session.delete(status)
+    #     db.session.commit()
+
+    #     return {"msg": "status deleted"}, 205
+
+
+class StatusList(Resource):
+
+    method_decorators = [jwt_required]
+
+    def get(self):
+        schema = StatusSchema(many=True)
+        query = Status.query
+        return paginate(query, schema)
+
+    def post(self):
+        schema = StatusSchema()
+        status = Status(**schema.load(request.json))
+
+        db.session.add(status)
+        db.session.commit()
+
+        return {"msg": "status created", "status": schema.dump(status)}, 201
+
+
 class ExperimentSamplesList(Resource):
     """Get all samples from a certain experiment
     """
@@ -728,6 +795,84 @@ class TagDistribution(Resource):
         return tag_distrib()
 
 
+class PatientSchema(ma.SQLAlchemyAutoSchema):
+
+    id = ma.auto_field()
+    full_name = ma.auto_field()
+    cedula = ma.auto_field()
+    birth_date = ma.auto_field()
+    is_male = ma.auto_field()
+
+    class Meta:
+        model = Patient
+        sqla_session = db.session
+
+
+class PatientResource(Resource):
+    """Single Object Resource
+    """
+
+    method_decorators = [jwt_required]
+
+    def get(self, patient_id):
+        schema = PatientSchema()
+        patient = Patient.query.get_or_404(patient_id)
+        return {"patient": schema.dump(patient)}
+
+    def put(self, patient_id):
+        schema = PatientSchema(partial=True)
+        patient = Patient.query.get_or_404(patient_id)
+        patient = schema.load(request.json, instance=patient)
+
+        db.session.add(patient)
+        db.session.commit()
+
+        return {"msg": "patient updated", "patient": schema.dump(patient)}
+
+    def delete(self, patient_id):
+        patient = Patient.query.get_or_404(patient_id)
+        db.session.delete(patient)
+        db.session.commit()
+
+        return {"msg": "patient deleted"}
+
+
+class PatientList(Resource):
+    """Creation and get all objects Resource
+    """
+    method_decorators = [jwt_required]
+
+    def get(self):
+        schema = PatientSchema(many=True)
+        query = Patient.query
+        return paginate(query, schema)
+
+    def post(self):
+        schema = PatientSchema()
+        patient = Patient(**schema.load(request.json))
+
+        db.session.add(patient)
+        db.session.commit()
+
+        return {"msg": "patient created", "patient": schema.dump(patient)}, 201
+
+
+class PatientsQuery(Resource):
+    """Query samples from database
+    """
+
+    method_decorators = [jwt_required]
+
+    def post(self):
+
+        # Parse params
+        patient = request.args.get('patient')
+
+        # Run query and return data
+        return query_samples(current_user, patient)
+
+
+
 # Wilcard export overwrite
 __all__ = [
     'UserResource', 'UserList',
@@ -736,5 +881,6 @@ __all__ = [
     'SampleResource', 'SampleList', 'SamplesQuery', 'ExperimentPCA',
     'ImportExperiment', 'MarkerList', 'ProjectBrief', 'AmpStatData', 'TagDistribution',
     'LocatedSamples', 'LocationList', 'LocationResource', 'ExperimentSampleTable', 'ExperimentFluorescenceList',
-    'TargetList', 'TargetResource', 'ExperimentMaxGradient'
+    'TargetList', 'TargetResource', 'ExperimentMaxGradient',
+    'PatientResource', 'PatientList', 'PatientsQuery',
 ]

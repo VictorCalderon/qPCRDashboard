@@ -12,6 +12,7 @@ class Target(db.Model):
     target = db.Column(db.String)
     description = db.Column(db.Text)
 
+    # Users
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref='targets', lazy=True)
 

@@ -10,9 +10,11 @@ class Marker(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     marker = db.Column(db.String, unique=True, nullable=False)
 
+    # Targets
     target_id = db.Column(db.Integer, db.ForeignKey('targets.id'))
     target = db.relationship('Target', backref='marker', lazy=True)
 
+    # Users
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref='markers', lazy=True)
 

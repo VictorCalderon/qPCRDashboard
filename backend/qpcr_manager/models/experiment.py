@@ -12,8 +12,10 @@ class Experiment(db.Model):
     date = db.Column(db.Date, nullable=False)
     observations = db.Column(db.Text)
     tags = db.Column(db.String)
+    amplified = db.Column(db.Boolean, default=False)
     analyzed = db.Column(db.Boolean, default=False)
 
+    # User
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship('User', backref='experiments', lazy=True)
 

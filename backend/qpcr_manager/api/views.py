@@ -28,10 +28,15 @@ api.add_resource(ExperimentSamplesList, "/experiments/<int:experiment_id>/sample
 api.add_resource(ExperimentSampleTable, "/experiments/<int:experiment_id>/table")
 api.add_resource(ExperimentFluorescenceList, "/experiments/<int:experiment_id>/fluorescences")
 
-# Single and multiple records queries for qpcrs
+# Single and multiple records queries for samples
 api.add_resource(SampleList, "/samples")
 api.add_resource(SampleResource, "/samples/<int:sample_id>")
 api.add_resource(SamplesQuery, "/samples/query")
+
+# Single and multiple records queries for patients
+api.add_resource(PatientList, "/patients")
+api.add_resource(PatientResource, "/patients/<int:patient_id>")
+api.add_resource(PatientsQuery, "/patients/query")
 
 # Import/Export functionality for experiments
 api.add_resource(ImportExperiment, "/experiments/import")

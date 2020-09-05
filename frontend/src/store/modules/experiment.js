@@ -2,60 +2,71 @@
 import Vue from 'vue'
 import Axios from 'axios';
 
-const state = {
-  samplePlate: [],
-
-  priorityOptions: [
-    { text: "Standard", value: 0 },
-    { text: "Urgent", value: 1 },
-  ],
-
-  stepOptions: [
-    { text: 'Rejected', value: 99 },
-    { text: 'Received', value: 0 },
-    { text: 'Extracted', value: 1 },
-    { text: 'Amplified', value: 2 },
-    { text: 'Reported', value: 3 },
-  ],
-
-  sexOptions: [
-    { text: "Choose", value: null },
-    { text: "Male", value: 1 },
-    { text: "Female", value: 0 },
-  ],
-}
+const state = {}
 
 const mutations = {
 
-  ADD_NEW_SAMPLE(state, sample) {
-
-    // Copy old samples to new array
-    let samples = [...state.samplePlate];
-
-    // Push new sample to stack
-    samples.push(sample);
-
-    // Set new samples as variable
-    Vue.set(state, 'samplePlate', samples)
+  LOAD_EXPERIMENTS(state, experiments) {
+    Vue.set(state, 'loadedExperiments', experiments)
   },
 
-  PATIENTS_UPDATE_MSG(state, patientUpdateMessage) {
+  LOAD_NEXT_EXPERIMENTS(state, nextUrl) {
+    Vue.set(state, 'next', nextUrl)
+  },
 
-    // Set message
-    Vue.set(state, 'patientMessage', patientUpdateMessage)
-  }
+  LOAD_PREV_EXPERIMENTS(state, prevUrl) {
+    Vue.set(state, 'prev', prevUrl)
+  },
+
+  SELECT_EXPERIMENT(state, experiment) {
+    Vue.set(state, 'currentExperiment', experiment)
+  },
+
+  // ADD_NEW_SAMPLE(state, sample) {
+  //   // Copy old samples to new array
+  //   let samples = [...state.samplePlate];
+
+  //   // Push new sample to stack
+  //   samples.push(sample);
+
+  //   // Set new samples as variable
+  //   Vue.set(state, 'samplePlate', samples)
+  // },
 }
 
 const actions = {
-  pushNewSample({ commit }, sample) {
-    commit('ADD_NEW_SAMPLE', sample)
+  // pushNewSample({ commit }, sample) {
+  //   commit('ADD_NEW_SAMPLE', sample)
+  // },
+
+  // saveSamplePlate({ commit, getters }) {
+  //   Axios.post('api/v1/patients', getters.samplePlate).then((res) => {
+  //     commit('PATIENTS_UPDATE_MSG', res.data.msg)
+  //   })
+  // },
+
+  selectExperiment({ commit }, experiment) {
+    commit('SELECT_EXPERIMENT', experiment);
+},
+
+  addNewExperiment({ commit }, newExperiment) {
+    Axios.post('api/v1/experiments', newExperiment).then(
+      res => {
+        commit('SELECT_EXPERIMENT', res.data.experiment)
+      }
+    )
   },
 
-  saveSamplePlate({ commit, getters }) {
-    Axios.post('api/v1/patients', getters.samplePlate).then((res) => {
-      commit('PATIENTS_UPDATE_MSG', res.data.msg)
+  loadOldExperiments({ commit }) {
+    Axios.get('api/v1/experiments', {
+    }).then(res => {
+      if (res.data.results.length > 0) {
+        commit('LOAD_EXPERIMENTS', res.data.results);
+        commit('LOAD_NEXT_EXPERIMENTS', res.data.next);
+        commit('LOAD_PREV_EXPERIMENTS', res.data.prev);
+      }
     })
-  }
+  },
 }
 
 
@@ -64,16 +75,8 @@ const getters = {
     return state.samplePlate || []
   },
 
-  priorityOptions(state) {
-    return state.priorityOptions
-  },
-
-  stepOptions(state) {
-    return state.stepOptions
-  },
-
-  sexOptions(state) {
-    return state.sexOptions
+  loadedExperiments(state) {
+    return state.loadedExperiments
   }
 }
 
