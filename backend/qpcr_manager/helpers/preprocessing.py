@@ -823,7 +823,7 @@ def sample_table(experiment_id):
 
     # Build query
     query = f"""
-    SELECT samples.id, sample, marker, amp_status AS amp, amp_cq AS cq, score, results.id AS result_id FROM experiments
+    SELECT samples.id, sample, marker, amp_status AS amp, amp_cq AS cq, results.id AS result_id FROM experiments
     JOIN samples on samples.experiment_id = experiments.id
     JOIN results on results.sample_id= samples.id
     JOIN markers on results.marker_id= markers.id

@@ -10,7 +10,7 @@ class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sample = db.Column(db.String, nullable=False)
     tmpl_well = db.Column(db.String)
-    priority_level = db.Column(db.Integer, nullable=False)
+    priority_level = db.Column(db.Integer, default=1)
     collection_date = db.Column(db.Date)
     description = db.Column(db.Text)
 

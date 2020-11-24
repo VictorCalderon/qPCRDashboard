@@ -28,7 +28,7 @@ Vue.use(BootstrapVue)
 import axios from 'axios'
 
 // Set basic URL
-axios.defaults.baseURL = 'http://10.0.0.170:5000/'
+axios.defaults.baseURL = 'http://localhost:5000/'
 axios.defaults.headers['Content-Type'] = 'application/json'
 
 // Set token interceptor
